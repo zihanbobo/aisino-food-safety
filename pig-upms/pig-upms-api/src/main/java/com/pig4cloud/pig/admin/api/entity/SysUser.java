@@ -153,5 +153,13 @@ public class SysUser implements Serializable {
    * 真实姓名
    */
   private String realName;
+  /**
+   * 用户区划号
+   **/
+  private String areaCode;
+  /**
+   * 用户级别（1全国2省3市4区/县）
+   **/
+  private String userLevel;
 
 }

@@ -618,5 +618,21 @@ public class UserController {
     UserVO userVo = userService.getUserVoById(userId);
     return new R<>(userVo);
   }
+  
+  /**
+   * 监管端获取当前用户全部信息
+   *
+   * @return 用户信息
+   */
+  @GetMapping(value = {"/getUserInfo"})
+  public R getUserInfo() {
+    String username = SecurityUtils.getUser().getUsername();
+    SysUser user = userService.getOne(Wrappers.<SysUser>query()
+      .lambda().eq(SysUser::getUsername, username));
+    if (user == null) {
+      return new R<>(Boolean.FALSE, "获取当前用户信息失败");
+    }
+    return new R<>(userService.getUserInfo2(user));
+  }
 
 }

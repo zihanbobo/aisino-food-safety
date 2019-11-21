@@ -117,6 +117,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		userInfo.setPermissions(ArrayUtil.toArray(permissions, String.class));
 		return userInfo;
 	}
+  
+  /**
+   * 监管端通过查用户的全部信息
+   *
+   * @param sysUser 用户
+   * @return
+   */
+  @Override
+  public UserInfo getUserInfo2(SysUser sysUser) {
+    UserInfo userInfo = new UserInfo();
+    userInfo.setSysUser(sysUser);
+    //设置角色列表  （ID）
+    List<String> roleCodes = sysRoleService.listRolesByUserId(sysUser.getUserId())
+      .stream()
+      .map(SysRole::getRoleCode)
+      .collect(Collectors.toList());
+    userInfo.setRoleCodes(ArrayUtil.toArray(roleCodes, String.class));
+    
+    //设置权限列表（menu.permission）
+//    Set<String> permissions = new HashSet<>();
+//    roleIds.forEach(roleId -> {
+//      List<String> permissionList = sysMenuService.getMenuByRoleId(roleId)
+//        .stream()
+//        .filter(menuVo -> StringUtils.isNotEmpty(menuVo.getPermission()))
+//        .map(MenuVO::getPermission)
+//        .collect(Collectors.toList());
+//      permissions.addAll(permissionList);
+//    });
+//    userInfo.setPermissions(ArrayUtil.toArray(permissions, String.class));
+    return userInfo;
+  }
 
 	/**
 	 * 分页查询用户信息（含有角色信息）

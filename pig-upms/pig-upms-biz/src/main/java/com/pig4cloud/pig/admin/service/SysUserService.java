@@ -39,6 +39,14 @@ public interface SysUserService extends IService<SysUser> {
 	 * @return userInfo
 	 */
 	UserInfo getUserInfo(SysUser sysUser);
+  
+  /**
+   * 监管端查询用户信息
+   *
+   * @param sysUser 用户
+   * @return userInfo
+   */
+  UserInfo getUserInfo2(SysUser sysUser);
 
 	/**
 	 * 分页查询用户信息（含有角色信息）
