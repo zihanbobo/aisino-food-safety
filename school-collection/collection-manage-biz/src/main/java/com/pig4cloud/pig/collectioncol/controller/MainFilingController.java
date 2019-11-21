@@ -1,6 +1,7 @@
 package com.pig4cloud.pig.collectioncol.controller;
 
 import cn.hutool.extra.qrcode.QrCodeUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.feign.RemoteUserService;
@@ -8,6 +9,7 @@ import com.pig4cloud.pig.admin.api.vo.SysUserVO;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
 import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.core.util.BASE64DecodedMultipartFile;
+import com.pig4cloud.pig.common.core.util.OCRDemo;
 import com.pig4cloud.pig.common.core.util.OSSUtil;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.portal.api.entity.PublicUser;
@@ -193,5 +195,34 @@ public class MainFilingController {
     //R dictByTypeW = remoteUserService.getDictByTypeW(dicType, SecurityConstants.FROM_IN);
     return new R<>(r);
   }
+
+  /**
+   * ocr营业执照图片识别(参数为base64编码的营业执照)
+   * @param imgUrl
+   * @return
+   * @throws IOException
+   */
+  @PostMapping("/uploadOCR")
+  public Map<String,Object> uploadOCR(@RequestBody String imgUrl) throws IOException {
+    //传过来的图片解析base64
+    MultipartFile multipartFile = BASE64DecodedMultipartFile.base64ToMultipart(imgUrl);
+    //上传到阿里云返回路径
+    String upload = OSSUtil.upload(multipartFile, OSSUtil.FileDirType.ZHANGHAN_TEST);
+    //JSONObject jsonObject = JSONObject.parseObject(upload);
+    //String r = jsonObject.getString("imgUrl");
+    String ocrJson = OCRDemo.OCRIdentification(upload);
+    Map map = new HashMap();
+    map.put("OCRJson",ocrJson);
+    if(!StringUtils.isEmpty(ocrJson)){
+      map.put("code",0);
+      map.put("status","解析成功");
+    }else {
+      map.put("code",1);
+      map.put("status","解析失败");
+    }
+    return map;
+  }
+
+
 
 }
