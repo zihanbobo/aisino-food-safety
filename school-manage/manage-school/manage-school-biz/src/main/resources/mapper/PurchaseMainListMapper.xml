@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.PurchaseMainListMapper">
+
+  <resultMap id="purchaseMainListMap" type="com.pig4cloud.pig.school.api.vo.recipe.PurchaseMainListVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="purName" column="pur_name"/>
+                        <result property="purTime" column="pur_time"/>
+                        <result property="purMoney" column="pur_money"/>
+                        <result property="useTime" column="use_time"/>
+                        <result property="purPerson" column="pur_person"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="claimTicket" column="claim_ticket"/>
+                        <result property="listPhoto" column="list_photo"/>
+                        <result property="purStatus" column="pur_status"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="realName" column="realName"/>
+                        <result property="supplyContact" column="supply_contact"/>
+                        <result property="supplyTel" column="supply_tel"/>
+                        <result property="acceptor" column="acceptor"/>
+            <collection property="ingredientsFilingList" ofType="com.pig4cloud.pig.school.api.entity.recipe.IngredientsFiling"
+                        select="com.pig4cloud.pig.school.mapper.IngredientsFilingMapper.ingredientBySourceId" column="id">
+            </collection>
+            <collection property="purchaseFoodList" ofType="com.pig4cloud.pig.school.api.vo.recipe.PurchaseFilingVO"
+                        select="com.pig4cloud.pig.school.mapper.PurchaseMainListMapper.purchaseFoodList" column="id">
+            </collection>
+            </resultMap>
+
+
+
+  <!--根据采购id查询食材-->
+  <select id="purchaseFoodList" resultMap="purchaseFoodList">
+    select a.pur_id as purId,
+    a.filing_id as filingId,
+    b.foodName as foodName,
+    a.check_file as checkFile,
+    a.is_qualified as isQualified,
+    a.weight as weight,
+    a.unit_price as unitPrice,
+    a.reality_weight as realityWeight,
+		a.food_channel as foodChannel,
+		a.is_del as isDel,
+		a.shelf_life as shelfLife
+    from pur_purchase_filing a
+    left join view_sup_ingredients_filing b on b.id = a.filing_id
+    where 1=1 and a.pur_id = #{id}
+  </select>
+  <resultMap id="purchaseFoodList" type="com.pig4cloud.pig.school.api.vo.recipe.PurchaseFilingVO">
+    <result property="purId" column="purId"/>
+    <result property="id" column="purId"/>
+    <result property="filingId" column="filingId"/>
+    <result property="foodName" column="foodName"/>
+    <result property="checkFile" column="checkFile"/>
+    <result property="isQualified" column="isQualified"/>
+    <result property="weight" column="weight"/>
+    <result property="unitPrice" column="unitPrice"/>
+    <result property="realityWeight" column="realityWeight"/>
+    <result property="foodChannel" column="foodChannel"/>
+    <result property="isDel" column="isDel"/>
+    <result property="shelfLife" column="shelfLife"/>
+    <collection property="mainFilingList" ofType="HashMap"
+                select="com.pig4cloud.pig.school.mapper.MainFilingMapper.listMainsByFoodId" column="filingId">
+    </collection>
+  </resultMap>
+
+
+
+  <!--purchaseMainList简单分页查询-->
+  <select id="getPurchaseMainListPage" resultMap="purchaseMainListMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.pur_name,
+    a.pur_time,
+    a.pur_money,
+    a.use_time,
+    a.pur_person,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    a.claim_ticket,
+    a.list_photo,
+    a.pur_status,
+    b.sch_name as schoolName,
+    c.real_name as realName,
+    a.supply_contact,
+    a.supply_tel,
+    a.acceptor
+    FROM pur_purchase_main a
+    left join se_school b on b.id = a.school_id
+    left join sys_user c on c.user_id = a.pur_person
+    <where>
+      1=1 and a.del_flag='0'
+              <if test="purchaseMainList.id != null and purchaseMainList.id.trim() != ''">
+          AND a.id = #{purchaseMainList.id}
+        </if>
+              <if test="purchaseMainList.schoolId != null">
+          AND a.school_id = #{purchaseMainList.schoolId}
+        </if>
+              <if test="purchaseMainList.purName != null and purchaseMainList.purName.trim() != ''">
+          AND a.pur_name = #{purchaseMainList.purName}
+        </if>
+              <if test="purchaseMainList.purTime != null and purchaseMainList.purTime.trim() != ''">
+          AND a.pur_time = #{purchaseMainList.purTime}
+        </if>
+              <if test="purchaseMainList.purMoney != null and purchaseMainList.purMoney.trim() != ''">
+          AND a.pur_money = #{purchaseMainList.purMoney}
+        </if>
+              <if test="purchaseMainList.useTime != null and purchaseMainList.useTime.trim() != ''">
+          AND a.use_time = #{purchaseMainList.useTime}
+        </if>
+              <if test="purchaseMainList.purPerson != null and purchaseMainList.purPerson.trim() != ''">
+          AND a.pur_person = #{purchaseMainList.purPerson}
+        </if>
+              <if test="purchaseMainList.remarks != null and purchaseMainList.remarks.trim() != ''">
+          AND a.remarks = #{purchaseMainList.remarks}
+        </if>
+              <if test="purchaseMainList.createTime != null and purchaseMainList.createTime.trim() != ''">
+          AND a.create_time = #{purchaseMainList.createTime}
+        </if>
+              <if test="purchaseMainList.updateTime != null and purchaseMainList.updateTime.trim() != ''">
+          AND a.update_time = #{purchaseMainList.updateTime}
+        </if>
+              <if test="purchaseMainList.delFlag != null and purchaseMainList.delFlag.trim() != ''">
+          AND a.del_flag = #{purchaseMainList.delFlag}
+        </if>
+      <if test="purchaseMainList.claimTicket != null and purchaseMainList.claimTicket.trim() != ''">
+        AND a.claim_ticket = #{purchaseMainList.claimTicket}
+      </if>
+      <if test="purchaseMainList.listPhoto != null and purchaseMainList.listPhoto.trim() != ''">
+        AND a.list_photo = #{purchaseMainList.listPhoto}
+      </if>
+      <if test="purchaseMainList.purStatus != null and purchaseMainList.purStatus.trim() != ''">
+        AND a.pur_status = #{purchaseMainList.purStatus}
+      </if>
+      <if test="purchaseMainList.supplyContact != null and purchaseMainList.supplyContact.trim() != ''">
+        AND a.supply_contact = #{purchaseMainList.supplyContact}
+      </if>
+      <if test="purchaseMainList.supplyTel != null and purchaseMainList.supplyTel.trim() != ''">
+        AND a.supply_tel = #{purchaseMainList.supplyTel}
+      </if>
+      <if test="purchaseMainList.acceptor != null and purchaseMainList.acceptor.trim() != ''">
+        AND a.acceptor = #{purchaseMainList.acceptor}
+      </if>
+          </where>
+          order by a.pur_time desc
+  </select>
+
+
+
+
+  <resultMap id="ingredientsFilingMap" type="com.pig4cloud.pig.school.api.vo.recipe.IngredientsFilingVO">
+    <id property="id" column="id"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="foodId" column="food_id"/>
+    <result property="foodType" column="food_type"/>
+    <result property="remarks" column="remarks"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+    <!--自定义返回信息-->
+    <result property="schoolName" column="schoolName"/>
+    <result property="foodName" column="foodName"/>
+    <collection property="mainFilingList" ofType="HashMap"
+                select="com.pig4cloud.pig.school.mapper.MainFilingMapper.listMainsByFoodId" column="id">
+    </collection>
+  </resultMap>
+
+
+
+  <!--校园端,根据每日食谱id查询食材-->
+  <select id="getFoodByDay" resultMap="ingredientsFilingMap">
+   /* select a.id as id,a.foodName as foodName,a.food_pic as foodPic
+    from view_sup_ingredients_filing a
+    where 1=1 and a.del_flag = '0' and a.id in(
+    select DISTINCT(d.food_id) from re_daily a
+      left join re_daily_source b on b.daily_id = a.id
+      left join re_source c on c.id = b.source_id
+      left join re_source_food d on d.source_id = c.id*/
+    select
+    a.id as id,
+    a.school_id as school_id,
+    a.food_id as food_id,
+    a.remarks as remarks,
+    a.create_time as create_time,
+    a.update_time as update_time,
+    a.del_flag as del_flag,
+    b.sch_name as schoolName,
+    a.foodName as foodName
+    from view_sup_ingredients_filing a
+    left join se_school b on b.id = a.school_id
+    where 1=1 and a.del_flag = '0' and a.id in(
+    select DISTINCT(d.food_id) from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    left join re_source_food d on d.source_id = c.id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+        <if test="map.rdDate != null">
+          and DATE_FORMAT(a.rd_date, '%Y-%m-%d') = #{map.rdDate}
+        </if>
+      </where>
+    )
+  </select>
+</mapper>

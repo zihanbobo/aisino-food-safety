@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.FoodAdditiveMapper">
+
+  <resultMap id="foodAdditiveMap" type="com.pig4cloud.pig.school.api.vo.account.FoodAdditiveVO">
+                  <id property="id" column="id"/>
+                        <result property="faName" column="fa_name"/>
+                        <result property="faUse" column="fa_use"/>
+                        <result property="faUsage" column="fa_usage"/>
+                        <result property="faTime" column="fa_time"/>
+                        <result property="faHcn" column="fa_hcn"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="schoolName" column="schoolName"/>
+            </resultMap>
+
+  <!--foodAdditive简单分页查询-->
+  <select id="getFoodAdditivePage" resultMap="foodAdditiveMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.fa_name,
+    a.fa_use,
+    a.fa_usage,
+    a.fa_time,
+    a.fa_hcn,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName
+              FROM sl_food_additive a
+    left join se_school b on b.id = a.school_id
+    <where>
+              <if test="foodAdditive.id != null and foodAdditive.id.trim() != ''">
+          AND a.id = #{foodAdditive.id}
+        </if>
+      <if test="foodAdditive.schoolId != null">
+        AND a.school_id = #{foodAdditive.schoolId}
+      </if>
+              <if test="foodAdditive.faName != null and foodAdditive.faName.trim() != ''">
+		  AND a.fa_name like concat('%',#{foodAdditive.faName},'%')
+        </if>
+              <if test="foodAdditive.faUse != null and foodAdditive.faUse.trim() != ''">
+          AND a.fa_use = #{foodAdditive.faUse}
+        </if>
+              <if test="foodAdditive.faUsage != null and foodAdditive.faUsage.trim() != ''">
+          AND a.fa_usage = #{foodAdditive.faUsage}
+        </if>
+              <if test="foodAdditive.faTime != null and foodAdditive.faTime.trim() != ''">
+		  AND DATE_FORMAT(a.fa_time,'%Y-%m-%d') = #{foodAdditive.faTime}
+        </if>
+              <if test="foodAdditive.faHcn != null and foodAdditive.faHcn.trim() != ''">
+          AND a.fa_hcn = #{foodAdditive.faHcn}
+        </if>
+              <if test="foodAdditive.remarks != null and foodAdditive.remarks.trim() != ''">
+          AND a.remarks = #{foodAdditive.remarks}
+        </if>
+              <if test="foodAdditive.createTime != null and foodAdditive.createTime.trim() != ''">
+          AND a.create_time = #{foodAdditive.createTime}
+        </if>
+              <if test="foodAdditive.updateTime != null and foodAdditive.updateTime.trim() != ''">
+          AND a.update_time = #{foodAdditive.updateTime}
+        </if>
+              <if test="foodAdditive.delFlag != null and foodAdditive.delFlag.trim() != ''">
+          AND a.del_flag = #{foodAdditive.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

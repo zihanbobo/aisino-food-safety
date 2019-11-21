@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.PurchaseFilingMapper">
+
+  <resultMap id="purchaseFilingMap" type="com.pig4cloud.pig.school.api.entity.recipe.PurchaseFiling">
+                  <id property="purId" column="pur_id"/>
+                        <result property="filingId" column="filing_id"/>
+                        <result property="checkFile" column="check_file"/>
+                        <result property="isQualified" column="is_qualified"/>
+                        <result property="weight" column="weight"/>
+                        <result property="unitPrice" column="unit_price"/>
+                        <result property="realityWeight" column="reality_weight"/>
+                        <result property="foodChannel" column="food_channel"/>
+                        <result property="isDel" column="is_del"/>
+                        <result property="shelfLife" column="shelf_life"/>
+            </resultMap>
+
+  <!--purchaseFiling简单分页查询-->
+  <select id="getPurchaseFilingPage" resultMap="purchaseFilingMap">
+              SELECT
+                  pur_id,
+                  filing_id,
+                  check_file,
+                  is_qualified,
+                  weight,
+                  unit_price,
+                  reality_weight,
+                  food_channel,
+                  is_del,
+                  shelf_life
+              FROM pur_purchase_filing
+    <where>
+              <if test="purchaseFiling.purId != null and purchaseFiling.purId.trim() != ''">
+          AND pur_id = #{purchaseFiling.purId}
+        </if>
+              <if test="purchaseFiling.filingId != null and purchaseFiling.filingId.trim() != ''">
+          AND filing_id = #{purchaseFiling.filingId}
+        </if>
+              <if test="purchaseFiling.checkFile != null and purchaseFiling.checkFile.trim() != ''">
+          AND check_file = #{purchaseFiling.checkFile}
+        </if>
+              <if test="purchaseFiling.isQualified != null and purchaseFiling.isQualified.trim() != ''">
+          AND is_qualified = #{purchaseFiling.isQualified}
+        </if>
+              <if test="purchaseFiling.weight != null and purchaseFiling.weight.trim() != ''">
+          AND weight = #{purchaseFiling.weight}
+        </if>
+              <if test="purchaseFiling.unitPrice != null and purchaseFiling.unitPrice.trim() != ''">
+          AND unit_price = #{purchaseFiling.unitPrice}
+        </if>
+      <if test="purchaseFiling.shelfLife != null and purchaseFiling.shelfLife.trim() != ''">
+        AND shelf_life = #{purchaseFiling.shelfLife}
+      </if>
+    </where>
+  </select>
+
+
+
+</mapper>

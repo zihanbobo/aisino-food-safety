@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.EquipmentMapper">
+
+  <resultMap id="equipmentMap" type="com.pig4cloud.pig.portal.api.vo.live.EquipmentVO">
+    <id property="id" column="id"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="eqId" column="eq_id"/>
+    <result property="eqName" column="eq_name"/>
+    <result property="eqCode" column="eq_code"/>
+    <result property="eqModal" column="eq_modal"/>
+    <result property="eqBrand" column="eq_brand"/>
+    <result property="eqIp" column="eq_ip"/>
+    <result property="eqPort" column="eq_port"/>
+    <result property="eqBit" column="eq_bit"/>
+    <result property="eqArea" column="eq_area"/>
+    <result property="restaurantName" column="restaurant_name"/>
+    <result property="eqStatus" column="eq_status"/>
+    <result property="eqAdmin" column="eq_admin"/>
+    <result property="eqPassword" column="eq_password"/>
+    <result property="eqUrl" column="eq_url"/>
+    <result property="createById" column="create_by_id"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateById" column="update_by_id"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+    <result property="username" column="username"/>
+    <result property="schoolname" column="schoolname"/>
+  </resultMap>
+
+  <!--equipment简单分页查询-->
+  <select id="getEquipmentPage" resultMap="equipmentMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.eq_id,
+    a.eq_name,
+    a.eq_code,
+    a.eq_modal,
+    a.eq_brand,
+    a.eq_ip,
+    a.eq_port,
+    a.eq_bit,
+    a.eq_area,
+    a.restaurant_name,
+    a.eq_status,
+    a.eq_admin,
+    a.eq_password,
+    a.eq_url,
+    a.create_by_id,
+    a.create_time,
+    a.update_by_id,
+    a.update_time,
+    a.del_flag,
+    b.username as username,
+    c.sch_name as schoolname
+    FROM vd_equipment a
+    left join sys_user b on a.create_by_id = b.user_id
+    left join se_school c on c.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="equipment.id != null">
+        AND id = #{equipment.id}
+      </if>
+      <if test="equipment.schoolId != null">
+        AND school_id = #{equipment.schoolId}
+      </if>
+      <if test="equipment.eqId != null">
+        AND eq_id = #{equipment.eqId}
+      </if>
+      <if test="equipment.eqName != null and equipment.eqName.trim() != ''">
+        AND eq_name = #{equipment.eqName}
+      </if>
+      <if test="equipment.eqCode != null and equipment.eqCode.trim() != ''">
+        AND eq_code = #{equipment.eqCode}
+      </if>
+      <if test="equipment.eqModal != null and equipment.eqModal.trim() != ''">
+        AND eq_modal = #{equipment.eqModal}
+      </if>
+      <if test="equipment.eqBrand != null and equipment.eqBrand.trim() != ''">
+        AND eq_brand = #{equipment.eqBrand}
+      </if>
+      <if test="equipment.eqIp != null and equipment.eqIp.trim() != ''">
+        AND eq_ip = #{equipment.eqIp}
+      </if>
+      <if test="equipment.eqPort != null and equipment.eqPort.trim() != ''">
+        AND eq_port = #{equipment.eqPort}
+      </if>
+      <if test="equipment.eqBit != null and equipment.eqBit.trim() != ''">
+        AND eq_bit = #{equipment.eqBit}
+      </if>
+      <if test="equipment.eqArea != null and equipment.eqArea.trim() != ''">
+        AND eq_area = #{equipment.eqArea}
+      </if>
+      <if test="equipment.restaurantName != null and equipment.restaurantName.trim() != ''">
+        AND restaurant_name = #{equipment.restaurantName}
+      </if>
+      <if test="equipment.eqStatus != null and equipment.eqStatus.trim() != ''">
+        AND eq_status = #{equipment.eqStatus}
+      </if>
+      <if test="equipment.eqAdmin != null and equipment.eqAdmin.trim() != ''">
+        AND eq_admin = #{equipment.eqAdmin}
+      </if>
+      <if test="equipment.eqPassword != null and equipment.eqPassword.trim() != ''">
+        AND eq_password = #{equipment.eqPassword}
+      </if>
+      <if test="equipment.createById != null and equipment.createById.trim() != ''">
+        AND create_by_id = #{equipment.createById}
+      </if>
+      <if test="equipment.createTime != null and equipment.createTime.trim() != ''">
+        AND create_time = #{equipment.createTime}
+      </if>
+      <if test="equipment.updateById != null and equipment.updateById.trim() != ''">
+        AND update_by_id = #{equipment.updateById}
+      </if>
+      <if test="equipment.updateTime != null and equipment.updateTime.trim() != ''">
+        AND update_time = #{equipment.updateTime}
+      </if>
+      <if test="equipment.delFlag != null and equipment.delFlag.trim() != ''">
+        AND del_flag = #{equipment.delFlag}
+      </if>
+    </where>
+  </select>
+
+
+
+</mapper>

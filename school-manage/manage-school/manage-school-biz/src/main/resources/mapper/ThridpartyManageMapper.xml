@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.ThridpartyManageMapper">
+
+  <resultMap id="thridpartyManageMap" type="com.pig4cloud.pig.school.api.entity.selseal.ThridpartyManage">
+                  <id property="id" column="id"/>
+                        <result property="thridName" column="thrid_name"/>
+                        <result property="thridPic" column="thrid_pic"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--thridpartyManage简单分页查询-->
+  <select id="getThridpartyManagePage" resultMap="thridpartyManageMap">
+    SELECT
+                  id,
+                        thrid_name,
+                        thrid_pic,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM se_thridparty_manage
+    <where>
+              <if test="thridpartyManage.id != null and thridpartyManage.id.trim() != ''">
+          AND id = #{thridpartyManage.id}
+        </if>
+              <if test="thridpartyManage.thridName != null and thridpartyManage.thridName.trim() != ''">
+--           AND thrid_name = #{thridpartyManage.thridName}
+		  AND thrid_name LIKE CONCAT('%',#{thridpartyManage.thridName},'%')
+        </if>
+              <if test="thridpartyManage.thridPic != null and thridpartyManage.thridPic.trim() != ''">
+          AND thrid_pic = #{thridpartyManage.thridPic}
+        </if>
+              <if test="thridpartyManage.remarks != null and thridpartyManage.remarks.trim() != ''">
+          AND remarks = #{thridpartyManage.remarks}
+        </if>
+              <if test="thridpartyManage.createTime != null and thridpartyManage.createTime.trim() != ''">
+          AND create_time = #{thridpartyManage.createTime}
+        </if>
+              <if test="thridpartyManage.updateTime != null and thridpartyManage.updateTime.trim() != ''">
+          AND update_time = #{thridpartyManage.updateTime}
+        </if>
+              <if test="thridpartyManage.delFlag != null and thridpartyManage.delFlag.trim() != ''">
+          AND del_flag = #{thridpartyManage.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

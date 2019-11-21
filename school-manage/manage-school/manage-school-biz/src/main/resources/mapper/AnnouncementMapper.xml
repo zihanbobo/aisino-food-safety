@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.AnnouncementMapper">
+
+  <resultMap id="announcementMap" type="com.pig4cloud.pig.school.api.vo.message.AnnouncementVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="file" column="file"/>
+                        <result property="title" column="title"/>
+                        <result property="content" column="content"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="viewTime" column="view_time"/>
+                        <result property="status" column="status"/>
+                        <result property="type" column="type"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="realName" column="real_name"/>
+                        <result property="supStatus" column="sup_status"/>
+                        <result property="schName" column="sch_name"/>
+  </resultMap>
+
+  <!--announcement简单分页查询-->
+  <select id="getAnnouncementPage" resultMap="announcementMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.file,
+    a.title,
+    a.content,
+    a.start_time,
+    a.view_time,
+    a.status,
+    a.type,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    a.user_id,
+    b.real_name,
+    a.sup_status,
+    c.sch_name
+    FROM
+    msg_announcement a
+    LEFT JOIN sys_user b ON a.user_id = b.user_id
+    LEFT JOIN se_school c on a.school_id = c.id
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="announcement.id != null and announcement.id.trim() != ''">
+          AND a.id = #{announcement.id}
+        </if>
+              <if test="announcement.schoolId != null">
+          AND a.school_id = #{announcement.schoolId}
+        </if>
+              <if test="announcement.file != null and announcement.file.trim() != ''">
+          AND a.file = #{announcement.file}
+        </if>
+              <if test="announcement.title != null and announcement.title.trim() != ''">
+          AND a.title = #{announcement.title}
+        </if>
+              <if test="announcement.content != null and announcement.content.trim() != ''">
+          AND a.content = #{announcement.content}
+        </if>
+              <if test="announcement.startTime != null and announcement.startTime.trim() != ''">
+          AND a.start_time = #{announcement.startTime}
+        </if>
+              <if test="announcement.viewTime != null and announcement.viewTime.trim() != ''">
+          AND a.view_time = #{announcement.viewTime}
+        </if>
+              <if test="announcement.status != null and announcement.status.trim() != ''">
+          AND a.status = #{announcement.status}
+        </if>
+              <if test="announcement.type != null and announcement.type.trim() != ''">
+          AND a.type = #{announcement.type}
+        </if>
+          <if test="announcement.createTime != null and announcement.createTime.trim() != ''">
+          AND a.create_time = #{announcement.createTime}
+        </if>
+          <if test="announcement.updateTime != null and announcement.updateTime.trim() != ''">
+        AND a.update_time = #{announcement.updateTime}
+        </if>
+          <if test="announcement.delFlag != null and announcement.delFlag.trim() != ''">
+          AND a.del_flag = #{announcement.delFlag}
+        </if>
+           <if test="announcement.userId != null">
+          AND a.user_id = #{announcement.userId}
+         </if>
+           <if test="announcement.supStatus != null and announcement.supStatus.trim() != ''">
+          AND a.sup_status = #{announcement.supStatus}
+        </if>
+          </where>
+    ORDER BY a.create_time DESC
+  </select>
+
+
+
+</mapper>

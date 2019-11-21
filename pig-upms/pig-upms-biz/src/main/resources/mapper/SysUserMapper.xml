@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright (c) 2019-2020, 冷冷 (wangiegie@gmail.com).
+  ~  <p>
+  ~  Licensed under the GNU Lesser General Public License 3.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~  <p>
+  ~ https://www.gnu.org/licenses/lgpl.html
+  ~  <p>
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pig4cloud.pig.admin.mapper.SysUserMapper">
+	<!-- 通用查询映射结果 -->
+	<resultMap id="baseResultMap" type="com.pig4cloud.pig.admin.api.vo.UserVO">
+		<id column="user_id" property="userId"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="salt" property="salt"/>
+		<result column="phone" property="phone"/>
+		<result column="avatar" property="avatar"/>
+		<result column="wx_openid" property="wxOpenid"/>
+		<result column="qq_openid" property="qqOpenid"/>
+		<result column="ucreate_time" property="createTime"/>
+		<result column="uupdate_time" property="updateTime"/>
+		<result column="lock_flag" property="lockFlag"/>
+		<result column="udel_flag" property="delFlag"/>
+		<result column="deptId" property="deptId"/>
+		<result column="deptName" property="deptName"/>
+		<!--新增字段-->
+		<result column="union_id" property="unionId"/>
+		<result column="user_type" property="userType"/>
+		<result column="is_admin" property="isAdmin"/>
+		<result column="position" property="position"/>
+		<result column="health_number" property="healthNumber"/>
+		<result column="morning_check" property="morningCheck"/>
+    <!--9.5新增字段-->
+    <result column="identity_pic" property="identityPic"/>
+    <result column="identity_number" property="identityNumber"/>
+    <result column="health_pic" property="healthPic"/>
+    <result column="health_starttime" property="healthStarttime"/>
+    <result column="health_endtime" property="healthEndtime"/>
+    <result column="medical_address" property="medicalAddress"/>
+    <result column="real_name" property="realName"/>
+
+    <result column="schoolName" property="schoolName"/>
+
+    <result column="label" property="label"/>
+
+		<collection property="roleList" ofType="com.pig4cloud.pig.admin.api.entity.SysRole"
+					select="com.pig4cloud.pig.admin.mapper.SysRoleMapper.listRolesByUserId" column="user_id">
+		</collection>
+	</resultMap>
+
+	<!-- userVo结果集 -->
+	<resultMap id="userVoResultMap" type="com.pig4cloud.pig.admin.api.vo.UserVO">
+		<id column="user_id" property="userId"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="salt" property="salt"/>
+		<result column="phone" property="phone"/>
+		<result column="avatar" property="avatar"/>
+		<result column="wx_openid" property="wxOpenid"/>
+		<result column="qq_openid" property="qqOpenid"/>
+		<result column="ucreate_time" property="createTime"/>
+		<result column="uupdate_time" property="updateTime"/>
+		<result column="lock_flag" property="lockFlag"/>
+		<result column="udel_flag" property="delFlag"/>
+		<result column="deptId" property="deptId"/>
+		<result column="deptName" property="deptName"/>
+		<!--新增字段-->
+		<result column="union_id" property="unionId"/>
+		<result column="user_type" property="userType"/>
+		<result column="is_admin" property="isAdmin"/>
+		<result column="position" property="position"/>
+		<result column="health_number" property="healthNumber"/>
+		<result column="morning_check" property="morningCheck"/>
+
+    <!--9.5新增字段-->
+    <result column="identity_pic" property="identityPic"/>
+    <result column="identity_number" property="identityNumber"/>
+    <result column="health_pic" property="healthPic"/>
+    <result column="health_starttime" property="healthStarttime"/>
+    <result column="health_endtime" property="healthEndtime"/>
+    <result column="medical_address" property="medicalAddress"/>
+    <result column="real_name" property="realName"/>
+
+    <result column="schoolName" property="schoolName"/>
+
+    <result column="label" property="label"/>
+
+		<collection property="roleList" ofType="com.pig4cloud.pig.admin.api.entity.SysRole">
+			<id column="role_id" property="roleId"/>
+			<result column="role_name" property="roleName"/>
+			<result column="role_code" property="roleCode"/>
+			<result column="role_desc" property="roleDesc"/>
+			<result column="rcreate_time" property="createTime"/>
+			<result column="rupdate_time" property="updateTime"/>
+		</collection>
+	</resultMap>
+
+	<sql id="userRoleSql">
+		`user`.user_id,
+		`user`.username,
+		`user`.`password`,
+		`user`.salt,
+		`user`.phone,
+		`user`.avatar,
+		`user`.wx_openid,
+		`user`.qq_openid,
+		`user`.dept_id,
+		`user`.union_id,
+		`user`.user_type,
+		`user`.is_admin,
+		`user`.position,
+		`user`.health_number,
+		`user`.morning_check,
+		`user`.identity_pic,
+		`user`.identity_number,
+		`user`.health_pic,
+		`user`.health_starttime,
+		`user`.health_endtime,
+		`user`.medical_address,
+		`user`.real_name,
+		`user`.create_time AS ucreate_time,
+		`user`.update_time AS uupdate_time,
+		`user`.del_flag AS udel_flag,
+		`user`.lock_flag AS lock_flag,
+		`user`.dept_id AS deptId,
+		r.role_id,
+		r.role_name,
+		r.role_code,
+		r.role_desc,
+		r.create_time AS rcreate_time,
+		r.update_time AS rupdate_time
+	</sql>
+
+	<sql id="userRoleDeptSql">
+		`user`.user_id,
+		`user`.username,
+		`user`.`password`,
+		`user`.salt,
+		`user`.phone,
+		`user`.avatar,
+		`user`.wx_openid,
+		`user`.qq_openid,
+		`user`.union_id,
+		`user`.user_type,
+		`user`.is_admin,
+		`user`.position,
+		`user`.health_number,
+		`user`.morning_check,
+		`user`.identity_pic,
+		`user`.identity_number,
+		`user`.health_pic,
+		`user`.health_starttime,
+		`user`.health_endtime,
+		`user`.medical_address,
+		`user`.real_name,
+		`user`.create_time AS ucreate_time,
+		`user`.update_time AS uupdate_time,
+		`user`.del_flag AS udel_flag,
+		`user`.lock_flag AS lock_flag,
+		r.role_id,
+		r.role_name,
+		r.role_code,
+		r.role_desc,
+		r.create_time AS rcreate_time,
+		r.update_time AS rupdate_time,
+		d.name AS deptName,
+		d.dept_id AS deptId
+    </sql>
+
+	<select id="getUserVoByUsername" resultMap="userVoResultMap">
+		SELECT
+		<include refid="userRoleSql"/>
+		FROM
+		sys_user AS `user`
+		LEFT JOIN sys_user_role AS ur ON ur.user_id = `user`.user_id
+		LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+		WHERE `user`.username = #{username}
+	</select>
+
+	<!--<select id="getUserVoById" resultMap="userVoResultMap">
+		SELECT
+		<include refid="userRoleDeptSql"/>
+		FROM
+		sys_user AS `user`
+		LEFT JOIN sys_user_role AS ur ON ur.user_id = `user`.user_id
+		LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+		LEFT JOIN sys_dept AS d ON d.dept_id = `user`.dept_id
+		WHERE
+		`user`.user_id = #{id}
+	</select>-->
+
+  <select id="getUserVoById" resultMap="userVoResultMap">
+    SELECT
+		`user`.user_id,
+		`user`.username,
+		`user`.`password`,
+		`user`.salt,
+		`user`.phone,
+		`user`.avatar,
+		`user`.wx_openid,
+		`user`.qq_openid,
+		`user`.union_id,
+		`user`.user_type,
+		`user`.is_admin,
+		`user`.position,
+		`user`.health_number,
+		`user`.morning_check,
+		`user`.identity_pic,
+		`user`.identity_number,
+		`user`.health_pic,
+		`user`.health_starttime,
+		`user`.health_endtime,
+		`user`.medical_address,
+		`user`.real_name,
+		`user`.create_time AS ucreate_time,
+		`user`.update_time AS uupdate_time,
+		`user`.del_flag AS udel_flag,
+		`user`.lock_flag AS lock_flag,
+		r.role_id,
+		r.role_name,
+		r.role_code,
+		r.role_desc,
+		r.create_time AS rcreate_time,
+		r.update_time AS rupdate_time,
+		d.name AS deptName,
+		d.dept_id AS deptId,
+		c.sch_name as schoolName,
+    e.label as label
+		FROM
+		sys_user AS `user`
+		LEFT JOIN sys_user_role AS ur ON ur.user_id = `user`.user_id
+		LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+		LEFT JOIN sys_dept AS d ON d.dept_id = `user`.dept_id
+		left join se_school c on c.id = `user`.union_id
+		left join (select a.* from sys_dict a where 1=1 and a.del_flag = '0' and a.type='position')  e on e.value = `user`.position
+		WHERE
+    `user`.user_id = #{id}
+  </select>
+
+	<select id="getUserVosPage" resultMap="baseResultMap">
+    SELECT
+    a.user_id,
+    a.username,
+    a.`password`,
+    a.salt,
+    a.phone,
+    a.avatar,
+    a.wx_openid,
+    a.qq_openid,
+    a.dept_id,
+    a.union_id,
+    a.user_type,
+    a.is_admin,
+    a.position,
+    a.health_number,
+    a.morning_check,
+    a.identity_pic,
+    a.identity_number,
+    a.health_pic,
+    a.health_starttime,
+    a.health_endtime,
+    a.medical_address,
+    a.real_name,
+    a.create_time AS ucreate_time,
+    a.update_time AS uupdate_time,
+    a.del_flag AS udel_flag,
+    a.lock_flag AS lock_flag,
+    a.dept_id AS deptId,
+    d.name AS deptName,
+    c.sch_name as schoolName,
+    e.label as label
+    FROM
+    sys_user AS a
+    LEFT JOIN sys_dept AS d ON d.dept_id = a.dept_id
+    left join se_school c on c.id = a.union_id
+    left join (select a.* from sys_dict a where 1=1 and a.del_flag = '0' and a.type='position')  e on e.value = a.position
+		<where>
+		1=1 and a.del_flag = '0'
+			<if test="query.username != null and query.username != ''">
+				and a.username LIKE CONCAT('%',#{query.username},'%')
+			</if>
+			<if test="query.userType != null">
+				and a.user_type =#{query.userType}
+			</if>
+			<if test="query.unionId != null">
+				and a.union_id =#{query.unionId}
+			</if>
+			<if test="query.position != null">
+				and a.position =#{query.position}
+      </if>
+      <if test="query.isAdmin != null  and query.isAdmin != '' and query.isAdmin.trim() != '' and query.isAdmin == '0'.toString() ">
+        and (a.is_admin = "" or a.is_admin is null)
+      </if>
+      <if test="query.isAdmin != null and query.isAdmin != '' and query.isAdmin.trim() != '' and query.isAdmin == '1'.toString() ">
+				and a.is_admin =#{query.isAdmin}
+      </if>
+      <if test="query.notFindIsAdmin != null and query.notFindIsAdmin == '1'.toString() ">
+				and (a.is_admin is null or a.is_admin = '')
+      </if>
+
+      <if test="query.realName != null and query.realName.trim() != ''">
+        AND a.real_name like concat('%',#{query.realName},'%')
+      </if>
+     <!-- <if test="query.phone != null and query.phone != ''">
+        and a.phone =#{query.phone}
+      </if>-->
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+
+
+
+	<select id="getUserWithRolePageMarket" resultMap="baseResultMap">
+		SELECT
+		a.user_id,
+		a.username,
+		a.`password`,
+		a.salt,
+		a.phone,
+		a.avatar,
+		a.wx_openid,
+		a.qq_openid,
+		a.dept_id,
+		a.union_id,
+		a.user_type,
+		a.is_admin,
+		a.position,
+		a.health_number,
+		a.morning_check,
+    a.identity_pic,
+    a.identity_number,
+    a.health_pic,
+    a.health_starttime,
+    a.health_endtime,
+    a.medical_address,
+    a.real_name,
+		a.create_time AS ucreate_time,
+		a.update_time AS uupdate_time,
+		a.del_flag AS udel_flag,
+		a.lock_flag AS lock_flag,
+		a.dept_id AS deptId,
+		d.name AS deptName,
+		c.sch_name as schoolName
+    FROM
+    sys_user AS a
+    LEFT JOIN sys_dept AS d ON d.dept_id = a.dept_id
+    left join se_school c on c.id = a.union_id
+    left join sys_user_role e on e.user_id = a.user_id
+    left join sys_role f on f.role_id = e.role_id
+		<where>
+		1=1 and a.del_flag = '0'
+			<if test="query.username != null and query.username != ''">
+				and a.username LIKE CONCAT('%',#{query.username},'%')
+			</if>
+			<if test="query.userType != null">
+				and a.user_type =#{query.userType}
+			</if>
+			<if test="query.unionId != null">
+				and a.union_id =#{query.unionId}
+			</if>
+			<if test="query.position != null">
+				and a.position =#{query.position}
+      </if>
+      <if test="query.isAdmin != null  and query.isAdmin != '' and query.isAdmin.trim() != '' and query.isAdmin == '0'.toString() ">
+        and (a.is_admin = "" or a.is_admin is null)
+      </if>
+      <if test="query.isAdmin != null and query.isAdmin != '' and query.isAdmin.trim() != '' and query.isAdmin == '1'.toString() ">
+				and a.is_admin =#{query.isAdmin}
+      </if>
+      <if test="query.roleCode != null and query.roleCode != '' and query.roleCode.trim() != '' ">
+				and f.role_code =#{query.roleCode}
+      </if>
+
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+
+	<select id="homeLogin" resultMap="userVoResultMap">
+		SELECT
+		`user`.user_id,
+		`user`.username,
+		`user`.`password`,
+		`user`.salt,
+		`user`.phone,
+		`user`.avatar,
+		`user`.wx_openid,
+		`user`.qq_openid,
+		`user`.dept_id,
+		`user`.union_id,
+		`user`.user_type,
+		`user`.is_admin,
+		`user`.position,
+		`user`.health_number,
+		`user`.morning_check,
+    `user`.identity_pic,
+    `user`.identity_number,
+    `user`.health_pic,
+    `user`.health_starttime,
+    `user`.health_endtime,
+    `user`.medical_address,
+    `user`.identity_pic,
+    `user`.identity_number,
+    `user`.health_pic,
+    `user`.health_starttime,
+    `user`.health_endtime,
+    `user`.medical_address,
+    `user`.real_name,
+		`user`.create_time AS ucreate_time,
+		`user`.update_time AS uupdate_time,
+		`user`.del_flag AS udel_flag,
+		`user`.lock_flag AS lock_flag,
+		`user`.dept_id AS deptId,
+		d.name AS deptName
+		FROM
+		sys_user AS `user`
+		LEFT JOIN sys_dept AS d ON d.dept_id = `user`.dept_id
+		<where>
+			<if test="query.username != null and query.username != ''">
+				and `user`.username = CONCAT('%',#{query.username},'%')
+			</if>
+			<if test="query.password != null and query.password != ''">
+				and `user`.password = CONCAT('%',#{query.password},'%')
+			</if>
+      <!--<if test="query.phone != null and query.phone != ''">
+        and `user`.phone = CONCAT('%',#{query.phone},'%')
+      </if>-->
+		</where>
+		ORDER BY `user`.create_time DESC
+	</select>
+
+
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.IngredientsFilingMapper">
+
+  <resultMap id="ingredientsFilingMap" type="com.pig4cloud.pig.school.api.vo.recipe.IngredientsFilingVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="foodId" column="food_id"/>
+                        <result property="foodType" column="food_type"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <!--自定义返回信息-->
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="foodName" column="foodName"/>
+                        <collection property="mainFilingList" ofType="HashMap"
+                                    select="com.pig4cloud.pig.school.mapper.MainFilingMapper.listMainsByFoodId" column="id">
+                        </collection>
+            </resultMap>
+
+  <!--ingredientsFiling简单分页查询-->
+  <select id="getIngredientsFilingPage" resultMap="ingredientsFilingMap">
+    select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+    left join se_school b on b.id = a.school_id
+    left join sup_ingredients c on c.id = a.food_id
+    <where>
+      1=1 and a.del_flag='0' and a.food_type='1'
+      <if test="ingredientsFiling.id != null and ingredientsFiling.id.trim() != ''">
+          AND a.id = #{ingredientsFiling.id}
+        </if>
+              <if test="ingredientsFiling.schoolId != null">
+          AND a.school_id = #{ingredientsFiling.schoolId}
+        </if>
+              <if test="ingredientsFiling.foodId != null and ingredientsFiling.foodId.trim() != ''">
+          AND a.food_id = #{ingredientsFiling.foodId}
+        </if>
+        <if test="ingredientsFiling.foodType != null">
+          AND a.food_type = #{ingredientsFiling.foodType}
+        </if>
+        <if test="ingredientsFiling.foodName != null">
+          AND c.food_name like concat('%',#{ingredientsFiling.foodName},'%')
+        </if>
+              <if test="ingredientsFiling.delFlag != null and ingredientsFiling.delFlag.trim() != ''">
+          AND a.del_flag = #{ingredientsFiling.delFlag}
+        </if>
+          </where>
+
+    union all
+    select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+    left join se_school b on b.id = a.school_id
+    left join sup_school_custom c on c.id = a.food_id
+    <where>
+      1=1 and a.del_flag='0' and a.food_type='2'
+      <if test="ingredientsFiling.id != null and ingredientsFiling.id.trim() != ''">
+        AND a.id = #{ingredientsFiling.id}
+      </if>
+      <if test="ingredientsFiling.schoolId != null">
+        AND a.school_id = #{ingredientsFiling.schoolId}
+      </if>
+      <if test="ingredientsFiling.foodId != null and ingredientsFiling.foodId.trim() != ''">
+        AND a.food_id = #{ingredientsFiling.foodId}
+      </if>
+      <if test="ingredientsFiling.foodType != null">
+        AND a.food_type = #{ingredientsFiling.foodType}
+      </if>
+      <if test="ingredientsFiling.foodName != null">
+        AND c.food_name like concat('%',#{ingredientsFiling.foodName},'%')
+      </if>
+      <if test="ingredientsFiling.delFlag != null and ingredientsFiling.delFlag.trim() != ''">
+        AND a.del_flag = #{ingredientsFiling.delFlag}
+      </if>
+    </where>
+  </select>
+
+
+
+
+  <!--根据食谱id查询该道菜的主料-->
+  <select id="ingredientBySourceId" resultMap="ingredientsFilingMap">
+    SELECT  b.*  FROM re_source_food a
+    left join (
+      select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+      left join se_school b on b.id = a.school_id
+      left join sup_ingredients c on c.id = a.food_id
+      where	1=1 and a.del_flag='0' and a.food_type='1'
+      union all
+      select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+      left join se_school b on b.id = a.school_id
+      left join sup_school_custom c on c.id = a.food_id
+      where	1=1 and a.del_flag='0' and a.food_type='2'
+		)b on b.id = a.food_id
+		where type ='1'
+    and source_id IN (#{id})
+    </select>
+
+  <!--根据食谱id查询该道菜的辅料-->
+  <select id="materialListBySourceId" resultMap="ingredientsFilingMap">
+    SELECT  b.*  FROM re_source_food a
+    left join (
+      select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+      left join se_school b on b.id = a.school_id
+      left join sup_ingredients c on c.id = a.food_id
+      where	1=1 and a.del_flag='0' and a.food_type='1'
+      union all
+      select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+      left join se_school b on b.id = a.school_id
+      left join sup_school_custom c on c.id = a.food_id
+      where	1=1 and a.del_flag='0' and a.food_type='2'
+		)b on b.id = a.food_id
+		where type ='2'
+    and source_id IN (#{id})
+    </select>
+
+  <!--根据采购id查询食材-->
+  <select id="materialListByPurchaseId" resultMap="ingredientsFilingMap">
+    SELECT b.*
+    from pur_purchase_filing a
+    left join (
+        select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+          left join se_school b on b.id = a.school_id
+          left join sup_ingredients c on c.id = a.food_id
+          where	1=1 and a.del_flag='0' and a.food_type='1'
+          union all
+          select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+          left join se_school b on b.id = a.school_id
+          left join sup_school_custom c on c.id = a.food_id
+          where	1=1 and a.del_flag='0' and a.food_type='2'
+    )b on b.id = a.filing_id
+    and a.pur_id IN (#{id})
+  </select>
+
+</mapper>

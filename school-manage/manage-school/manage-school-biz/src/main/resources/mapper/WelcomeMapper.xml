@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.WelcomeMapper">
+
+  <resultMap id="announcementMap" type="com.pig4cloud.pig.school.api.entity.check.Welocomedomo">
+
+    <result property="pubName" column="real_name"/>   <!--姓名-->
+    <result property="position" column="position"/>   <!-- 职位-->
+    <result property="morningCheck" column="morning_check"/>  <!--晨检异常-->
+    <result property="healthEndtime" column="health_endtime"/>  <!--健康证截止日期-->
+    <result property="rummager" column="rummager"/>  <!--检查人姓名-->
+    <result property="isQualified" column="is_qualified"/>  <!--晨检结果-->
+    <result property="reason" column="reason"/>  <!--处理结果-->
+    <result property="hegeshu" column="hegesum"/>  <!--晨检合格数-->
+    <result property="zong" column="zongsum"/>   <!--晨检总数-->
+  </resultMap>
+
+
+  <select id="getStaff"  resultMap="announcementMap">
+   SELECT
+        su.real_name,         -- 姓名
+        su.position,          -- 职位
+        su.morning_check ,	-- 晨检情况
+        su.health_endtime ,    -- 健康证截止日期
+        cmc.rummager,       -- 检查人姓名
+        (SELECT COUNT(*)
+           FROM ck_morning_check cmc
+           WHERE
+           DATE_FORMAT( cmc.`check_time`, '%Y%m') = DATE_FORMAT( CURDATE( ) , '%Y%m')
+           AND cmc.user_id=#{schuName}
+           AND cmc.`is_qualified`='1'
+           AND cmc.`del_flag`='0') hegesum ,-- 晨检合格数
+          (SELECT COUNT(*)
+           FROM ck_morning_check cmc
+           WHERE
+           DATE_FORMAT( cmc.`check_time`, '%Y%m') = DATE_FORMAT( CURDATE( ) , '%Y%m')
+           AND cmc.`del_flag`='0'
+             AND cmc.user_id=#{schuName}
+             ) zongsum ,-- 晨检总数
+           cmc.is_qualified is_qualified ,-- 晨检结果
+          cmc.`reason`    -- 处理结果
+      from
+        sys_user su
+        left join ck_morning_check cmc on su.user_id =cmc.user_id
+      where
+      su.del_flag='0'
+      and su.lock_flag='0'
+      and su.user_id=#{schuName}
+      ORDER BY (cmc.check_time)  DESC  LIMIT 1
+
+  </select>
+
+
+  <!--第2行-校园端-欢迎页-台账统计--><!--返回是map-->
+  <select id="getAccount" resultType="Map">
+    select
+    (select sum(a.isSample)as 'sampleRecord' from (
+    select a.school_id as schoolId,c.sch_name as schoolName,a.rd_date as rdDate,
+    CASE WHEN max(b.sr_type) ='0' THEN 0
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN 1
+    ELSE 1 END AS isSample,
+    CASE WHEN max(b.sr_type) ='0' THEN '未留样'
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '部分留样'
+    ELSE '全部留样'
+    END AS isSampleZ
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join se_school c on c.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    group by a.rd_date
+    order by a.rd_date desc
+    ) a )as'sampleRecord',
+
+
+    (select count(*) from sl_dishwash_note
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'dishwashNote',
+
+
+    (select count(*) from sl_accompany_dinner
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'accompanyDinner',
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'equipmentWash',
+
+
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'foodAdditive',
+    (select count(*) from sl_diningarea_wash
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'diningareaWash',
+
+    (select count(*) from sl_kitwaste_treatment
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'kitwasteTreatment'
+
+
+  </select>
+
+
+  <!--第三行-校园端-欢迎页-校长-当日采购信息--> <!--返回是List<map>-->
+  <select id="getDayPurchase" resultType="Map">
+  select a.foodtypeId,a.name,ifnull(b.total,0) as 'total' from (
+    select a.foodtype_id as foodtypeId,a.name as 'name' from sup_food_type a
+    where 1=1 and a.del_flag = '0' and a.parent_id = '0' order by sort
+  )a left join (
+    select foodtypeId,count(*)as total from(
+      select b.*,d.name,
+      case when e.foodtype_id is null or e.foodtype_id = '' then d.foodtype_id  else e.foodtype_id end as foodtypeId
+      from pur_purchase_main a
+      left join pur_purchase_filing b on b.pur_id = a.id
+      left join view_sup_ingredients_filing c on c.id = b.filing_id
+      inner join sup_food_type d on d.foodtype_id = c.food_type
+      left join(select a.* from sup_food_type a
+      where 1=1 and a.del_flag = '0' and a.parent_id = '0' order by sort) e on e.foodtype_id = d.parent_id
+      <where>
+        1=1 and a.del_flag='0'
+        and DATE_FORMAT(a.pur_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+    )a group by foodtypeId
+  ) b on b.foodtypeId = a.foodtypeId
+
+  </select>
+
+
+  <!--第三行-校园端-欢迎页-当日采购票证上传率与高风险--> <!--返回是map-->
+  <select id="getHighRisk" resultType="Map">
+    select ifnull(convert(ifnull(sum(a.claimTicket),0)/count(a.claimTicket),decimal(15,2)),0)as claimTicketRidio,
+    '0.00' as 'highRiskRidio'
+     from (
+    select case when a.claim_ticket and a.claim_ticket is null or a.claim_ticket = '' then 1 else 0 end as claimTicket
+    from pur_purchase_main a
+    <where>
+      1=1 and a.del_flag='0'
+      and DATE_FORMAT(a.use_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+    <select id="getSchoolid" resultType="String">
+      select
+        a.`school_id`
+        from se_public_user a
+        where
+        a.`pub_identity`=#{schuName}
+        and a.`del_flag`='0'
+  </select>
+
+  <!--设备前三条-->
+  <select id="getdeviceInformation" resultType="Map">
+    SELECT
+      vd.device_name ,
+      vd1.wellsum,
+      vd2.nowellsum ,
+      (SELECT
+       COUNT(*)
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}) zong, -- 设备总数
+        (SELECT
+       COUNT(*)
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`is_passed`='1') hege -- 合格数
+      FROM
+      vd_device vd
+      LEFT JOIN
+      (SELECT
+      vd.id,
+      vd.`device_name`,
+       COUNT(vd.device_name) wellsum
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`run_well`='1'
+        GROUP BY vd.device_name) vd1  -- 合格数
+      ON
+      vd.device_name=vd1.device_name
+      LEFT JOIN
+      (SELECT
+      vd.id,
+      vd.`device_name`,
+       COUNT(vd.device_name) nowellsum
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`run_well`='2'
+        GROUP BY vd.device_name) vd2  -- 不合格数
+      ON
+      vd.device_name=vd2.device_name
+     WHERE
+      vd.del_flag='0'
+      AND
+      vd.school_id=#{schoolId}
+    GROUP BY vd.device_name
+     LIMIT 3
+  </select>
+
+  <!--设备所有`-->
+  <select id="getdeviceInforsum" resultType="Map">
+    SELECT
+      vd.device_name ,
+      vd1.wellsum,
+      vd2.nowellsum ,
+      (SELECT
+       COUNT(*)
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}) zong, -- 设备总数
+        (SELECT
+       COUNT(*)
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`is_passed`='1') hege -- 合格数
+      FROM
+      vd_device vd
+      LEFT JOIN
+      (SELECT
+      vd.id,
+      vd.`device_name`,
+       COUNT(vd.device_name) wellsum
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`run_well`='1'
+        GROUP BY vd.device_name) vd1  -- 合格数
+      ON
+      vd.device_name=vd1.device_name
+      LEFT JOIN
+      (SELECT
+      vd.id,
+      vd.`device_name`,
+       COUNT(vd.device_name) nowellsum
+      FROM
+      vd_device vd
+      WHERE
+       vd.del_flag='0'
+        AND
+        vd.school_id=#{schoolId}
+        AND vd.`run_well`='2'
+        GROUP BY vd.device_name) vd2  -- 不合格数
+      ON
+      vd.device_name=vd2.device_name
+     WHERE
+      vd.del_flag='0'
+      AND
+      vd.school_id=#{schoolId}
+    GROUP BY vd.device_name
+  </select>
+
+
+  <!--第三行-校园端-欢迎页-当日采购食材id--> <!--返回是List<map>-->
+  <!--<select id="getFoodid1 " resultType="Map">
+          SELECT
+        sft.foodtype_id
+      FROM
+       sup_food_type sft  join
+      (select
+        sft.`name`,count(1) num ,sft.`parent_id` parent_id
+      from
+      sup_food_type sft
+      join
+      (select
+       si.food_type  food
+      from pur_purchase_main ppm
+      join pur_purchase_filing ppf on ppm.id=ppf.pur_id
+      join sup_ingredients_filing sif on ppf.`filing_id`=sif.`id`
+      join sup_ingredients si on si.id= sif.`food_id`
+      where
+       TO_DAYS(ppm.pur_time)=TO_DAYS(NOW())
+       and ppm.school_id=#{schoolId}
+       and ppm.`del_flag`='0'
+       and sif.`del_flag`='0'
+       and si.`del_flag`='0'
+       ) ppmid   采购食材
+       on sft.`foodtype_id`=  ppmid.food
+      WHERE sft.`del_flag`='0'
+       group by sft.`foodtype_id`) sft1
+       on sft.`foodtype_id`=  sft1.parent_id
+       where sft.`parent_id`=0
+  </select>-->
+
+
+</mapper>

@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.WelHeadmasterMapper">
+
+
+
+  <!--第一行-校园端-欢迎页-校长-预警统计--> <!--List<Map>-->
+ <!-- <select id="getEarlyWarnTotal" resultType="Map">
+    select a.value,a.label,IFNULL(b.total,0) as totalAll,IFNULL(b.personTotal,0) as personTotal,IFNULL(b.cardTotal,0) as cardTotal,IFNULL(b.foodTotal,0) as foodTotal from (
+    select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='wel_warning' order by a.sort
+    ) a left join (
+      select a.early_warning,count(a.id)as 'total',sum(a.personTotal) as 'personTotal',sum(a.cardTotal) as 'cardTotal',sum(a.foodTotal) as 'foodTotal'from (
+      select a.id,
+      case when early_warning in(1,2) then '1' when early_warning in ('3') then '2'
+      when early_warning = '4' then '3' else '1' end as early_warning,
+      case when early_warning in (1,2) then 1 else 0 end as cardTotal,
+      case when early_warning in (3) then 1 else 0 end as personTotal,
+      case when early_warning in (4) then 1 else 0 end as foodTotal
+      from ck_early_warning a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+      </where>
+      )a group by a.early_warning
+    )b on b.early_warning = a.value
+  </select>-->
+  <select id="getEarlyWarnTotal" resultType="Map">
+    select count(a.id)as totalAll,sum(cardTotal)as cardTotal ,sum(personTotal) personTotal ,sum(foodTotal) foodTotal from (
+    select a.id,
+    case when early_warning in (1,2) then 1 else 0 end as cardTotal,
+    case when early_warning in (3) then 1 else 0 end as personTotal,
+    case when early_warning in (4) then 1 else 0 end as foodTotal
+    from ck_early_warning a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+      </where>
+    )a
+  </select>
+
+  <!--第一行-校园端-欢迎页-校长-报警统计--> <!--List<Map>-->
+  <select id="getAlarmTotal" resultType="Map">
+  select a.value,a.label,ifnull(b.total,0) as total from (
+  select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='deal_with' order by a.sort
+  ) a left join (
+  select a.deal_with,count(*) as total from ck_early_alarm a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+  group by a.deal_with
+  )b on b.deal_with = a.value
+  </select>
+
+  <!--第一行-校园端-欢迎页-校长-本周报警统计按类别--> <!--List<Map>-->
+  <select id="getAlarmWeekTotal" resultType="Map">
+    select a.date as date,IFNULL(b.personTotal,0) as personTotal,IFNULL(b.cardTotal,0) as cardTotal,IFNULL(b.foodTotal,0) as foodTotal from (
+      SELECT DATE_FORMAT( DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), '%Y-%m-%d') as date
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 1 DAY), '%Y-%m-%d')
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 2 DAY), '%Y-%m-%d')
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 3 DAY), '%Y-%m-%d')
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 4 DAY), '%Y-%m-%d')
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 5 DAY), '%Y-%m-%d')
+        union all
+        SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 6 DAY), '%Y-%m-%d')
+    )a left join (
+        select a.date,sum(a.personTotal) as 'personTotal',sum(a.cardTotal) as 'cardTotal',sum(a.foodTotal) as 'foodTotal'from (
+        select DATE_FORMAT(a.alarm_time,'%Y-%m-%d') as date,a.id,
+        case when alarm in (4) then 1 else 0 end as personTotal,
+        case when alarm in (1,2,3) then 1 else 0 end as cardTotal,
+        case when alarm in (5,6,7) then 1 else 0 end as foodTotal
+        from ck_early_alarm a
+        <where>
+          1=1 and a.del_flag = '0'
+          and DATE_FORMAT(a.alarm_time,'%Y-%m-%d') between (SELECT DATE_FORMAT( DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), '%Y-%m-%d'))  AND
+          (SELECT DATE_FORMAT( DATE_ADD(SUBDATE(CURDATE(), WEEKDAY(CURDATE())), INTERVAL 6 DAY), '%Y-%m-%d'))
+          <if test="map.schoolId != null">
+            AND a.school_id = #{map.schoolId}
+          </if>
+        </where>
+      )a group by DATE_FORMAT(a.date,'%Y-%m-%d')
+    )b on a.date=b.date order by date
+  </select>
+
+  <!--第2行-校园端-欢迎页-校长-监管及通知公告统计--><!--Map-->
+  <select id="getPurchaseWarn" resultType="Map">
+    select count(total) as 'totalAll',sum(a.yichuliJ) as 'yichuliJ',sum(a.weichuliJ) as 'weichuliJ',
+    sum(a.yichuliG) as 'yichuliG',sum(a.weichuliG) as 'weichuliG',
+    convert((sum(a.yichuliJ)+sum(a.yichuliG))/count(total),decimal(15,2)) as processRate
+    from (
+      select '监管意见' as 'type',
+        a.status as 'total',
+        case a.status when '1' then 1 else 0 end as 'yichuliJ',
+        case a.status when '2' then 1 else 0 end as 'weichuliJ',
+        0 as 'yichuliG',
+        0 as 'weichuliG'
+      from msg_regulatory_opinion a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+      </where>
+      union all
+      select '公告通知' as 'type',
+        a.status as 'total',
+        0 as 'yichuliJ',
+        0 as 'weichuliJ',
+        case a.status when '1' then 1 else 0 end as 'yichuliG',
+        case a.status when '2' then 1 else 0 end as 'weichuliG'
+      from msg_announcement a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+      </where>
+    )a
+  </select>
+
+
+
+  <!--第2行-校园端-欢迎页-校长-台账统计--><!--返回是map-->
+  <select id="getAccount" resultType="Map">
+    select
+    (select ifnull(sum(a.isSample),0)as 'sampleRecord' from (
+    select a.school_id as schoolId,c.sch_name as schoolName,a.rd_date as rdDate,
+    CASE WHEN max(b.sr_type) ='0' THEN 0
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN 1
+    ELSE 1 END AS isSample,
+    CASE WHEN max(b.sr_type) ='0' THEN '未留样'
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '部分留样'
+    ELSE '全部留样'
+    END AS isSampleZ
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join se_school c on c.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    group by a.rd_date
+    order by a.rd_date desc
+    ) a )as'sampleRecord',
+
+
+    (select count(*) from sl_dishwash_note
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'dishwashNote',
+
+
+    (select count(*) from sl_accompany_dinner
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'accompanyDinner',
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'equipmentWash',
+
+
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'foodAdditive',
+    (select count(*) from sl_diningarea_wash
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'diningareaWash',
+
+    (select count(*) from sl_kitwaste_treatment
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'kitwasteTreatment'
+
+
+  </select>
+
+
+
+  <!--第三行-校园端-欢迎页-校长-人员信息--> <!--返回是map-->
+  <select id="getSchoolUserInfo" resultType="Map">
+    select count(b.totalAll) as totalAll,sum(b.houchu) as houchu,
+    sum(b.anquan) as anquan,sum(b.peican) as peican,
+    convert(sum(b.identityPic)/count(b.totalAll),decimal(15,2)) as processRate,
+    convert(sum(b.healthPic)/count(b.totalAll),decimal(15,2)) as healthPic
+    from (
+      select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='position'  order by a.sort
+    ) a left join (
+    select a.position,
+    a.position as 'totalAll',
+    case a.position when '1' then 1 else 0 end as 'houchu',
+    case a.position when '2' then 1 else 0 end as 'anquan',
+    case a.position when '3' then 1 else 0 end as 'peican',
+    case when a.identity_pic and a.identity_pic is null or a.identity_pic = '' then 1 else 0 end as identityPic,
+    case when a.health_pic and a.health_pic is not null and a.health_pic <![CDATA[ <> ]]> '' then 1 else 0 end as healthPic
+    from sys_user a
+    <where>
+      1=1 and a.del_flag='0'
+      and a.user_type ='2'
+      and (a.is_admin is null or a.is_admin = '')
+      and a.position is not null and a.position <![CDATA[ <> ]]> ''
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+    </where>
+    )b on b.position = a.value
+  </select>
+
+
+
+  <!--第三行-校园端-欢迎页-校长-当日人员晨检合格率--> <!--返回是map-->
+  <select id="getDayUserQualified" resultType="Map">
+    select '当日人员晨检合格率' as 'label',convert(sum(a.qualified)/count(a.id),decimal(15,2)) as qualifiedRate from(
+    select
+      a.id as id,
+      case a.is_qualified when '1' then 1 else 0 end as 'qualified',
+      case a.is_qualified when '2' then 1 else 0 end as 'noqualified'
+    from ck_morning_check a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+  <!--第三行-校园端-欢迎页-校长-食材信息--> <!--返回是map-->
+  <!--食材信息（供应商总数total、快检合格率foodRate、供应商匹配率mainMate-->
+  <select id="getFoodInfo" resultType="Map">
+    select
+    (select count(*) as mainTotal from sup_main_filing a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as total,
+    (select convert(sum(a.qualified)/count(a.id),decimal(15,2)) as foodRate from (
+      select a.id,case a.is_qualified when '1' then 1 else 0 end as 'qualified'
+       from ck_food_inspection a
+      <where>
+        1=1 and a.del_flag='0'
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+      ) a) as 'foodRate',
+    convert((select count(distinct(c.id))as mainMate from view_sup_ingredients_filing a
+      inner join sup_food_main b on b.food_id = a.food_id
+      inner join sup_main_filing c on c.id = b.main_id
+      <where>
+        1=1 and a.del_flag='0'
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+      )/
+      (select count(*) as mainTotal from sup_main_filing a
+      <where>
+        1=1 and a.del_flag='0'
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+      ),decimal(15,2)
+    ) as 'mainMate'
+  </select>
+
+
+
+  <!--第三行-校园端-欢迎页-校长-当日采购信息--> <!--返回是List<map>-->
+  <select id="getDayPurchase" resultType="Map">
+  select a.foodtypeId,a.name,ifnull(b.total,0) as 'total' from (
+    select a.foodtype_id as foodtypeId,a.name as 'name' from sup_food_type a
+    where 1=1 and a.del_flag = '0' and a.parent_id = '0' order by sort
+  )a left join (
+    select foodtypeId,count(*)as total from(
+      select b.*,d.name,
+      case when e.foodtype_id is null or e.foodtype_id = '' then d.foodtype_id  else e.foodtype_id end as foodtypeId
+      from pur_purchase_main a
+      left join pur_purchase_filing b on b.pur_id = a.id
+      left join view_sup_ingredients_filing c on c.id = b.filing_id
+      inner join sup_food_type d on d.foodtype_id = c.food_type
+      left join(select a.* from sup_food_type a
+      where 1=1 and a.del_flag = '0' and a.parent_id = '0' order by sort) e on e.foodtype_id = d.parent_id
+      <where>
+        1=1 and a.del_flag='0'
+        and DATE_FORMAT(a.pur_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+    )a group by foodtypeId
+  ) b on b.foodtypeId = a.foodtypeId
+
+  </select>
+
+
+  <!--第三行-校园端-欢迎页-校长-当日采购票证上传率与高风险--> <!--返回是map-->
+  <select id="getHighRisk" resultType="Map">
+    select ifnull(convert(ifnull(sum(a.claimTicket),0)/count(a.claimTicket),decimal(15,2)),0)as claimTicketRidio,
+    '0.00' as 'highRiskRidio'
+     from (
+    select case when a.claim_ticket and a.claim_ticket is null or a.claim_ticket = '' then 1 else 0 end as claimTicket
+    from pur_purchase_main a
+    <where>
+      1=1 and a.del_flag='0'
+      and DATE_FORMAT(a.use_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+
+  <!--第四行-校园端-欢迎页-校长-供应商信息--> <!--返回是map-->
+  <select id="getMainFilingInfo" resultType="Map">
+    select count(a.id)as 'total',sum(a.qiye) as 'qiye',sum(a.geti) as 'geti',
+    ifnull(convert(sum(a.bulicense)/count(a.id),DECIMAL(15,2)),0)as 'bulicense',
+    ifnull(convert(sum(a.permit)/count(a.id),DECIMAL(15,2)),0)as 'permit'
+     from (
+    select
+    a.id,
+    case a.sup_type when '1' then 1 else 0 end as 'qiye',
+    case a.sup_type when '2' then 1 else 0 end as 'geti',
+    case when DATE_FORMAT(a.bulicense_end,'%Y-%m-%d')>=(select DATE_SUB(curdate(),INTERVAL 0 DAY)) then 1 else 0 end as 'bulicense',
+    case when DATE_FORMAT(a.permit_end,'%Y-%m-%d')>=(select DATE_SUB(curdate(),INTERVAL 0 DAY)) then 1 else 0 end as 'permit'
+    from sup_main_filing a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+  <!--第四行-校园端-欢迎页-校长-厨余设备--> <!--返回是map-->
+  <select id="getVdDevice" resultType="Map">
+    select count(a.id)as 'total',sum(a.disinfectionCabinet) as 'disinfectionCabinet',
+    sum(a.fridge) as 'fridge',sum(a.steamOven) as 'steamOven',
+    ifnull(convert(sum(a.runWell)/count(a.id),DECIMAL(15,2)),0)as 'runWell',
+    ifnull(convert(sum(a.steamOven)/count(a.id),DECIMAL(15,2)),0)as 'isPassed'
+    from (
+    select
+    a.id,
+    case a.device_type when '1' then 1 else 0 end as 'disinfectionCabinet',
+    case a.device_type when '2' then 1 else 0 end as 'fridge',
+    case a.device_type when '3' then 1 else 0 end as 'steamOven',
+    case a.run_well when '1' then 1 else 0 end as 'runWell',
+    case a.is_passed when '1' then 1 else 0 end as 'isPassed'
+    from vd_device a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+
+
+
+  <!--第1行员工信息--> <!--返回是map-->
+  <select id="getUserInfo" resultType="Map">
+    select a.real_name as realName,b.label as label,'有效期内' as 'card',
+    ifnull(a.health_endtime,'无健康证')as 'healthEndtime',
+    case c.is_qualified when '1' then '合格' when '2' then '不合格' else '当日未晨检' end as isQualified,
+    case when c.rummager is not null or c.is_qualified <![CDATA[ <> ]]> '' then c.rummager else '当日未晨检' end as runmmager,
+    case when c.is_qualified = '1' then '合格' when c.reason is not null or c.reason <![CDATA[ <> ]]> '' '' then c.reason else '当日未晨检' end as 'reson',
+    (select ifnull(convert(sum(a.hege)/count(a.id),DECIMAL(15,2)),0) as 'percent' from(
+    select a.id as id,
+    case a.is_qualified when '1' then 1 else 0 end as 'hege',
+    case a.is_qualified when '2' then 1 else 0 end as 'buhege'
+    from ck_morning_check a where 1=1 and a.del_flag = '0' and a.user_id = '36'
+    )a)as 'monthChenjian'
+    from sys_user a
+    left join (select a.* from sys_dict a where a.del_flag ='0' and a.type='position')b on b.value = a.position
+    left join (select a.* from ck_morning_check a
+    <where>
+      1=1 and a.del_flag='0'
+      and DATE_FORMAT(a.check_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+      <if test="map.userId != null">
+        and a.user_id = #{map.userId}
+      </if>
+    </where>
+    )c on c.user_id = a.user_id
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.userId != null">
+        and a.user_id = #{map.userId}
+      </if>
+    </where>
+  </select>
+
+
+  <!--第四行设备--> <!--返回是List<map>-->
+  <select id="getSchoolVdDevice" resultType="Map">
+    select a.label,ifnull(sum(b.runWell),0)as 'runWell',ifnull(sum(b.runHitch),0)as 'runHitch' from (
+    select a.* from sys_dict a where 1=1 and a.del_flag = '0' and type='device_type' order by a.sort
+    )a left join (
+    select a.id,a.device_type,
+    case a.run_well when '1' then 1 else 0 end as 'runWell',
+    case a.run_well when '2' then 1 else 0 end as 'runHitch'
+    from vd_device a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )b on b.device_type = a.value
+    group by a.label
+  </select>
+
+
+  <!--第四行设备比率--> <!--返回是map-->
+  <select id="getEqOperationRatio" resultType="Map">
+    select count(a.id)as 'total',ifnull(convert(sum(a.isPassed)/count(a.id),DECIMAL(15,2)),0)as 'eqRatio' from (
+      select a.id,
+      case a.is_passed when '1' then 1 else 0 end as 'isPassed'
+      from vd_device a
+      <where>
+        1=1 and a.del_flag='0'
+        <if test="map.schoolId != null">
+          and a.school_id = #{map.schoolId}
+        </if>
+      </where>
+    )a
+  </select>
+
+
+
+
+</mapper>

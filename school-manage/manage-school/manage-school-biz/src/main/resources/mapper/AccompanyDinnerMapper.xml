@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.AccompanyDinnerMapper">
+
+  <resultMap id="accompanyDinnerMap" type="com.pig4cloud.pig.school.api.vo.account.AccompanyDinnerVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="adTime" column="ad_time"/>
+                        <result property="parameter" column="parameter"/>
+                        <result property="adAms" column="ad_ams"/>
+                        <result property="adIsproblem" column="ad_isproblem"/>
+                        <result property="adPerson" column="ad_person"/>
+                        <result property="adPic" column="ad_pic"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="realName" column="realName"/>
+            </resultMap>
+
+  <!--accompanyDinner简单分页查询-->
+  <select id="getAccompanyDinnerPage" resultMap="accompanyDinnerMap">
+    SELECT
+      a.id,
+      a.school_id,
+      a.user_id,
+      a.ad_time,
+      a.parameter,
+      a.ad_ams,
+      a.ad_isproblem,
+      a.ad_person,
+      a.ad_pic,
+      a.remarks,
+      a.create_time,
+      a.update_time,
+      a.del_flag,
+      b.sch_name as schoolName,
+      c.real_name as realName
+    FROM sl_accompany_dinner a
+    left join se_school b on b.id = a.school_id
+    left join sys_user c on c.user_id = a.user_id
+    <where>
+    1=1 and a.del_flag = '0'
+      <if test="accompanyDinner.schoolId != null">
+        AND a.school_id = #{accompanyDinner.schoolId}
+      </if>
+              <if test="accompanyDinner.id != null">
+          AND a.id = #{accompanyDinner.id}
+        </if>
+              <if test="accompanyDinner.adTime != null and accompanyDinner.adTime.trim() != ''">
+		  AND DATE_FORMAT(a.ad_time,'%Y-%m-%d') = #{accompanyDinner.adTime}
+        </if>
+              <if test="accompanyDinner.parameter != null and accompanyDinner.parameter.trim() != ''">
+          AND a.parameter = #{accompanyDinner.parameter}
+        </if>
+              <if test="accompanyDinner.adAms != null and accompanyDinner.adAms.trim() != ''">
+          AND a.ad_ams = #{accompanyDinner.adAms}
+        </if>
+              <if test="accompanyDinner.adIsproblem != null and accompanyDinner.adIsproblem.trim() != ''">
+          AND a.ad_isproblem = #{accompanyDinner.adIsproblem}
+        </if>
+              <if test="accompanyDinner.adPerson != null and accompanyDinner.adPerson.trim() != ''">
+          AND a.ad_person = #{accompanyDinner.adPerson}
+        </if>
+              <if test="accompanyDinner.adPic != null and accompanyDinner.adPic.trim() != ''">
+          AND a.ad_pic = #{accompanyDinner.adPic}
+        </if>
+              <if test="accompanyDinner.remarks != null and accompanyDinner.remarks.trim() != ''">
+          AND a.remarks = #{accompanyDinner.remarks}
+        </if>
+              <if test="accompanyDinner.createTime != null">
+          AND a.create_time = #{accompanyDinner.createTime}
+        </if>
+              <if test="accompanyDinner.updateTime != null">
+          AND a.update_time = #{accompanyDinner.updateTime}
+        </if>
+              <if test="accompanyDinner.delFlag != null and accompanyDinner.delFlag.trim() != ''">
+          AND a.del_flag = #{accompanyDinner.delFlag}
+        </if>
+          ORDER BY  a.ad_time desc
+    </where>
+  </select>
+
+  <select id="getAccompanyDinnerById" resultMap="accompanyDinnerMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.user_id,
+    a.ad_time,
+    a.parameter,
+    a.ad_ams,
+    a.ad_isproblem,
+    a.ad_person,
+    a.ad_pic,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName,
+    c.real_name as realName
+    FROM sl_accompany_dinner a
+    left join se_school b on b.id = a.school_id
+    left join sys_user c on c.user_id = a.user_id
+    where
+    1=1 and a.del_flag = '0' and a.id = #{id}
+    ORDER BY  a.ad_time desc
+  </select>
+
+</mapper>
+

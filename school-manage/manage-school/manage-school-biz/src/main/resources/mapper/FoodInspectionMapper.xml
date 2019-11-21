@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.FoodInspectionMapper">
+
+  <resultMap id="foodInspectionMap" type="com.pig4cloud.pig.school.api.vo.check.FoodInspectionVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="checkTime" column="check_time"/>
+                        <result property="inspectionUnit" column="inspection_unit"/>
+                        <result property="foodId" column="food_id"/>
+                        <result property="foodnameNote" column="foodname_note"/>
+                        <result property="isQualified" column="is_qualified"/>
+                        <result property="fileUrl" column="file_url"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="foodName" column="foodName"/>
+            </resultMap>
+
+  <!--foodInspection简单分页查询-->
+  <select id="getFoodInspectionPage" resultMap="foodInspectionMap">
+    SELECT
+      a.id,
+      a.school_id,
+      a.check_time,
+      a.inspection_unit,
+      a.food_id,
+      a.foodname_note,
+      a.is_qualified,
+      a.file_url,
+      a.create_time,
+      a.update_time,
+      a.del_flag,
+      b.sch_name as schoolName,
+      c.foodName as foodName
+    FROM ck_food_inspection a
+    left join se_school b on b.id = a.school_id
+    left join view_sup_ingredients_filing c on c.food_id = a.food_id
+    <where>
+      1=1 and a.del_flag='0'
+              <if test="foodInspection.id != null and foodInspection.id.trim() != ''">
+          AND a.id = #{foodInspection.id}
+        </if>
+              <if test="foodInspection.schoolId != null">
+          AND a.school_id = #{foodInspection.schoolId}
+        </if>
+              <if test="foodInspection.ctDate != null">
+          AND DATE_FORMAT(a.check_time,'%Y-%m-%d') = #{foodInspection.ctDate}
+        </if>
+              <if test="foodInspection.checkTime != null and foodInspection.checkTime.trim() != ''">
+          AND a.check_time = #{foodInspection.checkTime}
+        </if>
+              <if test="foodInspection.inspectionUnit != null and foodInspection.inspectionUnit.trim() != ''">
+          AND a.inspection_unit = #{foodInspection.inspectionUnit}
+        </if>
+              <if test="foodInspection.foodId != null and foodInspection.foodId.trim() != ''">
+          AND a.food_id = #{foodInspection.foodId}
+        </if>
+              <if test="foodInspection.isQualified != null and foodInspection.isQualified.trim() != ''">
+          AND a.is_qualified = #{foodInspection.isQualified}
+        </if>
+              <if test="foodInspection.fileUrl != null and foodInspection.fileUrl.trim() != ''">
+          AND a.file_url = #{foodInspection.fileUrl}
+        </if>
+              <if test="foodInspection.createTime != null and foodInspection.createTime.trim() != ''">
+          AND a.create_time = #{foodInspection.createTime}
+        </if>
+              <if test="foodInspection.updateTime != null and foodInspection.updateTime.trim() != ''">
+          AND a.update_time = #{foodInspection.updateTime}
+        </if>
+              <if test="foodInspection.delFlag != null and foodInspection.delFlag.trim() != ''">
+          AND a.del_flag = #{foodInspection.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

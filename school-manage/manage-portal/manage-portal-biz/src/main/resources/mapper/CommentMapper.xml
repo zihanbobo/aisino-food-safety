@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.CommentMapper">
+
+	<!-- <resultMap id="commentMap" type="com.pig4cloud.pig.portal.api.vo.CommentVO">
+                     <id property="id" column="id"/>
+                           <result property="schoolId" column="school_id"/>
+                           <result property="userId" column="user_id"/>
+                           <result property="parentId" column="parent_id"/>
+                           <result property="content" column="content"/>
+                           <result property="time" column="time"/>
+                           <result property="praiseCounts" column="praise_counts"/>
+                           <result property="commentCategory" column="comment_category"/>
+                           <result property="commentType" column="comment_type"/>
+                           <result property="remarks" column="remarks"/>
+                           <result property="createTime" column="create_time"/>
+                           <result property="updateTime" column="update_time"/>
+                           <result property="delFlag" column="del_flag"/>
+                           <result property="schoolName" column="schoolName"/>
+                           <result property="nickName" column="nickName"/>
+               </resultMap>
+
+     &lt;!&ndash;comment简单分页查询&ndash;&gt;
+     <select id="getCommentPage" resultMap="commentMap">
+         SELECT
+             a.id,
+             a.school_id,
+             a.user_id,
+             a.parent_id,
+             a.content,
+             a.time,
+             a.praise_counts,
+             a.comment_category,
+             a.comment_type,
+             a.remarks,
+             a.create_time,
+             a.update_time,
+             a.del_flag,
+             b.sch_name as schoolName,
+             c.nick_name as nickName
+         FROM site_comment a
+         left join se_school b on b.id = a.school_id
+         left join se_public_user c on a.user_id = c.id
+       <where>
+           1=1 and a.del_flag = '0'
+                 <if test="comment.id != null">
+             AND a.id = #{comment.id}
+           </if>
+                 <if test="comment.schoolId != null ">
+             AND a.school_id = #{comment.schoolId}
+           </if>
+                 <if test="comment.userId != null ">
+             AND a.user_id = #{comment.userId}
+           </if>
+                 <if test="comment.parentId != null">
+             AND a.parent_id = #{comment.parentId}
+           </if>
+           <if test="comment.commentType != null">
+               AND a.comment_type = #{comment.commentType}
+           </if>
+             </where>
+     </select>-->
+  <!--管理端分页查询所有评论信息(全量)-->
+  <select id="getCommentPageForManage" resultMap="commentMapManage">
+    select bbb.id,bbb.content,bbb.pubPic,bbb.time,sum(bbb.praise_counts) as praiseCounts,
+    max(bbb.userPraise)as isPraise,bbb.nickName as nickName,bbb.schoolName as schoolName,bbb.comment_type as commentType from (
+    select aa.*,case when bb.id is not null then '1' else '0' end as 'userPraise' from (
+    select temp.id as id,
+    max(temp.content) as content,max(temp.time) as time,
+    max(temp.comment_type) as comment_type,max(temp.nickName) as nickName,
+    max(temp.pubPic) as pubPic,
+    max(temp.schoolName) as schoolName,
+    sum(temp.zan) as praise_counts,
+    temp.pub_id as pubId
+    from (
+    SELECT case when d.id is not null then 1 else 0 end 'zan',
+    d.pub_id,
+    a.id,
+    a.school_id,
+    a.user_id,
+    a.parent_id,
+    a.content,
+    a.time,
+    a.comment_category,
+    a.comment_type,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName,
+    c.nick_name as nickName,
+    c.pub_pic as pubPic
+    FROM site_comment a
+    left join site_comment_praise d on d.comment_id = a.id
+    left join se_public_user c on a.user_id = c.id
+    left join se_school b on b.id = a.school_id
+      where a.del_flag = '0'
+      <if test="comment.commentCategory != null">
+        AND a.comment_category = #{comment.commentCategory}
+      </if>
+      and a.comment_type ='1'
+    )temp group by pub_id,id
+    )aa left join (
+    select a.pub_id as id from site_comment_praise a
+    group by a.pub_id
+    )bb on aa.pubId = bb.id
+    )bbb
+    group by bbb.id
+    order by time desc
+  </select>
+
+  <resultMap id="commentMapManage" type="com.pig4cloud.pig.portal.api.vo.CommentVO">
+    <id property="id" column="id"/>
+    <result property="content" column="content"/>
+    <result property="pubPic" column="pubPic"/>
+    <result property="time" column="time"/>
+    <result property="praiseCounts" column="praiseCounts"/>
+    <result property="isPraise" column="isPraise"/>
+    <result property="nickName" column="nickName"/>
+    <result property="schoolName" column="schoolName"/>
+    <result property="commentType" column="commentType"/>
+    <result property="commentCategory" column="commentCategory"/>
+    <result property="schoolId" column="schoolId"/>
+  </resultMap>
+
+	<!--门户端分页查询所有评论信息-->
+	<select id="getCommentPage" resultMap="commentMap">
+		select bbb.id,bbb.content,bbb.pubPic,bbb.time,sum(bbb.praise_counts) as praiseCounts,
+		max(bbb.userPraise)as isPraise,bbb.pubPhone as pubPhone,bbb.nickName as nickName from (
+		select aa.*,case when bb.id is not null then '1' else '0' end as 'userPraise' from (
+		select temp.id as id,
+		max(temp.content) as content,max(temp.time) as time,
+		max(temp.comment_type) as comment_type,max(temp.nickName) as nickName,
+		max(temp.pubPic) as pubPic,
+    max(temp.pubPhone) as pubPhone,
+		sum(temp.zan) as praise_counts,
+		temp.pub_id as pubId
+		from (
+		SELECT case when d.id is not null then 1 else 0 end 'zan',
+		d.pub_id,
+		a.id,
+		a.school_id,
+		a.user_id,
+		a.parent_id,
+		a.content,
+		a.time,
+		a.comment_category,
+		a.comment_type,
+		a.create_time,
+		a.update_time,
+		a.del_flag,
+		b.sch_name as schoolName,
+		c.nick_name as nickName,
+		c.pub_pic as pubPic,
+    c.pub_phone as pubPhone
+		FROM site_comment a
+		left join site_comment_praise d on d.comment_id = a.id
+		left join se_public_user c on a.user_id = c.id
+		left join se_school b on b.id = a.school_id
+		<where>
+			1=1 and a.del_flag = '0'
+			<if test="comment.schoolId != null ">
+				AND a.school_id = #{comment.schoolId}
+			</if>
+			<if test="comment.commentType != null">
+				AND a.comment_type = #{comment.commentType}
+			</if>
+			<if test="comment.commentCategory != null">
+				AND a.comment_category = #{comment.commentCategory}
+			</if>
+		</where>
+		)temp group by pub_id,id
+		)aa left join (
+		select a.pub_id as id from site_comment_praise a where a.pub_id = #{comment.userId}
+		group by a.pub_id
+		)bb on aa.pubId = bb.id
+		)bbb
+		group by bbb.id
+		order by time desc
+	</select>
+	<resultMap id="commentMap" type="com.pig4cloud.pig.portal.api.vo.CommentVO">
+		<id property="id" column="id"/>
+		<result property="content" column="content"/>
+		<result property="time" column="time"/>
+    <result property="pubPhone" column="pubPhone"/>
+		<result property="praiseCounts" column="praiseCounts"/>
+		<result property="isPraise" column="isPraise"/>
+		<result property="nickName" column="nickName"/>
+	</resultMap>
+
+
+	<!--根据评论id与用户id查看该条评论所有的回复内容（门户端）-->
+	<select id="getCommentChild" resultMap="getCommentChild">
+		SELECT e.* FROM (
+		SELECT a.id as 'id',
+		a.nickName AS 'nickName',
+		b.id AS 'parentId',
+		b.nickName AS 'nickNameP',
+		b.pubPhone AS 'pubPhoneP',
+		a.content AS 'content',
+		a.pubPic as 'pubPic',
+		a.pubPhone AS 'pubPhone',
+		DATE_FORMAT(a.time, '%Y-%m-%d %H:%i:%s') AS 'time',
+		a.praiseCounts as 'praiseCounts',
+		a.isPraise as 'isPraise'
+		FROM(
+
+		select bbb.id,
+		bbb.content,
+		bbb.pubPic,
+		max(bbb.parentId)as parentId,
+		max(bbb.time)as time,
+		max(bbb.nickName)as nickName,
+		max(bbb.pubPhone)as pubPhone,
+		sum(bbb.praise_counts) as praiseCounts,
+		max(bbb.userPraise)as isPraise from (
+
+		select aa.*,case when bb.id is not null then '1' else '0' end as 'userPraise' from (
+
+		select temp.id as id,
+		max(temp.content) as content,max(temp.time) as time,
+		max(temp.comment_type) as comment_type,
+		max(temp.nickName) as nickName,
+		max(temp.pubPic) as pubPic,
+		max(temp.pubPhone) as pubPhone,
+		max(temp.parent_id) as parentId,
+		sum(temp.zan) as praise_counts,
+		temp.pub_id as pubId
+		from (
+		SELECT case when c.id is not null then 1 else 0 end 'zan',
+		c.pub_id,
+		b.nick_name AS nickName,
+		b.pub_pic as pubPic,
+		b.pub_phone AS pubPhone,
+		a.*
+		FROM site_comment a
+		LEFT JOIN se_public_user b ON b.id = a.user_id
+		left join site_comment_praise c on c.comment_id = a.id
+		WHERE 1 = 1
+		and a.del_flag = '0'
+		AND FIND_IN_SET(a.id, getChild(#{parentId}))
+		)temp group by pub_id,id
+		)aa left join (
+		select a.pub_id as id from site_comment_praise a where a.pub_id = #{userId}
+		group by a.pub_id )bb on aa.pubId = bb.id
+
+		)bbb
+		group by bbb.id
+		) a
+		LEFT JOIN (
+			SELECT
+			b.*,
+			a.nick_name AS nickName,
+			a.pub_pic as pubPic,
+			a.pub_phone AS pubPhone
+			FROM se_public_user a
+			LEFT JOIN	site_comment b ON a.id = b.user_id
+			WHERE 1 = 1
+			and b.del_flag = '0'
+			AND FIND_IN_SET(b.id, getChild(#{parentId}))
+		) b ON a.parentId = b.id
+		) e WHERE e.parentId <![CDATA[ <> ]]> '' ORDER BY time
+	</select>
+	<resultMap id="getCommentChild" type="HashMap">
+		<result property="nickName" column="nickName"/>
+		<result property="nickNameP" column="nickNameP"/>
+		<result property="content" column="content"/>
+		<result property="pubPic" column="pubPic"/>
+    <result property="pubPhone" column="pubPhone"/>
+    <result property="pubPhoneP" column="pubPhoneP"/>
+		<result property="praiseCounts" column="praiseCounts"/>	<!--总赞数-->
+		<result property="isPraise" column="isPraise"/>	<!--本用户是否点赞-->
+		<result property="time" column="time"/>
+	</resultMap>
+
+  <!--查询多有回复和点赞信息(管理端)-->
+  <select id="getCommentChildForManage" resultMap="getCommentChildForManage">
+    SELECT e.* FROM (
+		SELECT a.id as 'id',
+		a.nickName AS 'nickName',
+		b.id AS 'parentId',
+		b.nickName AS 'nickNameP',
+		a.content AS 'content',
+		a.pubPic as 'pubPic',
+		a.pubPhone AS 'pubPhone',
+		DATE_FORMAT(a.time, '%Y-%m-%d %H:%i:%s') AS 'time',
+		a.praiseCounts as 'praiseCounts',
+		a.isPraise as 'isPraise',
+		a.commentType as 'commentType',
+		a.schoolName as 'schoolName'
+		FROM(
+
+		select bbb.id,
+		bbb.content,
+		bbb.pubPic,
+		max(bbb.parentId)as parentId,
+		max(bbb.comment_type)as commentType,
+		max(bbb.time)as time,
+		max(bbb.nickName)as nickName,
+		max(bbb.pubPhone)as pubPhone,
+		max(bbb.praise_counts) as praiseCounts,
+		max(bbb.schoolName) as schoolName,
+		max(bbb.userPraise)as isPraise from (
+
+		select aa.*,case when bb.id is not null then '1' else '0' end as 'userPraise' from (
+
+		select temp.id as id,
+		max(temp.content) as content,max(temp.time) as time,
+		max(temp.comment_type) as comment_type,
+		max(temp.nickName) as nickName,
+		max(temp.pubPic) as pubPic,
+		max(temp.pubPhone) as pubPhone,
+		max(temp.parent_id) as parentId,
+		max(temp.sch_name) as schoolName,
+		sum(temp.zan) as praise_counts,
+		temp.pub_id as pubId
+		from (
+		SELECT case when c.id is not null then 1 else 0 end 'zan',
+		c.pub_id,
+		b.nick_name AS nickName,
+		b.pub_pic as pubPic,
+		b.pub_phone AS pubPhone,
+		a.*,
+		d.sch_name
+		FROM site_comment a
+		LEFT JOIN se_public_user b ON b.id = a.user_id
+		left join site_comment_praise c on c.comment_id = a.id
+		LEFT JOIN se_school d ON d.id = a.school_id
+		WHERE 1 = 1
+		and a.del_flag = '0'
+		AND FIND_IN_SET(a.id, getChild(#{parentId}))
+		)temp group by pub_id,id
+		)aa left join (
+		select a.pub_id as id from site_comment_praise a
+		group by a.pub_id )bb on aa.pubId = bb.id
+		)bbb
+		group by bbb.id
+		) a
+		LEFT JOIN (
+			SELECT
+			b.*,
+			a.nick_name AS nickName,
+			a.pub_pic as pubPic,
+			a.pub_phone AS pubPhone
+			FROM se_public_user a
+			LEFT JOIN	site_comment b ON a.id = b.user_id
+			WHERE 1 = 1
+			and b.del_flag = '0'
+			AND FIND_IN_SET(b.id, getChild(#{parentId}))
+		) b ON a.parentId = b.id
+		) e WHERE e.parentId <![CDATA[ <> ]]> '' ORDER BY time
+  </select>
+  <!--管理端回复点赞返回信息-->
+  <resultMap id="getCommentChildForManage" type="HashMap">
+    <id property="id" column="id"/>
+    <result property="nickName" column="nickName"/>
+    <result property="parentId" column="parentId"/>
+    <result property="nickNameP" column="nickNameP"/>
+    <result property="content" column="content"/>
+    <result property="pubPic" column="pubPic"/>
+    <result property="pubPhone" column="pubPhone"/>
+    <result property="praiseCounts" column="praiseCounts"/>	<!--总赞数-->
+    <result property="isPraise" column="isPraise"/>	<!--本用户是否点赞-->
+    <result property="time" column="time"/>
+    <result property="commentType" column="commentType"/>
+    <result property="schoolName" column="schoolName"/>
+  </resultMap>
+
+
+
+  <!--个人中心查询所有已经发布的评论信息-->
+	<select id="personalComment" resultMap="personalComment">
+		SELECT a.id AS 'id',
+			a.nickName AS 'nickName',
+			a.comment_type AS 'commentType',
+			b.id AS 'parentId',
+			b.nickName AS 'nickNameP',
+			a.content AS 'content',
+			a.pubPic AS 'pubPic',
+			a.pubPhone AS 'pubPhone',
+			DATE_FORMAT(a.time, '%Y-%m-%d %H:%i:%s') AS 'time',
+			a.praiseCounts AS 'praiseCounts',
+			a.isPraise AS 'isPraise',
+			a.commentCategory AS 'commentCategory'
+			FROM(
+				  SELECT bbb.id,
+					bbb.content,
+					bbb.pubPic,
+					bbb.parentId,
+					bbb.time,
+					max(bbb.nickName) AS nickName,
+					max(bbb.pubPhone) AS pubPhone,
+					sum(bbb.praise_counts) AS praiseCounts,
+					max(bbb.userPraise) AS isPraise,
+					max(bbb.commentCategory) AS commentCategory,
+					bbb.comment_type
+					FROM(
+						SELECT	aa.*,CASE WHEN bb.id IS NOT NULL THEN '1' ELSE '0' END AS 'userPraise'
+						FROM(
+							SELECT temp.id AS id,
+								max(temp.content) AS content,
+								max(temp.time) AS time,
+								max(temp.comment_type) AS comment_type,
+								max(temp.nickName) AS nickName,
+								max(temp.pubPic) AS pubPic,
+								max(temp.comment_category) AS commentCategory,
+								max(temp.pubPhone) AS pubPhone,
+								max(temp.parent_id) AS parentId,
+								sum(temp.zan) AS praise_counts,
+								temp.pub_id AS pubId
+							  FROM(
+								  SELECT CASE WHEN c.id IS NOT NULL THEN 1 ELSE	0 END 'zan',
+									c.pub_id,b.nick_name AS nickName,b.pub_pic AS pubPic,b.pub_phone AS pubPhone,a.*
+									FROM site_comment a
+									LEFT JOIN se_public_user b ON b.id = a.user_id
+									LEFT JOIN site_comment_praise c ON c.comment_id = a.id
+									WHERE 1 = 1 AND a.del_flag = '0' and a.user_id = #{userId}
+								  ) temp GROUP BY pub_id,id
+							) aa
+						LEFT JOIN (SELECT a.pub_id AS id FROM site_comment_praise a WHERE a.pub_id = #{userId} GROUP BY a.pub_id
+						) bb ON aa.pubId = bb.id
+					) bbb GROUP BY bbb.id
+			) a
+		LEFT JOIN (
+			SELECT b.*, a.nick_name AS nickName,a.pub_pic AS pubPic
+			FROM se_public_user a
+			LEFT JOIN site_comment b ON a.id = b.user_id
+			WHERE 1 = 1 AND b.del_flag = '0'
+		) b ON a.parentId = b.id ORDER BY time desc
+	</select>
+
+	<resultMap id="personalComment" type="HashMap">
+		<id property="id" column="id"/>
+		<result property="nickName" column="nickName"/>
+		<result property="commentType" column="commentType"/>
+    <result property="commentCategory" column="commentCategory"/>
+		<result property="nickNameP" column="nickNameP"/>
+		<result property="content" column="content"/>
+		<result property="pubPic" column="pubPic"/>
+    <result property="pubPhone" column="pubPhone"/>
+		<result property="time" column="time"/>
+		<result property="praiseCounts" column="praiseCounts"/>	<!--总赞数-->
+		<result property="isPraise" column="isPraise"/>	<!--本用户是否点赞-->
+	</resultMap>
+
+  <!--查询该评论所有的回复,用于删除操作-->
+	<select id="getCommentByIdAll" resultMap="getCommentByIdAll">
+		select * from site_comment a
+		<where>
+			1=1 and a.del_flag = '0'
+			AND FIND_IN_SET(a.id, getChild(#{id}))
+		</where>
+	</select>
+	<resultMap id="getCommentByIdAll" type="com.pig4cloud.pig.portal.api.entity.Comment">
+		<id property="id" column="id"/>
+		<result property="schoolId" column="school_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="content" column="content"/>
+		<result property="time" column="time"/>
+		<result property="praiseCounts" column="praise_counts"/>
+		<result property="commentCategory" column="comment_category"/>
+		<result property="commentType" column="comment_type"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+	</resultMap>
+
+
+  <!--个人中心查询已收到回复的评论-->
+  <select id="receiveComment" resultMap="receiveComment">
+    select * from (
+    select
+    b.id as idHui,
+    b.content as contentHui,
+    b.time as timeHui,
+    b.pubPic as pubPicHui,
+    b.nickName as nickNameHui,
+    b.pubPhone as pubPhoneHui,
+    b.praiseCounts as praiseCountsHui,
+    b.isZan as isZanHui,
+    a.id as idPing,
+    a.content as contentPing,
+    a.time as timePing,
+    a.pubPic as pubPicPing,
+    a.nickName as nickNamePing,
+    a.pubPhone as pubPhonePing,
+    a.praiseCounts as praiseCountsPing,
+    a.isZan as isZanPing
+    from (
+
+    select id,parentId,content,time,comment_type,nickName,pubPic,pubPhone,sum(praise_counts)as praiseCounts,MAX(isZan) as isZan from (
+
+    select temp.id as id,max(temp.parent_id) as parentId,
+    max(temp.content) as content,max(temp.time) as time,
+    max(temp.comment_type) as comment_type,max(temp.nick_name) as nickName,
+    max(temp.pub_phone) as pubPhone,
+    max(temp.pub_pic) as pubPic,
+    sum(temp.zan) as praise_counts,
+    temp.pub_id as pubId,
+    case temp.pub_id when #{userId} then 1 else 0 end as isZan
+    from (
+    SELECT
+    case when c.id is not null then 1 else 0 end 'zan',c.pub_id,
+    b.nick_name,b.pub_pic,
+    b.pub_phone,
+    a.*
+    from site_comment a
+    left join se_public_user b on b.id = a.user_id
+    left join site_comment_praise c on c.comment_id = a.id
+    <where>
+
+      1=1 and a.del_flag = '0' and parent_id <![CDATA[ <> ]]> ''
+      <if test="userId != null ">
+        and a.user_id = #{userId}
+      </if>
+    </where>
+    )temp group by pub_id,id
+
+    )info
+    group by id,content,time,comment_type,nickName,pubPic,pubPhone
+
+
+    ) a left join (
+
+    select id,parentId,content,time,comment_type,nickName,pubPic,
+    pubPhone
+    ,sum(praise_counts)as praiseCounts,MAX(isZan) as isZan from (
+
+    select temp.id as id,max(temp.parent_id) as parentId,
+    max(temp.content) as content,max(temp.time) as time,
+    max(temp.comment_type) as comment_type,max(temp.nick_name) as nickName,
+    max(temp.pub_phone) as pubPhone,
+    max(temp.pub_pic) as pubPic,
+    sum(temp.zan) as praise_counts,
+    temp.pub_id as pubId,
+    case temp.pub_id when #{userId} then 1 else 0 end as isZan
+    from (
+    SELECT
+    case when c.id is not null then 1 else 0 end 'zan',c.pub_id,
+    b.nick_name,b.pub_pic,
+    b.pub_phone,
+    a.*
+    from site_comment a
+    left join se_public_user b on b.id = a.user_id
+    left join site_comment_praise c on c.comment_id = a.id
+    where 1=1 and a.del_flag = '0'
+    and parent_id <![CDATA[ <> ]]> ''
+    )temp group by pub_id,id
+    )info
+    group by id,content,time,comment_type,nickName,pubPic,pubPhone
+    ) b on a.id = b.parentId
+    )a where a.idHui <![CDATA[ <> ]]> ''
+  </select>
+  <resultMap id="receiveComment" type="HashMap">
+    <result property="idHui" column="idHui"/>
+    <result property="contentHui" column="contentHui"/>
+    <result property="timeHui" column="timeHui"/>
+    <result property="pubPicHui" column="pubPicHui"/>
+    <result property="nickNameHui" column="nickNameHui"/>
+    <result property="pubPhoneHui" column="pubPhoneHui"/>
+    <result property="praiseCountsHui" column="praiseCountsHui"/>
+    <result property="isZanHui" column="isZanHui"/>
+    <result property="idPing" column="idPing"/>
+    <result property="contentPing" column="contentPing"/>
+    <result property="timePing" column="timePing"/>
+    <result property="pubPicPing" column="pubPicPing"/>
+    <result property="nickNamePing" column="nickNamePing"/>
+    <result property="pubPhonePing" column="pubPhonePing"/>
+    <result property="praiseCountsPing" column="praiseCountsPing"/>
+    <result property="isZanPing" column="isZanPing"/>
+  </resultMap>
+
+
+
+
+  <!--评论查询学校有多少人参与评论 分类型（1直播2食谱）-->
+  <select id="getCommentCount" resultMap="getCommentCount">
+    select count(*) as commentCount from (
+    select a.user_id,count(*) as count from site_comment a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="schoolId != null ">
+        and a.school_id = #{schoolId}
+      </if>
+      <if test="commentCategory != null ">
+        and a.comment_category = #{commentCategory}
+      </if>
+    </where>
+   /* and a.comment_category = '1'
+    and a.school_id = '2'*/
+    group by user_id
+    ) a
+  </select>
+  <resultMap id="getCommentCount" type="HashMap">
+    <result property="commentCount" column="commentCount"/>
+  </resultMap>
+
+
+
+
+
+
+
+
+
+
+
+  <!--个人中心查询被回复的评论，返回一个id集合-->
+  <select id="gerReplyComment" resultMap="gerReplyComment">
+    select a.id from (
+      select * from site_comment
+      <where>
+        1=1 and del_flag = '0'
+        <if test="userId != null ">
+          and user_id = #{userId}
+        </if>
+      </where>
+    )a
+    inner join (
+      select * from site_comment
+      <where>
+        1=1 and del_flag = '0'
+ <!--       <if test="userId != null ">
+          and user_id = #{userId}
+        </if>-->
+      </where>
+    )b on a.id = b.parent_id
+    group by id
+  </select>
+  <!--个人中心查询被回复的评论id,返回父级id-->
+  <select id="getReplyCommentParentId" resultMap="gerReplyComment">
+      select a.id from site_comment a
+      <where>
+        1=1 and del_flag = '0'
+        <if test="id != null ">
+          AND FIND_IN_SET(a.id, getParent(#{id}))
+        </if>
+      </where>
+  </select>
+  <!-- 使用者gerReplyComment，gerReplyCommentParentId -->
+  <resultMap id="gerReplyComment" type="HashMap">
+    <result property="id" column="id"/>
+  </resultMap>
+  <!-- 所有评论 -->
+  <select id="getReplyCommentPage" resultMap="commentMapManage">
+    select bbb.id,bbb.content,bbb.pubPic,bbb.time,sum(bbb.praise_counts) as praiseCounts,
+    max(bbb.userPraise)as isPraise,bbb.pubPhone as pubPhone,bbb.nickName as nickName,
+    bbb.commentCategory as commentCategory,bbb.commentType as commentType,bbb.schoolId as schoolId
+    from (
+    select aa.*,case when bb.id is not null then '1' else '0' end as 'userPraise' from (
+    select temp.id as id,
+    max(temp.content) as content,max(temp.time) as time,
+    max(temp.comment_type) as commentType,max(temp.nickName) as nickName,
+    max(temp.comment_category) as commentCategory,
+    max(temp.school_id) as schoolId,
+    max(temp.pubPic) as pubPic,
+    max(temp.pubPhone) as pubPhone,
+    sum(temp.zan) as praise_counts,
+    temp.pub_id as pubId
+    from (
+    SELECT case when d.id is not null then 1 else 0 end 'zan',
+    d.pub_id,
+    a.id,
+    a.school_id,
+    a.user_id,
+    a.parent_id,
+    a.content,
+    a.time,
+    a.comment_category,
+    a.comment_type,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName,
+    c.nick_name as nickName,
+    c.pub_pic as pubPic,
+    c.pub_phone as pubPhone
+    FROM site_comment a
+    left join site_comment_praise d on d.comment_id = a.id
+    left join se_public_user c on a.user_id = c.id
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="idList != null ">
+        AND a.id in(${idList})
+      </if>
+    </where>
+    )temp group by pub_id,id
+    )aa left join (
+    select a.pub_id as id from site_comment_praise a
+    group by a.pub_id
+    )bb on aa.pubId = bb.id
+    )bbb
+    group by bbb.id
+    order by time desc
+  </select>
+  <!-- app 获取评论列表 -->
+  <select id="getAppComment" resultType="map">
+    SELECT
+      c.id,
+      u.nick_name as nickName,
+      u.pub_pic as pubPic,
+      c.time,
+      c.content,
+      count(p.id) as praiseCounts,
+      CASE WHEN p1.id IS NOT NULL THEN
+        '1' ELSE '0' END AS isZan
+    FROM
+        site_comment c
+        left join se_public_user u on c.user_id = u.id
+        left join site_comment_praise p on c.id = p.comment_id
+        LEFT JOIN site_comment_praise p1 ON c.id = p1.comment_id and p1.pub_id = #{userId}
+    <where>
+      c.del_flag = '0' and c.comment_type = '1'
+      and c.school_id = #{schoolId}
+      and c.comment_category = #{commentCategory}
+      group by c.id
+      order by c.time desc
+    </where>
+  </select>
+  <!-- app 根据评论id获取回复内容 -->
+  <select id="getReplyByCommentId" resultType="map">
+    SELECT
+    c.id,
+    u.nick_name as nickName,
+    u.pub_pic as pubPic,
+    c.time,
+    c.content,
+    count(p.id) as praiseCounts,
+    CASE WHEN p1.id IS NOT NULL THEN
+    '1' ELSE '0' END AS isZan
+    FROM
+    site_comment c
+    left join se_public_user u on c.user_id = u.id
+    left join site_comment_praise p on c.id = p.comment_id
+    LEFT JOIN site_comment_praise p1 ON c.id = p1.comment_id and p1.pub_id = #{userId}
+    <where>
+      c.del_flag = '0'
+      and c.parent_id = #{commentId}
+      group by c.id
+      order by c.time desc
+    </where>
+  </select>
+
+  <!-- app 评论回显 -->
+  <select id="findCommentById" resultType="map">
+    SELECT
+    c.id,
+    u.nick_name as nickName,
+    u.pub_pic as pubPic,
+    c.time,
+    c.content,
+    c.praise_counts as praiseCounts
+    FROM
+    site_comment c
+    left join se_public_user u on c.user_id = u.id
+    <where>
+      c.del_flag = '0'
+      and c.id = #{id}
+    </where>
+  </select>
+
+  <!-- app 评论回显 -->
+  <select id="getAppCommentCount" resultType="int">
+    SELECT
+     count(*)
+    FROM
+    site_comment c
+    <where>
+      c.del_flag = '0'
+      and c.comment_type = '1'
+      and c.school_id = #{schoolId}
+      and c.comment_category = #{commentCategory}
+    </where>
+  </select>
+
+  <!--个人中心查询已收到回复的评论-->
+  <select id="getAppReceiveComment" resultType="map">
+    SELECT
+      a.id,
+      a.school_id AS schoolId,
+      a.content,
+      a.time,
+      u.pub_pic AS pubPic,
+      u.nick_name AS nickName,
+    CASE
+	  WHEN p.id IS NOT NULL THEN
+	      '1' ELSE '0'
+	  END AS isZan,
+	      count( p1.id ) AS praiseCounts
+    FROM
+	      site_comment a
+	  LEFT JOIN site_comment b ON a.parent_id = b.id
+	  LEFT JOIN se_public_user u ON a.user_id = u.id
+	  LEFT JOIN site_comment_praise p ON a.id = p.comment_id and p.pub_id = #{userId}
+	  LEFT JOIN site_comment_praise p1 ON a.id = p1.comment_id
+    WHERE
+	      a.comment_type = 2
+	  AND b.user_id = #{userId}
+    GROUP BY
+        a.id
+  </select>
+
+  <!--app-comment 评论详情（包含该条评论的所有回复）-->
+  <select id="getAppCommentDetails" resultType="map">
+    SELECT
+      a.id,
+      a.parent_id as pid,
+      a.school_id AS schoolId,
+      a.content,
+      a.time,
+      u.pub_pic AS pubPic,
+      u.nick_name AS nickName,
+    CASE
+	  WHEN p.id IS NOT NULL THEN
+	      '1' ELSE '0'
+	  END AS isZan,
+	      count( p1.id ) AS praiseCounts
+    FROM
+	      site_comment a
+	  LEFT JOIN site_comment b ON a.parent_id = b.id
+	  LEFT JOIN se_public_user u ON a.user_id = u.id
+	  LEFT JOIN site_comment_praise p ON a.id = p.comment_id and p.pub_id = #{userId}
+	  LEFT JOIN site_comment_praise p1 ON a.id = p1.comment_id
+    WHERE
+        a.del_flag = '0'
+    and FIND_IN_SET(a.id,getChild(#{commentId}))
+    GROUP BY
+        a.id
+  </select>
+</mapper>
+
+
+
+
+
+
+
+
+	<!--comment简单分页查询-->
+	<!--<select id="getCommentChild" resultMap="getCommentChild">
+		SELECT
+		e.*
+		FROM
+		(
+		SELECT
+			#a.id as 'id',
+			a.nickName AS 'nickName',
+			b.id AS 'parentId',
+			b.nickName AS 'nickNameP',
+			a.content AS 'content',
+			a.pubPic as 'pubPic',
+			b.praise_counts as 'praiseCounts',
+			DATE_FORMAT(a.time, '%Y-%m-%d %H:%i:%s') AS 'time'
+		FROM
+		(
+			SELECT
+			a.*, b.nick_name AS nickName,b.pub_pic as pubPic
+			FROM
+			site_comment a
+			LEFT JOIN se_public_user b ON b.id = a.user_id
+			WHERE
+			1 = 1 and a.del_flag = '0'
+			AND FIND_IN_SET(a.id, getChild(#{parentId}))
+			) a
+			LEFT JOIN (
+			SELECT
+			a.*, b.nick_name AS nickName,b.pub_pic as pubPic
+			FROM
+			site_comment a
+			LEFT JOIN se_public_user b ON b.id = a.user_id
+			WHERE
+			1 = 1 and a.del_flag = '0'
+			AND FIND_IN_SET(a.id, getChild(#{parentId}))
+			) b ON a.parent_id = b.id
+		) e
+		WHERE e.parentId <![CDATA[ <> ]]> ''
+		ORDER BY time
+	</select>
+	<resultMap id="getCommentChild" type="HashMap">
+		<id property="nickName" column="nickName"/>
+		<result property="nickNameP" column="nickNameP"/>
+		<result property="content" column="content"/>
+		<result property="pubPic" column="pubPic"/>
+		<result property="praiseCounts" column="praiseCounts"/>
+		<result property="time" column="time"/>
+	</resultMap>-->
+
+
+

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.generator.mapper.ReCategoryMapper">
+
+  <resultMap id="reCategoryMap" type="com.pig4cloud.pig.generator.entity.ReCategory">
+                  <id property="id" column="id"/>
+                        <result property="createBy" column="create_by"/>
+                        <result property="createDate" column="create_date"/>
+                        <result property="updateBy" column="update_by"/>
+                        <result property="updateDate" column="update_date"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="reName" column="re_name"/>
+            </resultMap>
+
+  <!--reCategory简单分页查询-->
+  <select id="getReCategoryPage" resultMap="reCategoryMap">
+    SELECT
+                  id,
+                        create_by,
+                        create_date,
+                        update_by,
+                        update_date,
+                        remarks,
+                        del_flag,
+                        re_name
+              FROM re_category
+    <where>
+              <if test="reCategory.id != null and reCategory.id.trim() != ''">
+          AND id = #{reCategory.id}
+        </if>
+              <if test="reCategory.createBy != null and reCategory.createBy.trim() != ''">
+          AND create_by = #{reCategory.createBy}
+        </if>
+              <if test="reCategory.createDate != null and reCategory.createDate.trim() != ''">
+          AND create_date = #{reCategory.createDate}
+        </if>
+              <if test="reCategory.updateBy != null and reCategory.updateBy.trim() != ''">
+          AND update_by = #{reCategory.updateBy}
+        </if>
+              <if test="reCategory.updateDate != null and reCategory.updateDate.trim() != ''">
+          AND update_date = #{reCategory.updateDate}
+        </if>
+              <if test="reCategory.remarks != null and reCategory.remarks.trim() != ''">
+          AND remarks = #{reCategory.remarks}
+        </if>
+              <if test="reCategory.delFlag != null and reCategory.delFlag.trim() != ''">
+          AND del_flag = #{reCategory.delFlag}
+        </if>
+              <if test="reCategory.reName != null and reCategory.reName.trim() != ''">
+          AND re_name = #{reCategory.reName}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.TrendAnalysisMapper">
+
+
+
+  <!--监管端-趋势分析-学校预警总数Top5-List<Map>-->
+  <select id="getEarlyWarningRank" resultType="Map">
+    select a.id as id,a.sch_name as schoolName,ifnull(b.total,0) as total from (
+      select * from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+      )a left join (
+      select a.school_id as schoolId,b.sch_name as schoolName,count(*) as total from ck_early_warning a
+      left join se_school b on b.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.month != null">
+          and DATE_FORMAT(a.early_time,'%Y-%m') = #{map.month}
+        </if>
+      </where>
+    group by a.school_id,b.sch_name
+    ) b on b.schoolId = a.id
+    order by total desc
+    limit ${map.limit}
+  </select>
+
+
+  <!--监管端-趋势分析-学校报警总数Top5-List<Map>-->
+  <select id="getEarlyAlarmRank" resultType="Map">
+    select a.id as id,a.sch_name as schoolName,ifnull(b.total,0) as total from (
+    select * from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    )a left join (
+    select a.school_id as schoolId,b.sch_name as schoolName,count(*) as total from ck_early_alarm a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.month != null">
+        and DATE_FORMAT(a.alarm_time,'%Y-%m') = #{map.month}
+      </if>
+    </where>
+    group by a.school_id,b.sch_name
+    ) b on b.schoolId = a.id
+    order by total desc
+    limit ${map.limit}
+  </select>
+
+
+  <!--监管端-预警报警分析-预警环节数量对比(根据月查询)-List<Map>-->
+  <select id="getEarlyTotalContrast" resultType="Map">
+   select a.id,a.type,count(b.earlyWarningType)as total from
+    (select a.id,a.type from (
+      select
+        case when a.value in ('1','2')then '1'
+        when a.value in('3') then '2'
+        when a.value in ('4') then '3' end as id,
+        case when a.value in ('1','2')then '证照预警'
+        when a.value in('3') then '人员预警'
+        when a.value in ('4') then '食材预警' end as type
+        from sys_dict a where 1=1 and a.del_flag='0' and a.type='early_warning'  order by a.sort
+      )a group by a.id,a.type order by a.id) a left join (
+        select
+          case when early_warning in ('1','2') then '1' when early_warning in (3) then '2'
+          when early_warning in ('4') then '3' else '' end as earlyWarningType
+       from ck_early_warning a
+       left join se_school b on b.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.month != null">
+          and DATE_FORMAT(a.early_time,'%Y-%m') = #{map.month}
+        </if>
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+    ) b on b.earlyWarningType = a.id
+    group by a.id
+  </select>
+
+  <!--监管端-预警报警分析-报警环节数量对比(根据月查询)-List<Map>-->
+  <select id="getAlarmTotalContrast" resultType="Map">
+   select a.id,a.type,count(b.alarmType)as total from
+    (select a.id,a.type from (
+      select
+        case when a.value in ('1','2','3')then '1'
+        when a.value in('4') then '2'
+        when a.value in ('5','6','7') then '3' end as id,
+        case when a.value in ('1','2','3')then '证照报警'
+        when a.value in('4') then '人员报警'
+        when a.value in ('5','6','7') then '食材报警' end as type
+        from sys_dict a where 1=1 and a.del_flag='0' and a.type='alarm' order by a.sort
+      )a group by a.id,a.type order by a.id) a left join (
+        select
+        case when alarm in ('1','2','3') then '1' when alarm in ('4') then '2'
+        when alarm in ('5','6','7') then '3' end as alarmType
+      from ck_early_alarm a
+      left join se_school b on b.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.month != null">
+          and DATE_FORMAT(a.alarm_time,'%Y-%m') = #{map.month}
+        </if>
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+    ) b on b.alarmType = a.id
+    group by a.id
+  </select>
+
+
+  <!--监管端-预警报警分析-预警数量统计&报警数量统计(根据月查询)-Map-->
+  <select id="getWarnAlarmTotalContrast" resultType="Map">
+
+    select #{map.month} as date,(
+      select count(*) as total from ck_early_warning a
+      left join se_school b on b.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.month != null">
+          and DATE_FORMAT(a.early_time,'%Y-%m') = #{map.month}
+        </if>
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+    )as warningTotal,(
+    select count(*) as total from ck_early_alarm a
+      left join se_school b on b.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.month != null">
+          and DATE_FORMAT(a.alarm_time,'%Y-%m') = #{map.month}
+        </if>
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+    ) as alarmTotal
+  </select>
+
+
+
+
+
+ </mapper>

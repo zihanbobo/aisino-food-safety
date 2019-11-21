@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SelMealMapper">
+
+  <resultMap id="selMealMap" type="com.pig4cloud.pig.school.api.vo.selseal.SelMealVO">
+			  <id property="id" column="id"/>
+					<result property="mealName" column="meal_name"/>
+					<result property="mealContent" column="meal_content"/>
+					<result property="mealPic" column="meal_pic"/>
+					<result property="remarks" column="remarks"/>
+					<result property="createTime" column="create_time"/>
+					<result property="updateTime" column="update_time"/>
+					<result property="delFlag" column="del_flag"/>
+				    <collection property="serviceList" ofType="com.pig4cloud.pig.school.api.entity.selseal.ServiceMain"
+					  select="com.pig4cloud.pig.school.mapper.ServiceMainMapper.listServiceByMealId" column="id">
+				    </collection>
+            </resultMap>
+
+  <!--selMeal简单分页查询-->
+  <select id="getSelMealPage" resultMap="selMealMap">
+    SELECT
+                  id,
+                        meal_name,
+                        meal_content,
+                        meal_pic,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM se_sel_meal
+    <where>
+              <if test="selMeal.id != null and selMeal.id.trim() != ''">
+          AND id = #{selMeal.id}
+        </if>
+              <if test="selMeal.mealName != null and selMeal.mealName.trim() != ''">
+          AND meal_name = #{selMeal.mealName}
+        </if>
+              <if test="selMeal.mealContent != null and selMeal.mealContent.trim() != ''">
+          AND meal_content = #{selMeal.mealContent}
+        </if>
+              <if test="selMeal.mealPic != null and selMeal.mealPic.trim() != ''">
+          AND meal_pic = #{selMeal.mealPic}
+        </if>
+              <if test="selMeal.remarks != null and selMeal.remarks.trim() != ''">
+          AND remarks = #{selMeal.remarks}
+        </if>
+              <if test="selMeal.createTime != null and selMeal.createTime.trim() != ''">
+          AND create_time = #{selMeal.createTime}
+        </if>
+              <if test="selMeal.updateTime != null and selMeal.updateTime.trim() != ''">
+          AND update_time = #{selMeal.updateTime}
+        </if>
+              <if test="selMeal.delFlag != null and selMeal.delFlag.trim() != ''">
+          AND del_flag = #{selMeal.delFlag}
+        </if>
+          </where>
+  </select>
+
+	<!--食谱分页查询（带配料）-->
+	<select id="getSelMealVosPage" resultMap="selMealMap">
+		SELECT
+		id,
+		meal_name,
+		meal_content,
+		meal_pic,
+		remarks,
+		create_time,
+		update_time,
+		del_flag
+		FROM se_sel_meal AS `sm`
+		<where>
+			<if test="query.mealName != null and query.mealName != ''">
+				and `sm`.meal_name LIKE CONCAT('%',#{query.mealName},'%')
+			</if>
+		</where>
+		ORDER BY `sm`.create_time DESC
+	</select>
+
+	<!-- 通过学校ID，查询套餐信息-->
+	<select id="listMealBySchoolId" resultMap="selMealMap"><!-- 原BaseResultMap-->
+        SELECT
+            sem.*
+        FROM
+        se_sel_meal sem, se_school_meal scm
+        WHERE sem.id = scm.meal_id
+
+         AND sem.del_flag = 0  and  scm.school_id IN (#{id})
+    </select>
+</mapper>

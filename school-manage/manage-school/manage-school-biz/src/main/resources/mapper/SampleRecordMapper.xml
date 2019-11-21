@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SampleRecordMapper">
+
+  <resultMap id="sampleRecordMap" type="com.pig4cloud.pig.school.api.entity.account.SampleRecord">
+              <id property="id" column="id"/>
+              <result property="srNumber" column="sr_number"/>
+              <result property="parameter" column="parameter"/>
+              <result property="srDate" column="sr_date"/>
+              <result property="srWeight" column="sr_weight"/>
+              <result property="srPerson" column="sr_person"/>
+              <result property="srDuration" column="sr_duration"/>
+              <result property="srPic" column="sr_pic"/>
+					    <result property="remarks" column="remarks"/>
+					    <result property="createTime" column="create_time"/>
+					    <result property="updateTime" column="update_time"/>
+					    <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--sampleRecord简单分页查询-->
+ <!-- <select id="getSampleRecordPage" resultMap="sampleRecordMap">
+    SELECT
+                  id,
+                        sr_number,
+                        parameter,
+                        sr_date,
+                        sr_weight,
+                        sr_person,
+                        sr_duration,
+                        sr_pic,
+					    remarks,
+					    create_time,
+					    update_time,
+					    del_flag
+              FROM sl_sample_record
+    <where>
+              <if test="sampleRecord.id != null and sampleRecord.id.trim() != ''">
+          AND id = #{sampleRecord.id}
+        </if>
+              <if test="sampleRecord.srNumber != null and sampleRecord.srNumber.trim() != ''">
+          AND sr_number = #{sampleRecord.srNumber}
+        </if>
+              <if test="sampleRecord.parameter != null and sampleRecord.parameter.trim() != ''">
+          AND parameter = #{sampleRecord.parameter}
+        </if>
+              <if test="sampleRecord.srDate != null and sampleRecord.srDate.trim() != ''">
+          AND sr_date = #{sampleRecord.srDate}
+        </if>
+              <if test="sampleRecord.srWeight != null and sampleRecord.srWeight.trim() != ''">
+          AND sr_weight = #{sampleRecord.srWeight}
+        </if>
+              <if test="sampleRecord.srPerson != null and sampleRecord.srPerson.trim() != ''">
+          AND sr_person = #{sampleRecord.srPerson}
+        </if>
+              <if test="sampleRecord.srDuration != null and sampleRecord.srDuration.trim() != ''">
+          AND sr_duration = #{sampleRecord.srDuration}
+        </if>
+              <if test="sampleRecord.srPic != null and sampleRecord.srPic.trim() != ''">
+          AND sr_pic = #{sampleRecord.srPic}
+        </if>
+			  <if test="sampleRecord.remarks != null and sampleRecord.remarks.trim() != ''">
+		  AND remarks = #{sampleRecord.remarks}
+		</if>
+			  <if test="sampleRecord.createTime != null and sampleRecord.createTime.trim() != ''">
+		  AND create_time = #{sampleRecord.createTime}
+		</if>
+			  <if test="sampleRecord.updateTime != null and sampleRecord.updateTime.trim() != ''">
+		  AND update_time = #{sampleRecord.updateTime}
+		</if>
+			  <if test="sampleRecord.delFlag != null and sampleRecord.delFlag.trim() != ''">
+		  AND del_flag = #{sampleRecord.delFlag}
+		</if>
+          </where>
+  </select>-->
+
+  <!--管理端-取留样列表信息-->
+  <select id="getSampleSchoolPage" resultType="map">
+    select * from (
+      select a.school_id as schoolId,c.sch_name as schoolName,a.rd_date as rdDate,
+      CASE WHEN max(b.sr_type) ='0' THEN '1'
+      WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '2'
+      ELSE '3' END AS isSample,
+      CASE WHEN max(b.sr_type) ='0' THEN '未留样'
+      WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '部分留样'
+      ELSE '全部留样'
+      END AS isSampleZ
+      from re_daily a
+      left join re_daily_source b on b.daily_id = a.id
+      left join se_school c on c.id = a.school_id
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+        <if test="map.rdDate != null">
+          and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{map.rdDate}
+        </if>
+      </where>
+      group by a.rd_date
+      order by a.rd_date desc
+    ) a
+    <where>
+      1=1
+      <if test="map.isSample != null">
+        AND a.isSample = #{map.isSample}
+      </if>
+    </where>
+  </select>
+
+  <!--查询留样详情-->
+  <select id="getRecipeSampleDay" resultType="map">
+    select a.rd_type as rdType,a.rd_date as rdDate,c.re_name as 'reName',
+    b.daily_id as dailyId,b.source_id as sourceId,b.sr_type as srType,
+    b.user_id as userId,
+    b.sr_startdate as srStartdate,b.sr_enddate as srEnddate,b.sr_weight as srWeight,
+    b.sr_sampleholder as srSampleholder,b.sr_destroys as srDestroys,
+    b.sr_checkurl as srCheckurl,b.sr_pic as srPic,b.is_qualified as isQualified
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+      <if test="map.rdDate != null">
+        and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{map.rdDate}
+      </if>
+    </where>
+    order by a.rd_type
+  </select>
+
+
+
+
+
+</mapper>

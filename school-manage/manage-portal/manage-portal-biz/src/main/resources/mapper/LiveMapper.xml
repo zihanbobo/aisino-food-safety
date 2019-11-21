@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.LiveMapper">
+
+  <resultMap id="liveMap" type="com.pig4cloud.pig.portal.api.vo.live.LiveVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="eqId" column="eq_id"/>
+                        <result property="startTime" column="start_time"/>
+                        <result property="endTime" column="end_time"/>
+                        <result property="isStart" column="is_start"/>
+                        <result property="imageUrl" column="image_url"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+	  					<!--字段-->
+                        <result property="eqarea" column="eqarea"/>
+                        <result property="schoolname" column="schoolname"/>
+                        <result property="equrl" column="equrl"/>
+            </resultMap>
+
+  <!--live简单分页查询-->
+  <select id="getLivePage" resultMap="liveMap">
+	  SELECT
+		  a.id,
+		  a.school_id,
+		  a.eq_id,
+		  a.start_time,
+		  a.end_time,
+		  a.is_start,
+	 	  a.image_url,
+		  a.create_time,
+		  a.update_time,
+		  a.del_flag,
+		  b.eq_area as eqarea,
+		  c.sch_name as schoolname,
+		  b.eq_url as equrl
+	  FROM vd_live a
+	  left join vd_equipment b on a.eq_id = b.id
+	  left join se_school c on c.id = a.school_id
+    <where>
+		1=1 and a.del_flag = '0'
+              <if test="live.id != null">
+          AND a.id = #{live.id}
+        </if>
+              <if test="live.schoolId != null">
+          AND a.school_id = #{live.schoolId}
+        </if>
+              <if test="live.eqId != null">
+          AND a.eq_id = #{live.eqId}
+        </if>
+       <!--       <if test="live.startTime != null and live.startTime.trim() != ''">
+          AND start_time = #{live.startTime}
+        </if>
+              <if test="live.endTime != null and live.endTime.trim() != ''">
+          AND end_time = #{live.endTime}
+        </if>
+              <if test="live.isStart != null and live.isStart.trim() != ''">
+          AND is_start = #{live.isStart}
+        </if>
+              <if test="live.createTime != null and live.createTime.trim() != ''">
+          AND create_time = #{live.createTime}
+        </if>
+              <if test="live.updateTime != null and live.updateTime.trim() != ''">
+          AND update_time = #{live.updateTime}
+        </if>
+              <if test="live.delFlag != null and live.delFlag.trim() != ''">
+          AND del_flag = #{live.delFlag}
+        </if>-->
+          </where>
+  </select>
+
+
+	<!--门户端直播信息（根据学校id查询）-->
+	<resultMap id="liveSchoolMap" type="com.pig4cloud.pig.portal.api.vo.live.LiveSchoolVO">
+		<id property="id" column="id"/>
+		<result property="schoolId" column="school_id"/>
+		<result property="eqId" column="eq_id"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="isStart" column="is_start"/>
+		<result property="imageUrl" column="image_url"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="equipment.eqArea" column="eqArea"/>
+		<result property="equipment.restaurantName" column="restaurantName"/>
+    <result property="equipment.eqUrl" column="eqUrl"/>
+<!--		<result property="school.introduction" column="introduction"/>
+		<result property="school.officeNature" column="officeNature"/>
+		<result property="school.schoolType" column="schoolType"/>
+		<result property="school.schAddress" column="schAddress"/>
+		<result property="school.scName" column="scName"/>-->
+	</resultMap>
+	<select id="getLiveSchoolPage" resultMap="liveSchoolMap">
+		SELECT
+			a.id,
+			a.school_id,
+			a.eq_id,
+			a.start_time,
+			a.end_time,
+			a.is_start,
+			a.image_url,
+			a.create_time,
+			a.update_time,
+			a.del_flag,
+			b.eq_area as eqArea,
+			b.restaurant_name as restaurantName,
+			b.eq_url as eqUrl
+-- 			c.sch_name as schoolName,
+-- 			c.introduction as introduction,
+-- 			c.office_nature as officeNature,
+-- 			c.school_type as schoolType,
+-- 			c.sch_address as schAddress,
+-- 			c.sch_name as schName
+		FROM vd_live a
+		left join vd_equipment b on a.eq_id = b.id
+-- 		left join se_school c on c.id = a.school_id
+		<where>
+			1=1 and a.del_flag = '0'
+			<if test="live.schoolId != null">
+				AND a.school_id = #{live.schoolId}
+			</if>
+		</where>
+	</select>
+
+  <select id="getLiveMain" parameterType="java.util.List" resultType="map">
+    SELECT
+    a.id,
+    s.sch_name as schName,
+    a.school_id as schoolId,
+    a.image_url as imageUrl,
+    max(a.is_start) as isStart,
+    a.start_time as startTime,
+    a.end_time as endTime,
+    com.comments as comments
+    FROM vd_live a
+    left join se_school s on a.school_id = s.id
+    left join (SELECT
+      count( c.id ) as comments,
+      c.school_id
+      FROM
+      site_comment c
+      WHERE
+      c.comment_type = 1
+      AND c.comment_category = 1
+      GROUP BY
+      c.school_id) com on a.school_id = com.school_id
+    <where>
+      a.del_flag = '0'
+      <foreach collection="list" item="schoolId" open="and a.school_id in(" close=")" separator=",">
+        #{schoolId}
+      </foreach>
+    </where>
+    group by a.school_id
+  </select>
+
+  <select id="getLiveList" resultType="map">
+    SELECT
+    a.id,
+    a.image_url as imageUrl,
+    v.eq_area as eqArea
+    FROM vd_live a
+    left join vd_equipment v on a.eq_id = v.id
+    <where>
+      a.del_flag = '0'
+      and a.school_id = #{schoolId}
+    </where>
+  </select>
+
+  <select id="getLiveInfo" resultType="map">
+    SELECT
+    a.id,
+    s.sch_name as schName,
+    a.school_id as schoolId,
+    a.image_url as imageUrl,
+    a.is_start as isStart,
+    a.start_time as startTime,
+    a.end_time as endTime,
+    com.comments as comments
+    FROM vd_live a
+    left join se_school s on a.school_id = s.id
+    left join (SELECT
+    count( c.id ) as comments,
+    c.school_id
+    FROM
+    site_comment c
+    WHERE
+    c.comment_type = 1
+    AND c.comment_category = 1
+    GROUP BY
+    c.school_id) com on a.school_id = com.school_id
+    <where>
+      a.del_flag = '0'
+      and a.id = #{liveId}
+    </where>
+  </select>
+
+
+
+  <select id="getLiveListWatch" resultMap="liveMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.eq_id,
+    a.start_time,
+    a.end_time,
+    a.is_start,
+    a.image_url,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.eq_area as eqarea,
+    c.sch_name as schoolname,
+    b.eq_url as equrl
+    FROM vd_live a
+    left join vd_equipment b on a.eq_id = b.id
+    left join se_school c on c.id = a.school_id
+    <where>
+      a.del_flag = '0'
+      and a.school_id = #{schoolId}
+    </where>
+  </select>
+</mapper>

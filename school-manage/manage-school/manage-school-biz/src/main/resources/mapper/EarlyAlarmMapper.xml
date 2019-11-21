@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.EarlyAlarmMapper">
+
+  <resultMap id="earlyAlarmMap" type="com.pig4cloud.pig.school.api.vo.check.EarlyAlarmVO">
+                  <id property="id" column="id"/>
+                        <result property="alarmTime" column="alarm_time"/>
+                        <result property="alarm" column="alarm"/>
+                        <result property="dealWith" column="deal_with"/>
+                        <result property="expireTime" column="expire_time"/>
+                        <result property="schoodId" column="schood_id"/>
+                        <result property="schName" column="sch_name"/>
+                        <result property="supplierName" column="supplier_name"/>
+                        <result property="human" column="human"/>
+                        <result property="purchaseTime" column="purchase_time"/>
+                        <result property="foodName" column="food_name"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="description" column="description"/>
+            </resultMap>
+
+  <!--earlyAlarm简单分页查询-->
+  <select id="getEarlyAlarmPage" resultMap="earlyAlarmMap">
+    SELECT
+      a.id,
+      a.alarm_time,
+      a.alarm,
+      a.deal_with,
+      a.expire_time,
+      a.sch_name,
+      a.supplier_name,
+      a.human,
+      a.purchase_time,
+      a.food_name,
+      a.create_time,
+      a.update_time,
+      a.del_flag,
+      b.sch_name as schoolName,
+      c.description as description
+      FROM ck_early_alarm a
+      left join se_school b on b.id = a.school_id
+      left join (select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='alarm') c
+      on c.value = a.alarm
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="earlyAlarm.id != null and earlyAlarm.id.trim() != ''">
+          AND id = #{earlyAlarm.id}
+        </if>
+      <if test="earlyAlarm.schoolId != null">
+        AND a.school_id = #{earlyAlarm.schoolId}
+      </if>
+              <if test="earlyAlarm.alarmTime != null and earlyAlarm.alarmTime.trim() != ''">
+          AND a.alarm_time = #{earlyAlarm.alarmTime}
+        </if>
+              <if test="earlyAlarm.dealWith != null and earlyAlarm.dealWith.trim() != ''">
+          AND a.deal_with = #{earlyAlarm.dealWith}
+        </if>
+      <if test="earlyAlarm.ctDate != null">
+        AND DATE_FORMAT(a.alarm_time,'%Y-%m-%d') = #{earlyAlarm.ctDate}
+      </if>
+              <if test="earlyAlarm.alarm != null and earlyAlarm.alarm.trim() != ''">
+          AND alarm = #{earlyAlarm.alarm}
+        </if>
+              <if test="earlyAlarm.expireTime != null and earlyAlarm.expireTime.trim() != ''">
+          AND expire_time = #{earlyAlarm.expireTime}
+        </if>
+              <if test="earlyAlarm.schName != null and earlyAlarm.schName.trim() != ''">
+          AND sch_name = #{earlyAlarm.schName}
+        </if>
+              <if test="earlyAlarm.supplierName != null and earlyAlarm.supplierName.trim() != ''">
+          AND supplier_name = #{earlyAlarm.supplierName}
+        </if>
+              <if test="earlyAlarm.human != null and earlyAlarm.human.trim() != ''">
+          AND human = #{earlyAlarm.human}
+        </if>
+              <if test="earlyAlarm.purchaseTime != null and earlyAlarm.purchaseTime.trim() != ''">
+          AND purchase_time = #{earlyAlarm.purchaseTime}
+        </if>
+              <if test="earlyAlarm.foodName != null and earlyAlarm.foodName.trim() != ''">
+          AND food_name = #{earlyAlarm.foodName}
+        </if>
+              <if test="earlyAlarm.createTime != null and earlyAlarm.createTime.trim() != ''">
+          AND create_time = #{earlyAlarm.createTime}
+        </if>
+              <if test="earlyAlarm.updateTime != null and earlyAlarm.updateTime.trim() != ''">
+          AND update_time = #{earlyAlarm.updateTime}
+        </if>
+              <if test="earlyAlarm.delFlag != null and earlyAlarm.delFlag.trim() != ''">
+          AND del_flag = #{earlyAlarm.delFlag}
+        </if>
+          </where>
+  </select>
+
+  <!--检索-报警-->
+  <select id="getAlarm" resultType="Map">
+
+
+    select
+    '1' as 'alarm',
+    a.bulicense_end as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    a.sup_name as 'supplier_name',
+    null as 'human',
+    null as 'purchase_time',
+    null as 'food_name'
+    from sup_main_filing a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and not (select DATE_SUB(curdate(),INTERVAL 0 DAY)) BETWEEN a.bulicense_start and a.bulicense_end
+
+    union ALL
+
+    select
+    '2' as 'alarm',
+    a.bulicense_end as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    a.sup_name as 'supplier_name',
+    null as 'human',
+    null as 'purchase_time',
+    null as 'food_name'
+    from sup_main_filing a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and not (select DATE_SUB(curdate(),INTERVAL 0 DAY)) BETWEEN a.permit_start and a.permit_end
+    union ALL
+
+    select
+    '3' as 'alarm',
+    a.health_endtime as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    '' as 'supplier_name',
+    a.real_name as 'human',
+    null as 'purchase_time',
+    null as 'food_name'
+    from sys_user a
+    left join se_school b on b.id = a.union_id
+    where 1 = 1 and a.del_flag = '0'
+    and a.user_type = '2' and a.is_admin is null
+    and a.health_endtime is not null
+    and not (select DATE_SUB(curdate(),INTERVAL 0 DAY)) BETWEEN a.health_endtime and a.health_endtime
+
+    union ALL
+
+    select
+        '4' as 'alarm',
+        null as 'expire_time',
+        b.id as 'school_id',
+        b.sch_name as 'sch_name',
+        null as 'supplier_name',
+        c.real_name as 'human',
+        null as 'purchase_time',
+        null as 'food_name'
+     from ck_morning_check a
+    left join se_school b on b.id = a.school_id
+    left join sys_user c on c.user_id = a.user_id
+    where 1=1 and a.del_flag = '0'
+    and DATE_FORMAT(a.check_time,'%Y-%m-%d') = (select DATE_SUB(curdate(),INTERVAL 0 DAY))
+    and a.is_qualified = '2'
+
+    union ALL
+
+    select
+    '5' as 'alarm',
+    null as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    null as 'supplier_name',
+    null as 'human',
+    DATE_FORMAT(a.pur_time, '%Y-%m-%d') as 'purchase_time',
+    null as 'food_name'
+    from pur_purchase_main a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and (a.claim_ticket is null or a.claim_ticket = '')
+    and DATE_FORMAT(a.pur_time, '%Y-%m-%d') <![CDATA[ <= ]]> (select DATE_SUB(curdate(),INTERVAL 3 DAY))
+
+    union all
+
+
+
+
+
+
+    select
+    '6' as 'alarm',
+    null as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    null as 'supplier_name',
+    null as 'human',
+    DATE_FORMAT(a.pur_time, '%Y-%m-%d') as 'purchase_time',
+    d.foodName as 'food_name'
+    from pur_purchase_main a
+    left join se_school b on b.id = a.school_id
+    left join pur_purchase_filing c on c.pur_id = a.id
+    left join view_sup_ingredients_filing d on d.id = c.filing_id
+    where 1=1
+    and a.del_flag = '0'
+    and a.pur_status = '3'
+    and c.is_qualified = '2'
+
+    union all
+
+
+    select
+    '7' as 'alarm',
+    null as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    null as 'supplier_name',
+    null as 'human',
+    DATE_FORMAT(a.pur_time, '%Y-%m-%d') as 'purchase_time',
+    d.foodName as 'food_name'
+    from pur_purchase_main a
+    left join se_school b on b.id = a.school_id
+    left join pur_purchase_filing c on c.pur_id = a.id
+    left join view_sup_ingredients_filing d on d.id = c.filing_id
+    where 1=1
+    and a.del_flag = '0'
+    and a.pur_status = '3'
+    and (c.check_file is null or c.check_file = '')
+
+
+  </select>
+
+
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.IngredientsMapper">
+
+  <resultMap id="ingredientsMap" type="com.pig4cloud.pig.school.api.entity.source.Ingredients">
+                  <id property="id" column="id"/>
+                        <result property="foodType" column="food_type"/>
+                        <result property="foodName" column="food_name"/>
+                        <result property="foodPic" column="food_pic"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--ingredients简单分页查询-->
+  <select id="getIngredientsPage" resultMap="ingredientsMap">
+    SELECT
+                  a.id,
+                  a.food_type,
+                  a.food_name,
+                  a.food_pic,
+                  a.remarks,
+                  a.create_time,
+                  a.update_time,
+                  a.del_flag
+              FROM sup_ingredients a
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="ingredients.id != null and ingredients.id.trim() != ''">
+          AND a.id = #{ingredients.id}
+        </if>
+              <if test="ingredients.foodType != null and ingredients.foodType.trim() != ''">
+          AND a.food_type = #{ingredients.foodType}
+        </if>
+              <if test="ingredients.foodName != null and ingredients.foodName.trim() != ''">
+          AND a.food_name = #{ingredients.foodName}
+        </if>
+              <if test="ingredients.foodPic != null and ingredients.foodPic.trim() != ''">
+          AND a.food_pic = #{ingredients.foodPic}
+        </if>
+              <if test="ingredients.remarks != null and ingredients.remarks.trim() != ''">
+          AND a.remarks = #{ingredients.remarks}
+        </if>
+              <if test="ingredients.createTime != null and ingredients.createTime.trim() != ''">
+          AND a.create_time = #{ingredients.createTime}
+        </if>
+              <if test="ingredients.updateTime != null and ingredients.updateTime.trim() != ''">
+          AND a.update_time = #{ingredients.updateTime}
+        </if>
+              <if test="ingredients.delFlag != null and ingredients.delFlag.trim() != ''">
+          AND a.del_flag = #{ingredients.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

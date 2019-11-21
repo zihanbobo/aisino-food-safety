@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.HighRiskMapper">
+
+  <resultMap id="highRiskMap" type="com.pig4cloud.pig.school.api.entity.source.HighRisk">
+                  <id property="id" column="id"/>
+                        <result property="foodType" column="food_type"/>
+                        <result property="foodName" column="food_name"/>
+                        <result property="foodPic" column="food_pic"/>
+                        <result property="foodBrand" column="food_brand"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--highRisk简单分页查询-->
+  <select id="getHighRiskPage" resultMap="highRiskMap">
+    SELECT
+                  id,
+                        food_type,
+                        food_name,
+                        food_pic,
+                        food_brand,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM sup_high_risk
+    <where>
+              <if test="highRisk.id != null and highRisk.id.trim() != ''">
+          AND id = #{highRisk.id}
+        </if>
+              <if test="highRisk.foodType != null and highRisk.foodType.trim() != ''">
+          AND food_type = #{highRisk.foodType}
+        </if>
+              <if test="highRisk.foodName != null and highRisk.foodName.trim() != ''">
+          AND food_name = #{highRisk.foodName}
+        </if>
+              <if test="highRisk.foodPic != null and highRisk.foodPic.trim() != ''">
+          AND food_pic = #{highRisk.foodPic}
+        </if>
+              <if test="highRisk.foodBrand != null and highRisk.foodBrand.trim() != ''">
+          AND food_brand = #{highRisk.foodBrand}
+        </if>
+              <if test="highRisk.remarks != null and highRisk.remarks.trim() != ''">
+          AND remarks = #{highRisk.remarks}
+        </if>
+              <if test="highRisk.createTime != null and highRisk.createTime.trim() != ''">
+          AND create_time = #{highRisk.createTime}
+        </if>
+              <if test="highRisk.updateTime != null and highRisk.updateTime.trim() != ''">
+          AND update_time = #{highRisk.updateTime}
+        </if>
+              <if test="highRisk.delFlag != null and highRisk.delFlag.trim() != ''">
+          AND del_flag = #{highRisk.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

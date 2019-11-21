@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.KitwasteTreatmentMapper">
+
+  <resultMap id="kitwasteTreatmentMap" type="com.pig4cloud.pig.school.api.vo.account.KitwasteTreatmentVO">
+                  <id property="id" column="id"/>
+                        <result property="disposalUnit" column="disposal_unit"/>
+                        <result property="recoverTime" column="recover_time"/>
+                        <result property="recCategory" column="rec_category"/>
+                        <result property="disposer" column="disposer"/>
+                        <result property="contact" column="contact"/>
+                        <result property="carNumber" column="car_number"/>
+                        <result property="ktNum" column="kt_num"/>
+                        <result property="ktPic" column="kt_pic"/>
+                        <result property="ktPerson" column="kt_person"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="schoolName" column="schoolName"/>
+            </resultMap>
+
+  <!--kitwasteTreatment简单分页查询-->
+  <select id="getKitwasteTreatmentPage" resultMap="kitwasteTreatmentMap">
+    SELECT
+                  a.id,
+                  a.school_id,
+    a.disposal_unit,
+    a.recover_time,
+    a.rec_category,
+    a.disposer,
+    a.contact,
+    a.car_number,
+    a.kt_num,
+    a.kt_pic,
+    a.kt_person,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName
+              FROM sl_kitwaste_treatment a
+    left join se_school b on b.id = a.school_id
+    <where>
+              <if test="kitwasteTreatment.id != null and kitwasteTreatment.id.trim() != ''">
+          AND a.id = #{kitwasteTreatment.id}
+        </if>
+      <if test="kitwasteTreatment.schoolId != null">
+        AND a.school_id = #{kitwasteTreatment.schoolId}
+      </if>
+              <if test="kitwasteTreatment.disposalUnit != null and kitwasteTreatment.disposalUnit.trim() != ''">
+          AND a.disposal_unit = #{kitwasteTreatment.disposalUnit}
+        </if>
+              <if test="kitwasteTreatment.recoverTime != null and kitwasteTreatment.recoverTime.trim() != ''">
+          AND a.recover_time = #{kitwasteTreatment.recoverTime}
+        </if>
+              <if test="kitwasteTreatment.recCategory != null and kitwasteTreatment.recCategory.trim() != ''">
+          AND a.rec_category = #{kitwasteTreatment.recCategory}
+        </if>
+              <if test="kitwasteTreatment.disposer != null and kitwasteTreatment.disposer.trim() != ''">
+          AND a.disposer = #{kitwasteTreatment.disposer}
+        </if>
+              <if test="kitwasteTreatment.contact != null and kitwasteTreatment.contact.trim() != ''">
+          AND a.contact = #{kitwasteTreatment.contact}
+        </if>
+              <if test="kitwasteTreatment.carNumber != null and kitwasteTreatment.carNumber.trim() != ''">
+          AND a.car_number = #{kitwasteTreatment.carNumber}
+        </if>
+              <if test="kitwasteTreatment.ktNum != null and kitwasteTreatment.ktNum.trim() != ''">
+          AND a.kt_num = #{kitwasteTreatment.ktNum}
+        </if>
+              <if test="kitwasteTreatment.ktPic != null and kitwasteTreatment.ktPic.trim() != ''">
+          AND a.kt_pic = #{kitwasteTreatment.ktPic}
+        </if>
+              <if test="kitwasteTreatment.ktPerson != null and kitwasteTreatment.ktPerson.trim() != ''">
+          AND a.kt_pic = #{kitwasteTreatment.ktPerson}
+        </if>
+              <if test="kitwasteTreatment.remarks != null and kitwasteTreatment.remarks.trim() != ''">
+          AND a.remarks = #{kitwasteTreatment.remarks}
+        </if>
+              <if test="kitwasteTreatment.createTime != null and kitwasteTreatment.createTime.trim() != ''">
+          AND a.create_time = #{kitwasteTreatment.createTime}
+        </if>
+              <if test="kitwasteTreatment.updateTime != null and kitwasteTreatment.updateTime.trim() != ''">
+          AND a.update_time = #{kitwasteTreatment.updateTime}
+        </if>
+              <if test="kitwasteTreatment.delFlag != null and kitwasteTreatment.delFlag.trim() != ''">
+          AND a.del_flag = #{kitwasteTreatment.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

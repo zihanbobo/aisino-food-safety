@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SchoolCustomMapper">
+
+  <resultMap id="schoolCustomMap" type="com.pig4cloud.pig.school.api.vo.source.SchoolCustomVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="foodType" column="food_type"/>
+                        <result property="foodName" column="food_name"/>
+                        <result property="foodPic" column="food_pic"/>
+                        <result property="foodBrand" column="food_brand"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--schoolCustom简单分页查询-->
+  <select id="getSchoolCustomPage" resultMap="schoolCustomMap">
+    SELECT
+                  a.id,
+                  a.school_id,
+                  a.food_type,
+                  a.food_name,
+                  a.food_pic,
+                  a.food_brand,
+                  a.remarks,
+                  a.create_time,
+                  a.update_time,
+                  a.del_flag,
+                  b.sch_name as schoolName
+              FROM sup_school_custom a
+              left join se_school b on b.id = a.school_id
+    <where>
+          1=1 and a.del_flag = '0'
+              <if test="schoolCustom.id != null and schoolCustom.id.trim() != ''">
+          AND a.id = #{schoolCustom.id}
+        </if>
+              <if test="schoolCustom.schoolId != null">
+          AND a.school_id = #{schoolCustom.schoolId}
+        </if>
+              <if test="schoolCustom.foodType != null and schoolCustom.foodType.trim() != ''">
+          AND a.food_type = #{schoolCustom.foodType}
+        </if>
+              <if test="schoolCustom.foodName != null and schoolCustom.foodName.trim() != ''">
+          AND a.food_name = #{schoolCustom.foodName}
+        </if>
+              <if test="schoolCustom.foodPic != null and schoolCustom.foodPic.trim() != ''">
+          AND a.food_pic = #{schoolCustom.foodPic}
+        </if>
+              <if test="schoolCustom.foodBrand != null and schoolCustom.foodBrand.trim() != ''">
+          AND a.food_brand = #{schoolCustom.foodBrand}
+        </if>
+              <if test="schoolCustom.remarks != null and schoolCustom.remarks.trim() != ''">
+          AND a.remarks = #{schoolCustom.remarks}
+        </if>
+              <if test="schoolCustom.createTime != null and schoolCustom.createTime.trim() != ''">
+          AND a.create_time = #{schoolCustom.createTime}
+        </if>
+              <if test="schoolCustom.updateTime != null and schoolCustom.updateTime.trim() != ''">
+          AND a.update_time = #{schoolCustom.updateTime}
+        </if>
+              <if test="schoolCustom.delFlag != null and schoolCustom.delFlag.trim() != ''">
+          AND a.del_flag = #{schoolCustom.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

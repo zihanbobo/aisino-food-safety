@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pig4cloud.pig.portal.mapper.CommentPraiseMapper">
+
+
+	<delete id="deleteCommentPraise">
+		delete from site_comment_praise
+		where comment_id in (${commentAllStr})
+	</delete>
+	<delete id="deleteCommentPraise2" parameterType="java.lang.String">
+		delete from site_comment_praise where comment_id in (${commentAllStr})
+	</delete>
+</mapper>

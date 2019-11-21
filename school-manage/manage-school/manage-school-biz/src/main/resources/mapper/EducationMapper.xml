@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.EducationMapper">
+
+  <resultMap id="educationMap" type="com.pig4cloud.pig.school.api.entity.regulator.Education">
+                  <id property="id" column="id"/>
+                        <result property="parentId" column="parent_id"/>
+                        <result property="eduUserid" column="edu_userid"/>
+                        <result property="eduName" column="edu_name"/>
+                        <result property="eduAddress" column="edu_address"/>
+                        <result property="eduArea" column="edu_area"/>
+                        <result property="eduTel" column="edu_tel"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--education简单分页查询-->
+  <select id="getEducationPage" resultMap="educationMap">
+    SELECT
+                  id,
+                        parent_id,
+                        edu_userid,
+                        edu_name,
+                        edu_address,
+                        edu_area,
+                        edu_tel,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM se_education
+    <where>
+              <if test="education.id != null and education.id.trim() != ''">
+          AND id = #{education.id}
+        </if>
+              <if test="education.parentId != null and education.parentId.trim() != ''">
+          AND parent_id = #{education.parentId}
+        </if>
+              <if test="education.eduUserid != null and education.eduUserid.trim() != ''">
+          AND edu_userid = #{education.eduUserid}
+        </if>
+              <if test="education.eduName != null and education.eduName.trim() != ''">
+          AND edu_name = #{education.eduName}
+        </if>
+              <if test="education.eduAddress != null and education.eduAddress.trim() != ''">
+          AND edu_address = #{education.eduAddress}
+        </if>
+              <if test="education.eduArea != null and education.eduArea.trim() != ''">
+          AND edu_area = #{education.eduArea}
+        </if>
+              <if test="education.eduTel != null and education.eduTel.trim() != ''">
+          AND edu_tel = #{education.eduTel}
+        </if>
+              <if test="education.remarks != null and education.remarks.trim() != ''">
+          AND remarks = #{education.remarks}
+        </if>
+              <if test="education.createTime != null and education.createTime.trim() != ''">
+          AND create_time = #{education.createTime}
+        </if>
+              <if test="education.updateTime != null and education.updateTime.trim() != ''">
+          AND update_time = #{education.updateTime}
+        </if>
+              <if test="education.delFlag != null and education.delFlag.trim() != ''">
+          AND del_flag = #{education.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

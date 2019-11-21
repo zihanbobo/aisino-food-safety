@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.EquipmentWashMapper">
+
+  <resultMap id="equipmentWashMap" type="com.pig4cloud.pig.school.api.vo.account.EquipmentWashVO">
+                  <id property="id" column="id"/>
+                        <result property="ewName" column="ew_name"/>
+                        <result property="disinfection" column="disinfection"/>
+                        <result property="ewDate" column="ew_date"/>
+                        <result property="ewStart" column="ew_start"/>
+                        <result property="ewEnd" column="ew_end"/>
+                        <result property="ewTimelength" column="ew_timelength"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="schoolName" column="schoolName"/>
+            </resultMap>
+
+  <!--equipmentWash简单分页查询-->
+  <select id="getEquipmentWashPage" resultMap="equipmentWashMap">
+    SELECT
+                  a.id,
+    a.school_id,
+    a.ew_name,
+    a.disinfection,
+    a.ew_date,
+    a.ew_start,
+    a.ew_end,
+    a.ew_timelength,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName
+              FROM sl_equipment_wash a
+    left join se_school b on b.id = a.school_id
+    <where>
+    1=1 and a.del_flag = '0'
+              <if test="equipmentWash.id != null and equipmentWash.id.trim() != ''">
+          AND a.id = #{equipmentWash.id}
+        </if>
+      <if test="equipmentWash.schoolId != null">
+        AND a.school_id = #{equipmentWash.schoolId}
+      </if>
+              <if test="equipmentWash.ewName != null and equipmentWash.ewName.trim() != ''">
+		  AND a.ew_name like concat('%',#{equipmentWash.ewName},'%')
+        </if>
+              <if test="equipmentWash.disinfection != null and equipmentWash.disinfection.trim() != ''">
+          AND a.disinfection = #{equipmentWash.disinfection}
+        </if>
+              <if test="equipmentWash.ewDate != null and equipmentWash.ewDate.trim() != ''">
+          AND a.ew_date = #{equipmentWash.ewDate}
+        </if>
+              <if test="equipmentWash.ewStart != null and equipmentWash.ewStart.trim() != ''">
+          AND a.ew_start = #{equipmentWash.ewStart}
+        </if>
+              <if test="equipmentWash.ewEnd != null and equipmentWash.ewEnd.trim() != ''">
+          AND a.ew_end = #{equipmentWash.ewEnd}
+        </if>
+              <if test="equipmentWash.ewTimelength != null and equipmentWash.ewTimelength.trim() != ''">
+          AND a.ew_timelength = #{equipmentWash.ewTimelength}
+        </if>
+              <if test="equipmentWash.remarks != null and equipmentWash.remarks.trim() != ''">
+          AND a.remarks = #{equipmentWash.remarks}
+        </if>
+              <if test="equipmentWash.createTime != null and equipmentWash.createTime.trim() != ''">
+          AND a.create_time = #{equipmentWash.createTime}
+        </if>
+              <if test="equipmentWash.updateTime != null and equipmentWash.updateTime.trim() != ''">
+          AND a.update_time = #{equipmentWash.updateTime}
+        </if>
+              <if test="equipmentWash.delFlag != null and equipmentWash.delFlag.trim() != ''">
+          AND a.del_flag = #{equipmentWash.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.ServiceMainMapper">
+
+  <resultMap id="serviceMainMap" type="com.pig4cloud.pig.school.api.entity.selseal.ServiceMain">
+                  <id property="id" column="id"/>
+                        <result property="serviceName" column="service_name"/>
+                        <result property="serviceContent" column="service_content"/>
+                        <result property="servicePrice" column="service_price"/>
+                        <result property="servicePic" column="service_pic"/>
+                        <result property="serviceTel" column="service_tel"/>
+                        <result property="serviceFirm" column="service_firm"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--serviceMain简单分页查询-->
+  <select id="getServiceMainPage" resultMap="serviceMainMap">
+    SELECT
+                  id,
+                        service_name,
+                        service_content,
+                        service_price,
+                        service_pic,
+                        service_tel,
+                        service_firm,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM se_service_main
+    <where>
+              <if test="serviceMain.id != null and serviceMain.id.trim() != ''">
+          AND id = #{serviceMain.id}
+        </if>
+              <if test="serviceMain.serviceName != null and serviceMain.serviceName.trim() != ''">
+--           AND service_name = #{serviceMain.serviceName}
+		  AND service_name LIKE CONCAT('%',#{serviceMain.serviceName},'%')
+        </if>
+              <if test="serviceMain.serviceContent != null and serviceMain.serviceContent.trim() != ''">
+          AND service_content = #{serviceMain.serviceContent}
+        </if>
+              <if test="serviceMain.servicePrice != null and serviceMain.servicePrice.trim() != ''">
+          AND service_price = #{serviceMain.servicePrice}
+        </if>
+              <if test="serviceMain.servicePic != null and serviceMain.servicePic.trim() != ''">
+          AND service_pic = #{serviceMain.servicePic}
+        </if>
+              <if test="serviceMain.serviceTel != null and serviceMain.serviceTel.trim() != ''">
+          AND service_tel = #{serviceMain.serviceTel}
+        </if>
+              <if test="serviceMain.serviceFirm != null and serviceMain.serviceFirm.trim() != ''">
+          AND service_firm = #{serviceMain.serviceFirm}
+        </if>
+              <if test="serviceMain.remarks != null and serviceMain.remarks.trim() != ''">
+          AND remarks = #{serviceMain.remarks}
+        </if>
+              <if test="serviceMain.createTime != null and serviceMain.createTime.trim() != ''">
+          AND create_time = #{serviceMain.createTime}
+        </if>
+              <if test="serviceMain.updateTime != null and serviceMain.updateTime.trim() != ''">
+          AND update_time = #{serviceMain.updateTime}
+        </if>
+              <if test="serviceMain.delFlag != null and serviceMain.delFlag.trim() != ''">
+          AND del_flag = #{serviceMain.delFlag}
+        </if>
+          </where>
+  </select>
+
+	<!-- 通过套餐ID，查询服务信息-->
+	<select id="listServiceByMealId" resultMap="serviceMainMap"><!-- 原BaseResultMap-->
+        SELECT
+            sm.*
+        FROM
+        se_service_main sm, se_meal_service ms WHERE sm.id = ms.service_id AND sm.del_flag = 0  and  ms.meal_id IN (#{id})
+    </select>
+
+</mapper>

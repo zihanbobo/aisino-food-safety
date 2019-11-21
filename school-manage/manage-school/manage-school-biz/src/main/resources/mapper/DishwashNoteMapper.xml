@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.DishwashNoteMapper">
+
+  <resultMap id="dishwashNoteMap" type="com.pig4cloud.pig.school.api.vo.account.DishwashNoteVO">
+                  <id property="id" column="id"/>
+                        <result property="disinfection" column="disinfection"/>
+                        <result property="dnDate" column="dn_date"/>
+                        <result property="dnStart" column="dn_start"/>
+                        <result property="dnEnd" column="dn_end"/>
+                        <result property="dnDislength" column="dn_dislength"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="schoolName" column="schoolName"/>
+            </resultMap>
+
+  <!--dishwashNote简单分页查询-->
+  <select id="getDishwashNotePage" resultMap="dishwashNoteMap">
+    SELECT
+    a.id,
+                  a.school_id,
+    a.disinfection,
+    a.dn_date,
+    a.dn_start,
+    a.dn_end,
+    a.dn_dislength,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName
+              FROM sl_dishwash_note a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="dishwashNote.id != null and dishwashNote.id.trim() != ''">
+          AND a.id = #{dishwashNote.id}
+        </if>
+      <if test="dishwashNote.schoolId != null">
+        AND a.school_id = #{dishwashNote.schoolId}
+      </if>
+        <if test="dishwashNote.disinfection != null and dishwashNote.disinfection.trim() != ''">
+          AND a.disinfection = #{dishwashNote.disinfection}
+        </if>
+        <if test="dishwashNote.dnDislength != null and dishwashNote.dnDislength.trim() != ''">
+          AND a.dn_dislength = #{dishwashNote.dnDislength}
+        </if>
+        <if test="dishwashNote.remarks != null and dishwashNote.remarks.trim() != ''">
+          AND a.remarks = #{dishwashNote.remarks}
+        </if>
+        <if test="dishwashNote.createTime != null and dishwashNote.createTime.trim() != ''">
+          AND a.create_time = #{dishwashNote.createTime}
+        </if>
+        <if test="dishwashNote.updateTime != null and dishwashNote.updateTime.trim() != ''">
+          AND a.update_time = #{dishwashNote.updateTime}
+        </if>
+        <if test="dishwashNote.delFlag != null and dishwashNote.delFlag.trim() != ''">
+          AND a.del_flag = #{dishwashNote.delFlag}
+        </if>
+      <if test="dishwashNote.dnDate != null and dishwashNote.dnDate.trim() != ''">
+        AND DATE_FORMAT(a.dn_date,'%Y-%m-%d') = #{dishwashNote.dnDate}
+      </if>
+      order by dn_date desc
+          </where>
+  </select>
+
+
+
+</mapper>

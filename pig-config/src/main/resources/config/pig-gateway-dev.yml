@@ -1,0 +1,87 @@
+spring:
+  cloud:
+    gateway:
+      locator:
+        enabled: true
+      routes:
+        # 认证中心
+        - id: pig-auth
+          uri: lb://pig-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            # 验证码处理
+            - ValidateCodeGatewayFilter
+            # 前端密码解密
+            - PasswordDecoderFilter
+        #UPMS 模块
+        - id: pig-upms
+          uri: lb://pig-upms
+          predicates:
+            - Path=/admin/**
+          filters:
+            # 限流配置
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@remoteAddrKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+              # 降级配置
+            - name: Hystrix
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        # 代码生成模块
+        - id: pig-codegen
+          uri: lb://pig-codegen
+          predicates:
+            - Path=/gen/**
+        # 管理端-基础资源管理
+        - id: manage-brmanage
+          uri: lb://manage-brmanage
+          predicates:
+            - Path=/brmanageMan/**
+        # 管理端-学校管理
+        - id: manage-school
+          uri: lb://manage-school
+          predicates:
+            - Path=/schoolMan/**
+        # 管理端-监管方信息管理
+        - id: manage-supervision
+          uri: lb://manage-supervision
+          predicates:
+            - Path=/supervisionMan/**
+        # 管理端-门户管理
+        - id: manage-portal
+          uri: lb://manage-portal
+          predicates:
+            - Path=/portalMan/**
+        # 门户端接口
+        - id: portal-manage
+          uri: lb://portal-manage
+          predicates:
+            - Path=/managePor/**
+        # 公众端接口
+        - id: public-manage
+          uri: lb://public-manage
+          predicates:
+            - Path=/managePub/**
+        # 监管端接口
+        - id: watch-manage
+          uri: lb://watch-manage
+          predicates:
+            - Path=/manageWat/**
+        # h5数据采集接口
+        - id: collection-manage
+          uri: lb://collection-manage
+          predicates:
+            - Path=/collectionCol/**
+security:
+  encode:
+    # 前端密码密钥，必须16位
+    key: 'thanks,pig4cloud'
+
+# 不校验验证码终端
+ignore:
+  clients:
+    - test

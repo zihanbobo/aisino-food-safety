@@ -1,0 +1,93 @@
+#########################环境准备##########################
+redis：密码为空
+
+mysql：校园食品安全云端开发库：
+地址：101.201.148.215
+端口号：3306
+数据库名：school_fs
+账号：school_fs
+密码：school_fs@2019
+
+登录帐号：
+管理端：aisino 123456
+校园端：beida 123456
+#########################后端school##########################
+一、配置本地主机（教程：https://www.jb51.net/os/win10/395409.html）
+
+# 本地测试环境
+127.0.0.1   101.201.148.215
+127.0.0.1   pig-redis
+127.0.0.1   pig-gateway
+127.0.0.1   pig-eureka
+
+
+二.idea 装Lombok插件
+
+
+三、启动顺序
+必选
+1. PigEurekaApplication   (服务发现模块)
+2. PigConfigApplication      (注册中心模块)
+3. PigGatewayApplication  (网关管理模块)
+4. PigAuthApplication   (权限管理模块)
+5. PigAdminApplication  (系统设置模块)
+可选
+6. ManageSchoolApplication(启动学校相关管理模块服务<管理端、校园端>)
+7. ManagePortalApplication(启动门户相关管理模块服务<管理端、校园端>)
+8. ManageBrmanageApplication(启动基础资源相关管理模块服务<管理端>)
+9. ManageSupervisionApplication(启动监管相关管理模块服务<管理端>)
+10. ProtalManageApplication(启动门户web接口模块服务<门户端>)
+11. PublicManageApplication(启动公众App接口模块服务<公众端>)
+
+使用代码生成，监控时再启动以下项目(可选)
+12. PigCodeGenApplication   （代码生成）
+13. PigMonitorApplication
+14. PigxZipkinApplication
+
+
+
+
+#############################前端##########################
+方式1
+安装cnpm 代理 npm install -g cnpm --registry=https://registry.npm.taobao.org
+安装依赖 cnpm install
+启动 npm run dev
+
+方式2
+# 安装cnpm 镜像
+npm run pre
+# 安装依赖
+npm install
+# 启动
+npm run dev
+
+#############################样式(element-ui+avue)##########################
+https://avuejs.com/doc(主)
+https://element.eleme.cn/#/zh-CN/component/carousel
+
+#############################正式部署##########################
+管理端地址
+ http://112.125.25.93:8862
+ 账号 aisino   密码 123456
+
+ 校园端地址
+ http://112.125.25.93:8862
+ 账号 beida   密码 123456
+
+ 监管端地址
+ http://112.125.25.93:8863
+ 暂无账号
+
+ 门户端地址
+ http://112.125.25.93:8864
+ 账号  13800138000
+ 密码  123456
+
+ 绑定信息
+ 北京大学
+ 直播码  34t23rdw
+ 食谱码  4t23rdw1
+
+ 北京航天大学
+ 直播码  345i24n5
+ 食谱码  45i24n51

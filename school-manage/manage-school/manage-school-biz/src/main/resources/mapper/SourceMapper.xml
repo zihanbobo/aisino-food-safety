@@ -1,0 +1,164 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SourceMapper">
+
+  <resultMap id="sourceMap" type="com.pig4cloud.pig.school.api.entity.recipe.Source">
+    <id property="id" column="id"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="rcId" column="rc_id"/>
+    <result property="reName" column="re_name"/>
+    <result property="rePic" column="re_pic"/>
+    <result property="remarks" column="remarks"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+  </resultMap>
+
+  <!--source简单分页查询-->
+  <select id="getSourcePage" resultMap="sourceMapPage">
+    SELECT
+    a.id,
+    a.school_id,
+    a.re_name,
+    a.re_pic,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    a.rc_id,
+    b.sch_name AS schoolName
+    FROM
+    re_source a
+    left join se_school b on b.id = a.school_id
+    <where>
+    1=1 and a.del_flag = '0'
+      <if test="source.id != null and source.id.trim() != ''">
+        AND a.id = #{source.id}
+      </if>
+      <if test="source.schoolId != null">
+        AND a.school_id = #{source.schoolId}
+      </if>
+      <if test="source.rcId != null and source.rcId.trim() != ''">
+        AND a.rc_id = #{source.rcId}
+      </if>
+      <if test="source.reName != null and source.reName.trim() != ''">
+        AND a.re_name = #{source.reName}
+      </if>
+      <if test="source.rePic != null and source.rePic.trim() != ''">
+        AND a.re_pic = #{source.rePic}
+      </if>
+      <if test="source.remarks != null and source.remarks.trim() != ''">
+        AND a.remarks = #{source.remarks}
+      </if>
+      <if test="source.createTime != null and source.createTime.trim() != ''">
+        AND a.create_time = #{source.createTime}
+      </if>
+      <if test="source.updateTime != null and source.updateTime.trim() != ''">
+        AND a.update_time = #{source.updateTime}
+      </if>
+      <if test="source.delFlag != null and source.delFlag.trim() != ''">
+        AND a.del_flag = #{source.delFlag}
+      </if>
+    </where>
+  </select>
+
+  <!--食谱分页查询（带配料）-->
+  <select id="getSourceVosPage" resultMap="sourceMapPage">
+
+  <!--  select a.id,a.re_name,a.re_pic,a.remarks,a.create_time,a.update_time,a.del_flag,a.rc_id,a.schoolName AS schoolName,
+      max(temp1) as mainMaterialName,max(temp2) as minorIngredientName from
+      (
+        SELECT a.id,a.re_name,a.re_pic,a.remarks,a.create_time,a.update_time,a.del_flag,a.rc_id,b.sch_name AS schoolName,c.type,
+          case c.type when '1' then group_concat(d.foodName separator ' ') else '' end as temp1,
+          case c.type when '2' then group_concat(d.foodName separator ' ') else '' end as temp2
+          FROM   re_source a
+          left join se_school b on b.id = a.school_id
+          left join re_source_food c on c.source_id = a.id
+          left join (
+            select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+            left join se_school b on b.id = a.school_id
+            left join sup_ingredients c on c.id = a.food_id
+            where	1=1 and a.del_flag='0' and a.food_type='1'
+            union all
+            select a.*,b.sch_name as schoolName,c.food_name as foodName from sup_ingredients_filing a
+            left join se_school b on b.id = a.school_id
+            left join sup_school_custom c on c.id = a.food_id
+            where	1=1 and a.del_flag='0' and a.food_type='2'
+          )d on d.id = c.food_id
+          <where>
+            1=1 and a.del_flag = '0'
+            <if test="source.schoolId != null">
+              AND a.school_id = #{source.schoolId}
+            </if>
+            <if test="source.rcId != null">
+              AND a.rc_id = #{source.rcId}
+            </if>
+            <if test="source.reName != null">
+              AND a.re_name = #{source.reName}
+            </if>
+            <if test="source.delFlag != null and source.delFlag.trim() != ''">
+              AND a.del_flag = #{source.delFlag}
+            </if>
+          </where>
+          group by id,type
+    ) a group by id
+    ORDER BY a.create_time DESC-->
+
+    SELECT
+    a.id,
+    a.re_name,
+    a.re_pic,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    a.rc_id,
+    b.sch_name AS schoolName
+    FROM
+    re_source a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="source.schoolId != null">
+        AND a.school_id = #{source.schoolId}
+      </if>
+      <if test="source.rcId != null">
+        AND a.rc_id = #{source.rcId}
+      </if>
+      <if test="source.reName != null">
+        AND a.re_name LIKE CONCAT('%',#{source.reName},'%')
+      </if>
+      <if test="source.delFlag != null and source.delFlag.trim() != ''">
+        AND a.del_flag = #{source.delFlag}
+      </if>
+    </where>
+
+
+
+
+  </select>
+
+  <!-- 通用映射结果 -->
+  <resultMap id="sourceMapPage" type="com.pig4cloud.pig.school.api.vo.recipe.SourceVO">
+    <id property="id" column="id"/>
+    <result property="reName" column="re_name"/>
+    <result property="rePic" column="re_pic"/>
+    <result property="remarks" column="remarks"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+    <result property="rcId" column="rc_id"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="schoolName" column="schoolName"/>
+<!--    <result property="realName" column="realName"/>
+    <result property="userId" column="userId"/>-->
+<!--    <result property="mainMaterialName" column="mainMaterialName"/>
+    <result property="minorIngredientName" column="minorIngredientName"/>-->
+    <collection property="mainMaterialList" ofType="com.pig4cloud.pig.school.api.entity.recipe.IngredientsFiling"
+                select="com.pig4cloud.pig.school.mapper.IngredientsFilingMapper.ingredientBySourceId" column="id">
+    </collection>
+    <collection property="minorIngredientList" ofType="com.pig4cloud.pig.school.api.entity.recipe.IngredientsFiling"
+                select="com.pig4cloud.pig.school.mapper.IngredientsFilingMapper.materialListBySourceId" column="id">
+    </collection>
+  </resultMap>
+</mapper>

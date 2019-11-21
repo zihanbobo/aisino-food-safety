@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.FoodFilingMapper">
+
+	<!-- 通用映射结果 -->
+	<resultMap id="foodFilingMap" type="com.pig4cloud.pig.school.api.vo.recipe.FoodFilingVO">
+		<id property="id" column="id"/>
+		<result property="supId" column="sup_id"/>
+		<result property="foodName" column="food_name"/>
+		<result property="foodPic" column="food_pic"/>
+		<result property="foodBrand" column="food_brand"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="foodType" column="foodType"/>
+		<result property="foodtypeName" column="foodtypeName"/>
+		<collection property="mainFilingList" ofType="com.pig4cloud.pig.school.api.entity.source.MainFiling"
+				select="com.pig4cloud.pig.school.mapper.MainFilingMapper.listMainsByFoodId" column="id">
+		</collection>
+	</resultMap>
+
+	<!-- foodFilingVo结果集 -->
+	<resultMap id="foodFilingVoResultMap" type="com.pig4cloud.pig.school.api.vo.recipe.FoodFilingVO">
+		<id property="id" column="id"/>
+		<result property="supId" column="sup_id"/>
+		<result property="foodType" column="food_type"/>
+		<result property="foodName" column="food_name"/>
+		<result property="foodPic" column="food_pic"/>
+		<result property="foodBrand" column="food_brand"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result column="foodtypeId" property="foodtypeId"/>
+		<result column="foodtypeName" property="foodtypeName"/>
+		<collection property="mainFilingList" ofType="com.pig4cloud.pig.school.api.entity.recipe.MainFiling">
+			<id column="fmid" property="id"/>
+			<result column="supName" property="supName"/>
+<!--			<result column="role_code" property="roleCode"/>
+			<result column="role_desc" property="roleDesc"/>-->
+			<result column="fmcreate_time" property="createTime"/>
+			<result column="fmupdate_time" property="updateTime"/>
+		</collection>
+	</resultMap>
+
+	<sql id="filingMainSql">
+		`foodfiling`.id,
+		`foodfiling`.sup_id,
+		`foodfiling`.`food_type`,
+		`foodfiling`.food_name,
+		`foodfiling`.food_pic,
+		`foodfiling`.food_brand,
+		`foodfiling`.remarks,
+		`foodfiling`.create_time,
+		`foodfiling`.update_time,
+		`foodfiling`.del_flag,
+		fm.id,
+		fm.sup_name,
+		fm.create_time AS fmcreate_time,
+		fm.update_time AS fmupdate_time,
+	</sql>
+
+	<sql id="filingMainTypeSql">
+		`foodfiling`.id,
+		`foodfiling`.sup_id,
+		`foodfiling`.`food_type`,
+		`foodfiling`.food_name,
+		`foodfiling`.food_pic,
+		`foodfiling`.food_brand,
+		`foodfiling`.remarks,
+		`foodfiling`.create_time,
+		`foodfiling`.update_time,
+		`foodfiling`.del_flag,
+		fm.id as fmid,
+		fm.sup_name as supName,
+		fm.create_time AS fmcreate_time,
+		fm.update_time AS fmupdate_time,
+		ft.name AS foodtypeName,
+		ft.foodtype_id AS foodtypeId
+    </sql>
+
+
+  <!--foodFiling简单分页查询-->
+  <select id="getFoodFilingPage" resultMap="foodFilingMap">
+    SELECT
+                  id,
+                        sup_id,
+                        food_type,
+                        food_name,
+                        food_pic,
+                        food_brand,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM sup_food_filing
+    <where>
+              <if test="foodFiling.id != null and foodFiling.id.trim() != ''">
+          AND id = #{foodFiling.id}
+        </if>
+              <if test="foodFiling.supId != null and foodFiling.supId.trim() != ''">
+          AND sup_id = #{foodFiling.supId}
+        </if>
+              <if test="foodFiling.foodType != null and foodFiling.foodType.trim() != ''">
+          AND food_type = #{foodFiling.foodType}
+        </if>
+              <if test="foodFiling.foodName != null and foodFiling.foodName.trim() != ''">
+		  AND food_name like concat('%',#{foodFiling.foodName},'%')
+        </if>
+              <if test="foodFiling.foodPic != null and foodFiling.foodPic.trim() != ''">
+          AND food_pic = #{foodFiling.foodPic}
+        </if>
+              <if test="foodFiling.foodBrand != null and foodFiling.foodBrand.trim() != ''">
+          AND food_brand = #{foodFiling.foodBrand}
+        </if>
+              <if test="foodFiling.remarks != null and foodFiling.remarks.trim() != ''">
+          AND remarks = #{foodFiling.remarks}
+        </if>
+              <if test="foodFiling.createTime != null and foodFiling.createTime.trim() != ''">
+          AND create_time = #{foodFiling.createTime}
+        </if>
+              <if test="foodFiling.updateTime != null and foodFiling.updateTime.trim() != ''">
+          AND update_time = #{foodFiling.updateTime}
+        </if>
+              <if test="foodFiling.delFlag != null and foodFiling.delFlag.trim() != ''">
+          AND del_flag = #{foodFiling.delFlag}
+        </if>
+          </where>
+  </select>
+
+<!--	<select id="getUserVoByUsername" resultMap="userVoResultMap">
+		SELECT
+		<include refid="userRoleSql"/>
+		FROM
+		sys_user AS `user`
+		LEFT JOIN sys_user_role AS ur ON ur.user_id = `user`.user_id
+		LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+		WHERE `user`.username = #{username}
+	</select>-->
+
+	<!-- 根据食材备案id查询食材信息 -->
+	<select id="getFoodFilingVoById" resultMap="foodFilingVoResultMap">
+		SELECT
+		<include refid="filingMainTypeSql"/>
+		FROM
+		sup_food_filing AS `foodfiling`
+		LEFT JOIN sup_food_main AS fm ON fm.food_id = `foodfiling`.id
+		LEFT JOIN sup_main_filing AS mf ON mf.id = fm.main_id
+		LEFT JOIN sup_food_type AS ft ON ft.foodtype_id = `foodfiling`.food_type
+		WHERE
+		`foodfiling`.id = #{id}
+	</select>
+
+	<select id="getFoodFilingVosPage" resultMap="foodFilingMap">
+		SELECT
+		`foodfiling`.id,
+		`foodfiling`.sup_id,
+		`foodfiling`.food_name,
+		`foodfiling`.food_pic,
+		`foodfiling`.food_brand,
+		`foodfiling`.remarks,
+		`foodfiling`.create_time,
+		`foodfiling`.update_time,
+		`foodfiling`.del_flag,
+		`foodfiling`.food_type AS `foodType`,
+		ft.name AS foodtypeName
+		FROM
+		sup_food_filing AS `foodfiling`
+		LEFT JOIN sup_food_type AS ft ON ft.foodtype_id = `foodfiling`.food_type
+		<where>
+			<if test="query.foodName != null and query.foodName != ''">
+				and `foodfiling`.food_name LIKE CONCAT('%',#{query.foodName},'%')
+			</if>
+		</where>
+		ORDER BY `foodfiling`.create_time DESC
+	</select>
+
+
+
+
+	<!-- 通过食材ID，查询供应商信息-->
+	<select id="listFoodFilingsBySourceId" resultMap="listFoodFilingMap"><!-- 原BaseResultMap-->
+        SELECT
+            ff.*
+        FROM
+        sup_food_filing ff, re_source_food sf WHERE ff.id = sf.food_id AND ff.del_flag = 0 and  sf.source_id IN (#{id})
+    </select>
+
+	<!-- 通用映射结果 -->
+	<resultMap id="listFoodFilingMap" type="com.pig4cloud.pig.school.api.entity.recipe.FoodFiling">
+		<id property="id" column="id"/>
+		<result property="supId" column="sup_id"/>
+		<result property="foodName" column="food_name"/>
+		<result property="foodPic" column="food_pic"/>
+		<result property="foodBrand" column="food_brand"/>
+		<result property="remarks" column="remarks"/>
+		<result property="createTime" column="create_time"/>
+		<result property="updateTime" column="update_time"/>
+		<result property="delFlag" column="del_flag"/>
+		<result property="foodType" column="food_type"/>
+	</resultMap>
+
+</mapper>

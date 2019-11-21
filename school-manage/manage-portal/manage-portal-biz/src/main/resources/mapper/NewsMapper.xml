@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.NewsMapper">
+
+  <resultMap id="newsMap" type="com.pig4cloud.pig.portal.api.entity.news.News">
+                  <id property="id" column="id"/>
+                        <result property="areacode" column="areacode"/>
+                        <result property="title" column="title"/>
+                        <result property="adType" column="ad_type"/>
+                        <result property="newsType" column="news_type"/>
+                        <result property="subTitle" column="sub_title"/>
+                        <result property="navContent" column="nav_content"/>
+                        <result property="content" column="content"/>
+                        <result property="author" column="author"/>
+                        <result property="source" column="source"/>
+                        <result property="clickCounts" column="click_counts"/>
+                        <result property="isTop" column="is_top"/>
+                        <result property="isPublish" column="is_publish"/>
+                        <result property="keywords" column="keywords"/>
+                        <result property="imageUrl" column="image_url"/>
+                        <result property="publishTime" column="publish_time"/>
+                        <result property="publishId" column="publish_id"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--news简单分页查询-->
+  <select id="getNewsPage" resultMap="newsMap">
+    SELECT
+                  id,
+                        areacode,
+                        title,
+                        ad_type,
+                        news_type,
+                        sub_title,
+                        nav_content,
+                        content,
+                        author,
+                        source,
+                        click_counts,
+                        is_top,
+                        is_publish,
+                        keywords,
+                        image_url,
+                        publish_time,
+                        publish_id,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM site_news
+    <where>
+              <if test="news.id != null and news.id.trim() != ''">
+          AND id = #{news.id}
+        </if>
+              <if test="news.areacode != null and news.areacode.trim() != ''">
+          AND areacode = #{news.areacode}
+        </if>
+              <if test="news.title != null and news.title.trim() != ''">
+          AND title = #{news.title}
+        </if>
+              <if test="news.adType != null and news.adType.trim() != ''">
+          AND ad_type = #{news.adType}
+        </if>
+              <if test="news.newsType != null and news.newsType.trim() != ''">
+          AND news_type = #{news.newsType}
+        </if>
+              <if test="news.subTitle != null and news.subTitle.trim() != ''">
+          AND sub_title = #{news.subTitle}
+        </if>
+              <if test="news.navContent != null and news.navContent.trim() != ''">
+          AND nav_content = #{news.navContent}
+        </if>
+              <if test="news.content != null and news.content.trim() != ''">
+          AND content = #{news.content}
+        </if>
+              <if test="news.author != null and news.author.trim() != ''">
+          AND author = #{news.author}
+        </if>
+              <if test="news.source != null and news.source.trim() != ''">
+          AND source = #{news.source}
+        </if>
+              <if test="news.clickCounts != null and news.clickCounts.trim() != ''">
+          AND click_counts = #{news.clickCounts}
+        </if>
+              <if test="news.isTop != null and news.isTop.trim() != ''">
+          AND is_top = #{news.isTop}
+        </if>
+              <if test="news.isPublish != null and news.isPublish.trim() != ''">
+          AND is_publish = #{news.isPublish}
+        </if>
+              <if test="news.keywords != null and news.keywords.trim() != ''">
+          AND keywords = #{news.keywords}
+        </if>
+              <if test="news.imageUrl != null and news.imageUrl.trim() != ''">
+          AND image_url = #{news.imageUrl}
+        </if>
+              <if test="news.publishTime != null and news.publishTime.trim() != ''">
+          AND publish_time = #{news.publishTime}
+        </if>
+              <if test="news.publishId != null and news.publishId.trim() != ''">
+          AND publish_id = #{news.publishId}
+        </if>
+              <if test="news.createTime != null and news.createTime.trim() != ''">
+          AND create_time = #{news.createTime}
+        </if>
+              <if test="news.updateTime != null and news.updateTime.trim() != ''">
+          AND update_time = #{news.updateTime}
+        </if>
+              <if test="news.delFlag != null and news.delFlag.trim() != ''">
+          AND del_flag = #{news.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

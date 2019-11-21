@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.AnalysisDataMapper">
+
+
+  <!--监管端-预警列表(根据年查询)-List<Map>-->
+  <select id="getEarlywarningListYear" resultType="Map">
+    select
+    a.id as earlyId,
+    b.id as schoolId,
+    d.description as title,
+    case when early_warning in('1','2') then a.supplier_name when early_warning= '3' then a.human
+    when early_warning='4' then a.purchase_time else '' end as content,
+    case when early_warning in ('1','2') then '证照预警' when early_warning in (3) then '人员预警'
+    when early_warning in ('4') then '食材预警' else '' end as type,
+    b.sch_name as schoolName
+    from ck_early_warning a
+    left join (select a.* from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b on b.id = a.school_id
+    left join (select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='early_warning'  order by a.sort)d on d.value = a.early_warning
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+    </where>
+    LIMIT 5
+  </select>
+
+  <!--预警总数-->
+  <select id="getEarlyTotal" resultType="Integer">
+    select count(a.id) as 'total'
+    from ck_early_warning a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+    </where>
+  </select>
+
+  <!--监管端-报警列表(根据年查询)-List<Map>-->
+  <select id="getAlarmListYear" resultType="Map">
+    select
+    a.id as alarmId,
+    b.id as schoolId,
+    c.label as label,
+    case when alarm in ('1','2')  then a.supplier_name
+    when alarm in ('3','4') then a.human
+    when alarm in ('5','6','7') then a.purchase_time else '' end as content,
+    case when alarm in ('1','2') then '证照报警'
+    when alarm in ('3','4') then '人员报警'
+    when alarm in ('5','6','7') then '食材报警' else '' end as type,
+    b.sch_name as schoolName
+    from ck_early_alarm a
+    left join (select a.* from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b on b.id = a.school_id
+    left join (select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='alarm'  order by a.sort)c on c.value = a.alarm
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.alarm_time,'%Y') = #{map.year}
+      </if>
+    </where>
+    LIMIT 5
+  </select>
+
+  <!--报警待处理-->
+  <select id="getAlarmTotal" resultType="Integer">
+    select count(a.id) as 'total'
+    from ck_early_alarm a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      and a.deal_with = '1'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+      <if test="map.year != null">
+        and DATE_FORMAT(a.alarm_time,'%Y') = #{map.year}
+      </if>
+    </where>
+  </select>
+
+
+  <!--2-报警数量统计(根据月)-->
+  <select id="getAlarmsNumberBymonth" resultType="Integer">
+    SELECT count(*) as total
+    FROM ck_early_alarm a
+    left join se_school b on b.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      and YEAR(a.alarm_time)=YEAR(now())
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(b.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+      <if test="map.mouth != null">
+        and month(a.alarm_time) = #{map.mouth}
+      </if>
+    </where>
+  </select>
+
+  <!--监管端-预警报警分析-报警类别统计(根据年查询)-Map-->
+  <select id="getAlarmTotalByYear" resultType="Map">
+      select ifnull(sum(a.personTotal),0) as 'personTotal',ifnull(sum(a.cardTotal),0) as 'cardTotal',ifnull(sum(a.foodTotal),0) as 'foodTotal' from (
+      select DATE_FORMAT(a.alarm_time,'%Y') as date,a.id,
+      case when alarm in (3,4) then 1 else 0 end as personTotal,
+      case when alarm in (1,2) then 1 else 0 end as cardTotal,
+      case when alarm in (5,6,7) then 1 else 0 end as foodTotal
+      from ck_early_alarm a,
+      (select a.* from se_school a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+      ) b
+      <where>
+        a.school_id=b.id and a.del_flag = '0' and b.del_flag='0'
+        <if test="map.year != null">
+          and DATE_FORMAT(a.alarm_time,'%Y') = #{map.year}
+        </if>
+      </where>
+    )a
+  </select>
+
+  <!--2-3:报警区域统计柱状图-->
+  <select id="getAlarmsAreaByRegion" resultType="Map">
+    select a.code,a.name,ifnull(b.warningTotal,0) as 'warningTotal',ifnull(b.alarmTotal,0) as 'alramTotal' from (
+    select a.* from sys_t_region a
+    <where>
+      <if test="map.regionalLevel =='2'.toString()||map.regionalLevel =='3'.toString()">
+        p_code = #{map.areaCode}
+      </if>
+      <if test="map.regionalLevel =='4'.toString()">
+        code = #{map.areaCode}
+      </if>
+    </where>
+    ) a left join (
+    select a.schArea,a.pCode,sum(warningTotal)as 'warningTotal',sum(alarmTotal) as 'alarmTotal' from (
+    select a.school_id as schoolId,a.schArea,a.pCode,
+    sum(warning) as 'warningTotal',sum(alarm) as 'alarmTotal'
+    from (
+    select a.id,a.alarm_time as 'time',b.sch_area as 'schArea',c.p_code as pCode,a.school_id,0 as 'warning',1 as 'alarm'  from ck_early_alarm a
+    left join se_school b on b.id = a.school_id
+    left join(select a.* from sys_t_region a) c on c.code = b.sch_area
+    where 1=1 and a.del_flag = '0'
+    union all
+    select a.id,a.early_time as 'time',b.sch_area as 'schArea',c.p_code as pCode,a.school_id,1 as 'warning',0 as 'alarm' from ck_early_warning a
+    left join se_school b on b.id = a.school_id
+    left join(select a.* from sys_t_region a) c on c.code = b.sch_area
+    where 1=1 and a.del_flag = '0'
+    )a
+    <where>
+      1=1
+      <if test="map.year != null">
+        and DATE_FORMAT(a.time,'%Y') = #{map.year}
+      </if>
+    </where>
+    group by a.school_id
+    )a
+    <if test="map.regionalLevel =='2'.toString()">
+      group by a.pCode )b on b.pCode = a.code
+    </if>
+    <if test="map.regionalLevel =='3'.toString()||map.regionalLevel =='4'.toString()">
+      group by a.schArea )b on b.schArea = a.code
+    </if>
+    order by (warningTotal+alramTotal) desc
+    limit ${map.limit}
+  </select>
+
+  <!--监管端-第二行右一报警区域统计(查询学校)-->
+  <select id="getAlarmsArea" resultType="Map">
+    select a.id,a.schoolName,ifnull(b.warningTotal,0) as 'warningTotal',ifnull(b.alarmTotal,0)as 'alarmTotal' from(
+    select a.id,a.sch_name as schoolName from se_school a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.areaCode != null">
+          and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+        </if>
+      </where>
+    ) a left join (
+      select a.school_id as schoolId,
+      sum(warning) as 'warningTotal',sum(alarm) as 'alarmTotal' from (
+        select a.id,a.alarm_time as 'time',a.school_id,0 as 'warning',1 as 'alarm'  from ck_early_alarm a
+        where 1=1 and a.del_flag = '0'
+        union all
+        select a.id,a.early_time as 'time',a.school_id,1 as 'warning',0 as 'alarm' from ck_early_warning a
+        where 1=1 and a.del_flag = '0'
+        )a
+      <where>
+        1=1
+        <if test="map.year != null">
+          and DATE_FORMAT(a.time,'%Y') = #{map.year}
+        </if>
+      </where>
+      group by a.school_id
+    ) b on b.schoolId = a.id
+    order by (b.warningTotal+b.alarmTotal) desc
+    limit ${map.limit}
+  </select>
+
+
+
+
+
+
+
+
+ </mapper>

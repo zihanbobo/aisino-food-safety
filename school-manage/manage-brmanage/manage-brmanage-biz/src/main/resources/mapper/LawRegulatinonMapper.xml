@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.brmanage.mapper.LawRegulatinonMapper">
+
+  <resultMap id="lawRegulatinonMap" type="com.pig4cloud.pig.brmanage.api.entity.LawRegulatinon">
+                  <id property="id" column="id"/>
+                        <result property="lawTitle" column="law_title"/>
+                        <result property="lawChapter" column="law_chapter"/>
+                        <result property="lawClassify" column="law_classify"/>
+                        <result property="lawDept" column="law_dept"/>
+                        <result property="issuedNumber" column="issued_number"/>
+                        <result property="lawClass" column="law_class"/>
+                        <result property="lawTimeliness" column="law_timeliness"/>
+                        <result property="lawPublish" column="law_publish"/>
+                        <result property="lawApply" column="law_apply"/>
+                        <result property="lawContent" column="law_content"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--lawRegulatinon简单分页查询-->
+  <select id="getLawRegulatinonPage" resultMap="lawRegulatinonMap">
+    SELECT
+                  id,
+                        law_title,
+                        law_chapter,
+                        law_classify,
+                        law_dept,
+                        issued_number,
+                        law_class,
+                        law_timeliness,
+                        law_publish,
+                        law_apply,
+                        law_content,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM re_law_regulatinon
+    <where>
+              <if test="lawRegulatinon.id != null and lawRegulatinon.id.trim() != ''">
+          AND id = #{lawRegulatinon.id}
+        </if>
+              <if test="lawRegulatinon.lawTitle != null and lawRegulatinon.lawTitle.trim() != ''">
+          AND law_title = #{lawRegulatinon.lawTitle}
+        </if>
+              <if test="lawRegulatinon.lawChapter != null and lawRegulatinon.lawChapter.trim() != ''">
+          AND law_chapter = #{lawRegulatinon.lawChapter}
+        </if>
+              <if test="lawRegulatinon.lawClassify != null and lawRegulatinon.lawClassify.trim() != ''">
+          AND law_classify = #{lawRegulatinon.lawClassify}
+        </if>
+              <if test="lawRegulatinon.lawDept != null and lawRegulatinon.lawDept.trim() != ''">
+          AND law_dept = #{lawRegulatinon.lawDept}
+        </if>
+              <if test="lawRegulatinon.issuedNumber != null and lawRegulatinon.issuedNumber.trim() != ''">
+          AND issued_number = #{lawRegulatinon.issuedNumber}
+        </if>
+              <if test="lawRegulatinon.lawClass != null and lawRegulatinon.lawClass.trim() != ''">
+          AND law_class = #{lawRegulatinon.lawClass}
+        </if>
+              <if test="lawRegulatinon.lawTimeliness != null and lawRegulatinon.lawTimeliness.trim() != ''">
+          AND law_timeliness = #{lawRegulatinon.lawTimeliness}
+        </if>
+              <if test="lawRegulatinon.lawPublish != null and lawRegulatinon.lawPublish.trim() != ''">
+          AND law_publish = #{lawRegulatinon.lawPublish}
+        </if>
+              <if test="lawRegulatinon.lawApply != null and lawRegulatinon.lawApply.trim() != ''">
+          AND law_apply = #{lawRegulatinon.lawApply}
+        </if>
+              <if test="lawRegulatinon.lawContent != null and lawRegulatinon.lawContent.trim() != ''">
+          AND law_content = #{lawRegulatinon.lawContent}
+        </if>
+              <if test="lawRegulatinon.remarks != null and lawRegulatinon.remarks.trim() != ''">
+          AND remarks = #{lawRegulatinon.remarks}
+        </if>
+              <if test="lawRegulatinon.createTime != null and lawRegulatinon.createTime.trim() != ''">
+          AND create_time = #{lawRegulatinon.createTime}
+        </if>
+              <if test="lawRegulatinon.updateTime != null and lawRegulatinon.updateTime.trim() != ''">
+          AND update_time = #{lawRegulatinon.updateTime}
+        </if>
+              <if test="lawRegulatinon.delFlag != null and lawRegulatinon.delFlag.trim() != ''">
+          AND del_flag = #{lawRegulatinon.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.MorningCheckMapper">
+
+  <resultMap id="morningCheckMap" type="com.pig4cloud.pig.school.api.vo.check.MorningCheckVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="realName" column="real_name"/>
+                        <result property="checkTime" column="check_time"/>
+                        <result property="rummager" column="rummager"/>
+                        <result property="isQualified" column="is_qualified"/>
+                        <result property="reason" column="reason"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="userName" column="userName"/>
+            </resultMap>
+
+  <!--morningCheck简单分页查询-->
+  <select id="getMorningCheckPage" resultMap="morningCheckMap">
+    SELECT
+                  a.id,
+                  a.school_id,
+                  a.user_id,
+                  a.real_name,
+                  a.check_time,
+                  a.rummager,
+                  a.is_qualified,
+                  a.reason,
+                  a.remarks,
+                  a.create_time,
+                  a.update_time,
+                  a.del_flag,
+                  b.sch_name as schoolName,
+                  c.real_name as userName
+                FROM ck_morning_check a
+                left join se_school b on b.id = a.school_id
+                left join sys_user c on c.user_id = a.user_id
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="morningCheck.id != null and morningCheck.id.trim() != ''">
+          AND a.id = #{morningCheck.id}
+        </if>
+              <if test="morningCheck.schoolId != null">
+          AND a.school_id = #{morningCheck.schoolId}
+        </if>
+        <if test="morningCheck.ctDate != null">
+          AND DATE_FORMAT(a.check_time,'%Y-%m-%d') = #{morningCheck.ctDate}
+        </if>
+              <if test="morningCheck.userId != null and morningCheck.userId.trim() != ''">
+          AND a.user_id = #{morningCheck.userId}
+        </if>
+              <if test="morningCheck.checkTime != null and morningCheck.checkTime.trim() != ''">
+          AND a.check_time = #{morningCheck.checkTime}
+        </if>
+              <if test="morningCheck.rummager != null and morningCheck.rummager.trim() != ''">
+          AND a.rummager = #{morningCheck.rummager}
+        </if>
+              <if test="morningCheck.isQualified != null and morningCheck.isQualified.trim() != ''">
+          AND a.is_qualified = #{morningCheck.isQualified}
+        </if>
+              <if test="morningCheck.reason != null and morningCheck.reason.trim() != ''">
+          AND a.reason = #{morningCheck.reason}
+        </if>
+              <if test="morningCheck.remarks != null and morningCheck.remarks.trim() != ''">
+          AND a.remarks = #{morningCheck.remarks}
+        </if>
+              <if test="morningCheck.createTime != null and morningCheck.createTime.trim() != ''">
+          AND a.create_time = #{morningCheck.createTime}
+        </if>
+              <if test="morningCheck.updateTime != null and morningCheck.updateTime.trim() != ''">
+          AND a.update_time = #{morningCheck.updateTime}
+        </if>
+              <if test="morningCheck.delFlag != null and morningCheck.delFlag.trim() != ''">
+          AND a.del_flag = #{morningCheck.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

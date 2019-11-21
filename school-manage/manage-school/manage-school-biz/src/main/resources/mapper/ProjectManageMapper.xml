@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.ProjectManageMapper">
+
+  <resultMap id="projectManageMap" type="com.pig4cloud.pig.school.api.vo.project.ProjectManageVO">
+                  <id property="id" column="id"/>
+                        <result property="projectName" column="project_name"/>
+                        <result property="areaCode" column="area_code"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolCount" column="schoolCount"/>
+
+            </resultMap>
+
+  <!--projectManage简单分页查询-->
+  <select id="getProjectManagePage" resultMap="projectManageMap">
+    SELECT
+        a.id,
+        a.project_name,
+        a.area_code,
+        a.remarks,
+        a.create_time,
+        a.update_time,
+        a.del_flag,
+        count(*) as schoolCount,
+        REPLACE(group_concat(b.sch_name),',',',') as schoolNameAll
+    FROM se_project_manage a
+    left join se_school b on b.school_projectid = a.id
+    <where>
+    1=1 and a.del_flag = '0'
+              <if test="projectManage.id != null and projectManage.id.trim() != ''">
+          AND a.id = #{projectManage.id}
+        </if>
+              <if test="projectManage.projectName != null and projectManage.projectName.trim() != ''">
+          AND a.project_name = #{projectManage.projectName}
+        </if>
+              <if test="projectManage.areaCode != null and projectManage.areaCode.trim() != ''">
+          AND a.area_code = #{projectManage.areaCode}
+        </if>
+              <if test="projectManage.remarks != null and projectManage.remarks.trim() != ''">
+          AND a.remarks = #{projectManage.remarks}
+        </if>
+              <if test="projectManage.createTime != null and projectManage.createTime.trim() != ''">
+          AND a.create_time = #{projectManage.createTime}
+        </if>
+              <if test="projectManage.updateTime != null and projectManage.updateTime.trim() != ''">
+          AND a.update_time = #{projectManage.updateTime}
+        </if>
+              <if test="projectManage.delFlag != null and projectManage.delFlag.trim() != ''">
+          AND a.del_flag = #{projectManage.delFlag}
+        </if>
+          </where>
+    group by a.id
+  </select>
+
+
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.DailySourceMapper">
+
+  <resultMap id="dailySourceMap" type="com.pig4cloud.pig.school.api.entity.recipe.DailySource">
+                  <id property="dailyId" column="daily_id"/>
+                        <result property="sourceId" column="source_id"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="srType" column="sr_type"/>
+                        <result property="srStartdate" column="sr_startdate"/>
+                        <result property="srEnddate" column="sr_enddate"/>
+                        <result property="srWeight" column="sr_weight"/>
+                        <result property="srSampleholder" column="sr_sampleholder"/>
+                        <result property="srDestroys" column="sr_destroys"/>
+                        <result property="srCheckurl" column="sr_checkurl"/>
+                        <result property="srPic" column="sr_pic"/>
+                        <result property="isQualified" column="is_qualified"/>
+            </resultMap>
+
+  <!--dailySource简单分页查询-->
+  <select id="getDailySourcePage" resultMap="dailySourceMap">
+    SELECT
+                  daily_id,
+                        source_id,
+                        user_id,
+                        sr_type,
+                        sr_startdate,
+                        sr_enddate,
+                        sr_weight,
+                        sr_sampleholder,
+                        sr_destroys,
+                        sr_checkurl,
+                        sr_pic,
+                        is_qualified
+              FROM re_daily_source
+    <where>
+              <if test="dailySource.dailyId != null and dailySource.dailyId.trim() != ''">
+          AND daily_id = #{dailySource.dailyId}
+        </if>
+              <if test="dailySource.sourceId != null and dailySource.sourceId.trim() != ''">
+          AND source_id = #{dailySource.sourceId}
+        </if>
+              <if test="dailySource.userId != null and dailySource.userId.trim() != ''">
+          AND user_id = #{dailySource.userId}
+        </if>
+              <if test="dailySource.srType != null and dailySource.srType.trim() != ''">
+          AND sr_type = #{dailySource.srType}
+        </if>
+              <if test="dailySource.srStartdate != null and dailySource.srStartdate.trim() != ''">
+          AND sr_startdate = #{dailySource.srStartdate}
+        </if>
+              <if test="dailySource.srEnddate != null and dailySource.srEnddate.trim() != ''">
+          AND sr_enddate = #{dailySource.srEnddate}
+        </if>
+              <if test="dailySource.srWeight != null and dailySource.srWeight.trim() != ''">
+          AND sr_weight = #{dailySource.srWeight}
+        </if>
+              <if test="dailySource.srSampleholder != null and dailySource.srSampleholder.trim() != ''">
+          AND sr_sampleholder = #{dailySource.srSampleholder}
+        </if>
+              <if test="dailySource.srDestroys != null and dailySource.srDestroys.trim() != ''">
+          AND sr_destroys = #{dailySource.srDestroys}
+        </if>
+              <if test="dailySource.srCheckurl != null and dailySource.srCheckurl.trim() != ''">
+          AND sr_checkurl = #{dailySource.srCheckurl}
+        </if>
+              <if test="dailySource.srPic != null and dailySource.srPic.trim() != ''">
+          AND sr_pic = #{dailySource.srPic}
+        </if>
+              <if test="dailySource.isQualified != null and dailySource.isQualified.trim() != ''">
+          AND is_qualified = #{dailySource.isQualified}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

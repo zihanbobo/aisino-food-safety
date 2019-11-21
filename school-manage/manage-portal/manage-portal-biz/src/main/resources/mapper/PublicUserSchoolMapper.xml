@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pig4cloud.pig.portal.mapper.PublicUserSchoolMapper">
+
+<!--	<resultMap id="BaseResultMap" type="com.pig4cloud.pig.school.api.entity.SchoolMeal">
+		<id column="school_id" property="schoolId"/>
+		<result column="meal_id" property="mealId"/>
+		<result column="start_date" property="startDate"/>
+		<result column="end_date" property="endDate"/>
+	</resultMap>
+
+	<delete id="deleteBySchoolId">
+		DELETE FROM se_school_meal WHERE school_id = #{schoolId}
+	</delete>-->
+	<!--comment简单分页查询-->
+	<select id="getPublicSchool" resultMap="getPublicSchoolMap">
+		SELECT	b.id as schoolId,b.sch_name as schoolName,
+		b.live_identifier as liveIdentifier,b.recipe_identifier as recipeIdentifier
+		FROM se_public_school a
+		left join se_school b on b.id = a.school_id
+		<where>
+			1=1 and b.del_flag = '0'
+			<if test="publicUser.id != null">
+				AND a.public_id = #{publicUser.id}
+			</if>
+		</where>
+	</select>
+	<resultMap id="getPublicSchoolMap" type="HashMap">
+		<result property="schoolId" column="schoolId"/>
+		<result property="schoolName" column="schoolName"/>
+		<result property="schIdentifier" column="schIdentifier"/>
+	</resultMap>
+
+
+  <!--根据公共用户id与学校类型判断该用户绑定学校列表-门户端-->
+	<select id="getSchoolByIdType" resultMap="getSchoolByIdType">
+		SELECT	b.id as schoolId,b.sch_name as schoolName,
+		b.live_identifier as liveIdentifier,b.recipe_identifier as recipeIdentifier
+		FROM se_public_school a
+		left join se_school b on b.id = a.school_id
+		<where>
+			1=1 and b.del_flag = '0'
+			<if test="publicUserSchool.publicId != null">
+				AND a.public_id = #{publicUserSchool.publicId}
+			</if>
+			<if test="publicUserSchool.type != null">
+				AND a.type = #{publicUserSchool.type}
+			</if>
+		</where>
+	</select>
+	<resultMap id="getSchoolByIdType" type="HashMap">
+		<result property="schoolId" column="schoolId"/>
+		<result property="schoolName" column="schoolName"/>
+		<result property="schIdentifier" column="schIdentifier"/>
+	</resultMap>
+</mapper>

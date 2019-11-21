@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.api.mapper.FoodTypeMapper">
+
+  <resultMap id="foodTypeMap" type="com.pig4cloud.pig.school.api.entity.source.FoodType">
+                  <id property="foodtypeId" column="foodtype_id"/>
+                        <result property="name" column="name"/>
+                        <result property="sort" column="sort"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="parentId" column="parent_id"/>
+            </resultMap>
+
+  <!--foodType简单分页查询-->
+  <select id="getFoodTypePage" resultMap="foodTypeMap">
+    SELECT
+	  				foodtype_id,
+                name,
+                sort,
+                create_time,
+                update_time,
+                del_flag,
+                parent_id
+              FROM sup_food_type
+    <where>
+              <if test="foodType.foodtypeId != null and foodType.foodtypeId.trim() != ''">
+          AND foodtype_id = #{foodType.foodtypeId}
+        </if>
+              <if test="foodType.name != null and foodType.name.trim() != ''">
+          AND name = #{foodType.name}
+        </if>
+              <if test="foodType.sort != null and foodType.sort.trim() != ''">
+          AND sort = #{foodType.sort}
+        </if>
+              <if test="foodType.createTime != null and foodType.createTime.trim() != ''">
+          AND create_time = #{foodType.createTime}
+        </if>
+              <if test="foodType.updateTime != null and foodType.updateTime.trim() != ''">
+          AND update_time = #{foodType.updateTime}
+        </if>
+              <if test="foodType.delFlag != null and foodType.delFlag.trim() != ''">
+          AND del_flag = #{foodType.delFlag}
+        </if>
+              <if test="foodType.parentId != null and foodType.parentId.trim() != ''">
+          AND parent_id = #{foodType.parentId}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

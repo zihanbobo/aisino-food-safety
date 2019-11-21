@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.DailyMapper">
+
+  <resultMap id="dailyMap" type="com.pig4cloud.pig.school.api.entity.recipe.Daily">
+                  <id property="id" column="id"/>
+                        <result property="rdDate" column="rd_date"/>
+                        <result property="rdType" column="rd_type"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--daily简单分页查询-->
+  <select id="getDailyPage" resultMap="dailyMap">
+    SELECT
+                  id,
+                        rd_date,
+                        rd_type,
+                        remarks,
+                        create_time,
+                        update_time,
+                        school_id,
+                        del_flag
+              FROM re_daily
+    <where>
+              <if test="daily.id != null and daily.id.trim() != ''">
+          AND id = #{daily.id}
+        </if>
+              <if test="daily.rdDate != null and daily.rdDate.trim() != ''">
+          AND rd_date = #{daily.rdDate}
+        </if>
+              <if test="daily.rdType != null and daily.rdType.trim() != ''">
+          AND rd_type = #{daily.rdType}
+        </if>
+              <if test="daily.remarks != null and daily.remarks.trim() != ''">
+          AND remarks = #{daily.remarks}
+        </if>
+              <if test="daily.createTime != null and daily.createTime.trim() != ''">
+          AND create_time = #{daily.createTime}
+        </if>
+              <if test="daily.updateTime != null and daily.updateTime.trim() != ''">
+          AND update_time = #{daily.updateTime}
+        </if>
+              <if test="daily.schoolId != null and daily.schoolId.trim() != ''">
+          AND school_id = #{daily.schoolId}
+        </if>
+              <if test="daily.delFlag != null and daily.delFlag.trim() != ''">
+          AND del_flag = #{daily.delFlag}
+        </if>
+          </where>
+  </select>
+  <!--daily简单分页查询--><!--dailyId:学校每日食谱id,sourceId:每道菜的id-->
+  <select id="getSourceByDay" resultMap="getSourceByDay">
+    select a.id as 'dailyId',c.id as 'sourceId',c.re_name as 'reName',c.re_pic as 'rePic',a.school_id as 'schoolId'
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="daily.schoolId != null">
+        AND a.school_id = #{daily.schoolId}
+      </if>
+      <if test="daily.rdType != null">
+        AND a.rd_type = #{daily.rdType}
+      </if>
+      <if test="daily.rdDate != null">
+        and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{daily.rdDate}
+      </if>
+    </where>
+</select>
+  <resultMap id="getSourceByDay" type="HashMap">
+    <result property="dailyId" column="dailyId"/>
+    <result property="sourceId" column="sourceId"/>
+    <result property="reName" column="reName"/>
+    <result property="rePic" column="rePic"/>
+    <result property="schoolId" column="schoolId"/>
+  </resultMap>
+
+
+
+  <!--门户端接口-食材追溯-人员信息-当日厨房人员-->
+  <select id="getKitchenStaffDay" resultMap="getKitchenStaffDay">
+    select c.user_id as 'userId',c.real_name as 'realName',
+    d.label as 'position',
+    c.health_number as 'healthNumber',
+    case c.morning_check when '1' then '正常' when '2' then '异常' else '' end as 'morningCheck',
+    c.health_pic as 'healthPic',c.avatar as 'avatar'
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join sys_user c on c.user_id = b.user_id
+    left join (
+    select a.* from sys_dict a where 1=1 and a.del_flag ='0' and a.type = 'position' order by sort
+    ) d on d.value = c.position
+    <where>
+      1=1 and a.del_flag = '0' and c.del_flag ='0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+      <if test="map.rdType != null">
+        AND a.rd_type = #{map.rdType}
+      </if>
+      <if test="map.rdDate != null">
+        and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{map.rdDate}
+      </if>
+    </where>
+    group by c.user_id,c.real_name
+  </select>
+  <resultMap id="getKitchenStaffDay" type="HashMap">
+    <result property="userId" column="userId"/>
+    <result property="realName" column="realName"/>
+    <result property="position" column="position"/>
+    <result property="healthNumber" column="healthNumber"/>
+    <result property="morningCheck" column="morningCheck"/>
+    <result property="healthPic" column="healthPic"/>
+    <result property="avatar" column="avatar"/>
+  </resultMap>
+
+
+
+  <!--门户端接口-食材追溯-人员信息-当日厨房人员-->
+  <select id="getPersonInfo" resultMap="getKitchenStaffDay">
+    select a.user_id as 'userId',a.real_name as 'realName',
+    b.label as 'position',
+    a.health_number as 'healthNumber',
+    case a.morning_check when '1' then '正常' when '2' then '异常' else '' end as 'morningCheck',
+    a.health_pic as 'healthPic',a.avatar as 'avatar'
+    from sys_user a
+    left join (
+      select a.* from sys_dict a where 1=1 and a.del_flag ='0' and a.type = 'position' order by sort
+    ) b on b.value = a.position
+    <where>
+      1=1 and a.del_flag = '0' and a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      <if test="map.position != null">
+        and a.position =  #{map.position}
+      </if>
+    </where>
+  </select>
+
+  <!--门户端接口-食材追溯-人员信息-当日厨房人员-->
+  <select id="getPersonInfo2" resultMap="getKitchenStaffDay">
+    select a.user_id as 'userId',a.real_name as 'realName',
+    b.label as 'position',
+    a.health_number as 'healthNumber',
+    case a.morning_check when '1' then '正常' when '2' then '异常' else '' end as 'morningCheck',
+    a.health_pic as 'healthPic',a.avatar as 'avatar'
+    from sys_user a
+    left join (
+      select a.* from sys_dict a where 1=1 and a.del_flag ='0' and a.type = 'position' order by sort
+    ) b on b.value = a.position
+    <where>
+      1=1 and a.del_flag = '0' and a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      <if test="map.position != null">
+        and a.position =  #{map.position}
+      </if>
+    </where>
+  </select>
+
+
+
+  <!--门户端接口-食材追溯-供应商信息-->
+  <select id="getSupplierInfo" resultMap="getSupplierInfo">
+    select a.food_id as foodId,MAX(d.foodName) as foodName,max(d.food_pic) as foodPic,
+    d.id as supId,max(c.sup_name) as supName,c.permit_pic as picmitPic from (
+    select d.food_id
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    left join re_source_food d on d.source_id = c.id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+<!--      <if test="map.position != null">
+        and a.position =  #{map.position}
+      </if>-->
+      <if test="map.rdDate != null">
+        and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{map.rdDate}
+      </if>
+      <if test="map.rdType != null">
+        and a.rd_type =  #{map.rdType}
+      </if>
+    </where>
+    group by d.food_id
+    )a
+    left join sup_food_main b on b.food_id = a.food_id
+    left join sup_main_filing c on c.id = b.main_id
+    left join (select * from view_sup_ingredients_filing) d on d.id = a.food_id
+    group by a.food_id,d.id
+    order by foodId
+  </select>
+
+  <resultMap id="getSupplierInfo" type="HashMap">
+    <result property="foodId" column="foodId"/>
+    <result property="foodName" column="foodName"/>
+    <result property="foodPic" column="foodPic"/>
+    <result property="supId" column="supId"/>
+    <result property="supName" column="supName"/>
+    <result property="picmitPic" column="picmitPic"/>
+  </resultMap>
+
+
+
+
+
+  <!--门户端接口-食材追溯-留样信息-->
+  <select id="getSampleInfo" resultMap="getSampleInfo">
+    SELECT
+    a.daily_id AS dailyId,
+    a.source_id AS sourceId,
+    b.re_name AS 'reName',
+    a.sr_startdate AS srStartdate,
+    a.sr_enddate as srEnddate,
+    a.sr_weight AS srWeight,
+    a.sr_destroys AS srDestroys,
+    a.sr_sampleholder AS srSampleholder,
+    a.sr_checkurl AS srCheckurl,
+    a.sr_pic AS srPic,
+    b.re_pic as 'rePic',
+    a.is_qualified as isQualified
+    FROM
+    re_daily_source a
+    LEFT JOIN re_source b ON b.id = a.source_id
+    <where>
+      1=1 and b.del_flag = '0'
+      <if test="map.dailyId != null">
+        and a.daily_id = #{map.dailyId}
+      </if>
+      <if test="map.sourceId != null">
+        and a.source_id =  #{map.sourceId}
+      </if>
+    </where>
+  </select>
+
+    <resultMap id="getSampleInfo" type="HashMap">
+    <result property="dailyId" column="dailyId"/>
+    <result property="sourceId" column="sourceId"/>
+    <result property="reName" column="reName"/>
+    <result property="srStartdate" column="srStartdate"/>
+    <result property="srEnddate" column="srEnddate"/>
+    <result property="srWeight" column="srWeight"/>
+    <result property="srDestroys" column="srDestroys"/>
+    <result property="srSampleholder" column="srSampleholder"/>
+    <result property="srCheckurl" column="srCheckurl"/>
+    <result property="srPic" column="srPic"/>
+      <result property="rePic" column="rePic"/>
+      <result property="isQualified" column="isQualified"/>
+  </resultMap>
+
+  <!--门户端接口-食材追溯-食材用料-->
+  <select id="getIngredientsFood" resultMap="getIngredientsFood">
+    select a.foodId,a.foodName,GROUP_CONCAT(a.supName,' ')as supNameStr,a.foodPic,a.isQualified,a.checkFile from (
+    select c.id as foodId,c.foodName,c.food_pic as foodPic,e.id as supId,e.sup_name as supName,
+    f.is_qualified as isQualified,f.check_file as checkFile
+    from re_source a
+    left join re_source_food b on b.source_id = a.id
+    left join view_sup_ingredients_filing c on c.id = b.food_id
+    left join sup_food_main d on d.food_id = c.id
+    left join sup_main_filing e on e.id = d.main_id
+    left join pur_purchase_filing f on c.id = f.filing_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <!--      <if test="map.dailyId != null">
+              and a.daily_id = #{map.dailyId}
+            </if>-->
+      <if test="map.sourceId != null">
+        and a.id =  #{map.sourceId}
+      </if>
+    </where>
+    group by c.id,e.id
+    ) a group by a.foodId,a.foodName
+  </select>
+
+  <resultMap id="getIngredientsFood" type="HashMap">
+    <result property="foodId" column="foodId"/>
+    <result property="foodName" column="foodName"/>
+    <result property="supNameStr" column="supNameStr"/>
+    <result property="foodPic" column="foodPic"/>
+    <result property="isQualified" column="isQualified"/>
+    <result property="checkFile" column="checkFile"/>
+  </resultMap>
+
+
+  <!--校园端,根据学校id回显当天具体用餐时段的数据-->
+  <select id="getDailyBySchoolId" resultMap="sourceMap">
+    select c.*,b.user_id as userId,d.real_name as realName from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    left join sys_user d on d.user_id = b.user_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+      <if test="map.rdDate != null">
+        and DATE_FORMAT(a.rd_date, '%Y-%m-%d') = #{map.rdDate}
+      </if>
+      <if test="map.rdType != null">
+        and a.rd_type = #{map.rdType}
+      </if>
+    </where>
+  </select>
+
+  <resultMap id="sourceMap" type="HashMap">
+    <result property="id" column="id"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="rcId" column="rc_id"/>
+    <result property="reName" column="re_name"/>
+    <result property="rePic" column="re_pic"/>
+    <result property="remarks" column="remarks"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+    <result property="userId" column="userId"/>
+    <result property="realName" column="realName"/>
+  </resultMap>
+
+  <!--公众端,按条件检索每日食谱-->
+  <select id="getDailyRecipe" resultType="map">
+    select a.id as 'dailyId',c.id as 'sourceId',c.re_name as 'reName',c.re_pic as 'rePic',a.school_id as 'schoolId'
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join re_source c on c.id = b.source_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="daily.schoolId != null">
+        AND a.school_id = #{daily.schoolId}
+      </if>
+      <if test="daily.rdType != null">
+        AND a.rd_type = #{daily.rdType}
+      </if>
+      <if test="daily.rdDate != null">
+        and DATE_FORMAT(a.rd_date,'%Y-%m-%d') = #{daily.rdDate}
+      </if>
+    </where>
+  </select>
+
+  <!--公众端-食材追溯-食材用料-->
+  <select id="getFoodIngredients" resultType="map">
+    select a.foodId,a.foodName,GROUP_CONCAT(a.supName,' ')as supNameStr,a.foodPic,a.isQualified,a.checkFile, a.purTime from (
+      select c.id as foodId,c.foodName,c.food_pic as foodPic,e.id as supId,e.sup_name as supName,
+          f.is_qualified as isQualified,f.check_file as checkFile,g.pur_time as purTime
+      from re_source a
+      left join re_source_food b on b.source_id = a.id
+      left join view_sup_ingredients_filing c on c.id = b.food_id
+      left join sup_food_main d on d.food_id = c.id
+      left join sup_main_filing e on e.id = d.main_id
+      left join pur_purchase_filing f on c.id = f.filing_id
+      left join pur_purchase_main g on f.pur_id = g.id
+      <where>
+        1=1 and a.del_flag = '0'
+        <!--      <if test="map.dailyId != null">
+                and a.daily_id = #{map.dailyId}
+              </if>-->
+        <if test="map.sourceId != null">
+          and a.id =  #{map.sourceId}
+        </if>
+      </where>
+      group by c.id,e.id
+    ) a group by a.foodId,a.foodName
+  </select>
+
+
+  <!-- 校园端 查询当前月是否已经配置食谱-->
+  <select id="getIsDailyDay" resultType="map">
+      select a.school_id as schoolId,a.rd_date as rdDate,count(*) as sum
+      from re_daily a
+      <where>
+        1=1 and a.del_flag = '0'
+        <if test="map.schoolId != null">
+          AND a.school_id = #{map.schoolId}
+        </if>
+        <if test="map.rdDate != null">
+          and DATE_FORMAT(a.rd_date,'%Y-%m') = #{map.rdDate}
+        </if>
+      </where>
+      group by rd_date
+      order by rd_date
+  </select>
+
+  <!-- app-recipes 人员信息-->
+  <select id="getPersonnelInfo" resultType="map">
+    select a.user_id as 'userId',a.real_name as 'realName',
+    d.label as 'position',
+    a.health_number as 'healthNumber',
+    case a.morning_check when '1' then '正常' when '2' then '异常' else '' end as 'morningCheck',
+    a.health_pic as 'healthPic',a.avatar as 'avatar'
+    from sys_user a
+    left join sys_dict d on a.position = d.value and d.del_flag='0' and d.type = 'position'
+    <where>
+      a.del_flag = '0' and a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      <if test="map.position != null">
+        and a.position =  #{map.position}
+      </if>
+    </where>
+  </select>
+</mapper>

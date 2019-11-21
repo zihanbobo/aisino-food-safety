@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.EarlyWarningMapper">
+
+  <resultMap id="earlyWarningMap" type="com.pig4cloud.pig.school.api.vo.check.EarlyWarningVO">
+                  <id property="id" column="id"/>
+                        <result property="earlyTime" column="early_time"/>
+                        <result property="earlyWarning" column="early_warning"/>
+                        <result property="expireTime" column="expire_time"/>
+                        <result property="schoodId" column="schood_id"/>
+                        <result property="schName" column="sch_name"/>
+                        <result property="supplierName" column="supplier_name"/>
+                        <result property="human" column="human"/>
+                        <result property="purchaseTime" column="purchase_time"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="description" column="description"/>
+            </resultMap>
+
+  <!--earlyWarning简单分页查询-->
+  <select id="getEarlyWarningPage" resultMap="earlyWarningMap">
+    SELECT
+      a.id,
+      a.early_time,
+      a.early_warning,
+      a.expire_time,
+      a.school_id,
+      a.sch_name,
+      a.supplier_name,
+      a.human,
+      a.purchase_time,
+      a.create_time,
+      a.update_time,
+      a.del_flag,
+      b.sch_name as schoolName,
+      c.description as description
+      FROM ck_early_warning a
+      left join se_school b on b.id = a.school_id
+      left join (select * from sys_dict a where 1=1 and a.del_flag='0' and a.type='early_warning') c
+      on c.value = a.early_warning
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="earlyWarning.id != null and earlyWarning.id.trim() != ''">
+          AND id = #{earlyWarning.id}
+        </if>
+          <if test="earlyWarning.schoolId != null">
+            AND a.school_id = #{earlyWarning.schoolId}
+          </if>
+          <if test="earlyWarning.earlyTime != null and earlyWarning.earlyTime.trim() != ''">
+            AND early_time = #{earlyWarning.earlyTime}
+          </if>
+          <if test="earlyWarning.ctDate != null">
+            AND DATE_FORMAT(a.early_time,'%Y-%m-%d') = #{earlyWarning.ctDate}
+          </if>
+              <if test="earlyWarning.earlyWarning != null and earlyWarning.earlyWarning.trim() != ''">
+          AND a.early_warning = #{earlyWarning.earlyWarning}
+        </if>
+              <if test="earlyWarning.expireTime != null and earlyWarning.expireTime.trim() != ''">
+          AND expire_time = #{earlyWarning.expireTime}
+        </if>
+              <if test="earlyWarning.schName != null and earlyWarning.schName.trim() != ''">
+          AND sch_name = #{earlyWarning.schName}
+        </if>
+              <if test="earlyWarning.supplierName != null and earlyWarning.supplierName.trim() != ''">
+          AND supplier_name = #{earlyWarning.supplierName}
+        </if>
+              <if test="earlyWarning.human != null and earlyWarning.human.trim() != ''">
+          AND human = #{earlyWarning.human}
+        </if>
+              <if test="earlyWarning.purchaseTime != null and earlyWarning.purchaseTime.trim() != ''">
+          AND purchase_time = #{earlyWarning.purchaseTime}
+        </if>
+              <if test="earlyWarning.createTime != null and earlyWarning.createTime.trim() != ''">
+          AND create_time = #{earlyWarning.createTime}
+        </if>
+              <if test="earlyWarning.updateTime != null and earlyWarning.updateTime.trim() != ''">
+          AND update_time = #{earlyWarning.updateTime}
+        </if>
+              <if test="earlyWarning.delFlag != null and earlyWarning.delFlag.trim() != ''">
+          AND del_flag = #{earlyWarning.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+  <!--检索-营业执照预警-->
+  <select id="getBulicenseWarn" resultType="Map">
+     select
+    (select DATE_SUB(curdate(),INTERVAL 0 DAY)) as 'early_time',
+    '1' as 'early_warning',
+    a.bulicense_end as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    a.sup_name as 'supplier_name',
+    '' as 'human',
+    null as 'purchase_time'
+    from sup_main_filing a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and a.bulicense_end BETWEEN (select DATE_SUB(curdate(),INTERVAL 0 DAY)) and (select DATE_SUB(curdate(),INTERVAL -14 DAY))
+  </select>
+
+  <!--检索-许可证预警-->
+  <select id="getPermitWarn" resultType="Map">
+   select
+    (select DATE_SUB(curdate(),INTERVAL 0 DAY)) as 'early_time',
+    '2' as 'early_warning',
+    a.bulicense_end as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    a.sup_name as 'supplier_name',
+    '' as 'human',
+    null as 'purchase_time'
+    from sup_main_filing a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and a.permit_end BETWEEN (select DATE_SUB(curdate(),INTERVAL 0 DAY)) and (select DATE_SUB(curdate(),INTERVAL -14 DAY))
+  </select>
+
+  <!--检索-健康证预警-->
+  <select id="getHealthWarn" resultType="Map">
+   select
+    (select DATE_SUB(curdate(),INTERVAL 0 DAY)) as 'early_time',
+    '3' as 'early_warning',
+    a.health_endtime as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    '' as 'supplier_name',
+    a.real_name as 'human',
+    null as 'purchase_time'
+    from sys_user a
+    left join se_school b on b.id = a.union_id
+    where 1 = 1 and a.del_flag = '0'
+    and a.user_type = '2' and a.is_admin is null
+    and a.health_endtime is not null
+    and a.health_endtime BETWEEN (select DATE_SUB(curdate(),INTERVAL 0 DAY)) and (select DATE_SUB(curdate(),INTERVAL -14 DAY))
+  </select>
+
+  <!--检索-食材预警（采购时未上传索证索票）-->
+  <select id="getPurchaseWarn" resultType="Map">
+   select
+    (select DATE_SUB(curdate(),INTERVAL 0 DAY)) as 'early_time',
+    '4' as 'early_warning',
+    null as 'expire_time',
+    b.id as 'school_id',
+    b.sch_name as 'sch_name',
+    '' as 'supplier_name',
+    '' as 'human',
+    DATE_FORMAT(a.pur_time, '%Y-%m-%d') as 'purchase_time'
+    from pur_purchase_main a
+    left join se_school b on b.id = a.school_id
+    where 1 = 1 and a.del_flag = '0'
+    and (a.claim_ticket is null or a.claim_ticket = '')
+  </select>
+
+
+
+
+</mapper>

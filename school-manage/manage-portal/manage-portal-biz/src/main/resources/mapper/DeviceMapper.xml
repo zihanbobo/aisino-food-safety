@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.DeviceMapper">
+
+  <resultMap id="deviceMap" type="com.pig4cloud.pig.portal.api.entity.live.Device">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="deviceName" column="device_name"/>
+                        <result property="brand" column="brand"/>
+                        <result property="startDate" column="start_date"/>
+                        <result property="useYear" column="use_year"/>
+                        <result property="restaurantName" column="restaurant_name"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="deviceType" column="device_type"/>
+                        <result property="runWell" column="run_well"/>
+                        <result property="isPassed" column="is_passed"/>
+            </resultMap>
+
+  <!--device简单分页查询-->
+  <select id="getDevicePage" resultMap="deviceMap">
+    SELECT
+    a.id,
+    a.school_id,
+    a.device_name,
+    a.brand,
+    a.start_date,
+    a.use_year,
+    a.restaurant_name,
+    a.remarks,
+    a.del_flag,
+    a.device_type,
+    a.run_well,
+    a.is_passed
+    FROM vd_device a
+    left join se_school c on c.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+              <if test="device.id != null and device.id.trim() != ''">
+          AND id = #{device.id}
+        </if>
+              <if test="device.schoolId != null">
+          AND school_id = #{device.schoolId}
+        </if>
+              <if test="device.deviceName != null and device.deviceName.trim() != ''">
+          AND device_name = #{device.deviceName}
+        </if>
+              <if test="device.brand != null and device.brand.trim() != ''">
+          AND brand = #{device.brand}
+        </if>
+              <if test="device.startDate != null and device.startDate.trim() != ''">
+          AND start_date = #{device.startDate}
+        </if>
+              <if test="device.useYear != null and device.useYear.trim() != ''">
+          AND use_year = #{device.useYear}
+        </if>
+              <if test="device.restaurantName != null and device.restaurantName.trim() != ''">
+          AND restaurant_name = #{device.restaurantName}
+        </if>
+              <if test="device.remarks != null and device.remarks.trim() != ''">
+          AND remarks = #{device.remarks}
+        </if>
+              <if test="device.delFlag != null and device.delFlag.trim() != ''">
+          AND del_flag = #{device.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

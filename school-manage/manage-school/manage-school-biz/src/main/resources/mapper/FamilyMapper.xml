@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.FamilyMapper">
+
+  <resultMap id="publicUserMap" type="com.pig4cloud.pig.portal.api.vo.PublicUserVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="pubName" column="pub_name"/>
+                        <result property="pubIdentity" column="pub_identity"/>
+                        <result property="pubPassword" column="pub_password"/>
+                        <result property="pubArea" column="pub_area"/>
+                        <result property="wxOpenid" column="wx_openid"/>
+                        <result property="qqOpenid" column="qq_openid"/>
+                        <result property="pubPic" column="pub_pic"/>
+                        <result property="pubPhone" column="pub_phone"/>
+                        <result property="nickName" column="nick_name"/>
+                        <result property="identityCard" column="identity_card"/>
+                        <result property="pubSign" column="pub_sign"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="lockFlag" column="lock_flag"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="token" column="token"/>
+                        <result property="schoolNameAll" column="schoolNameAll"/>
+            </resultMap>
+
+  <!--publicUser简单分页查询-->
+  <select id="getFamilyPage" resultMap="publicUserMap">
+	  SELECT
+		  a.id,
+		  a.school_id,
+		  a.pub_name,
+		  a.pub_identity,
+		  a.pub_password,
+		  a.pub_area,
+		  a.wx_openid,
+		  a.qq_openid,
+		  a.pub_pic,
+		  a.pub_phone,
+		  a.nick_name,
+		  a.identity_card,
+		  a.pub_sign,
+		  a.remarks,
+		  a.lock_flag,
+		  a.create_time,
+		  a.update_time,
+		  a.del_flag,
+		  REPLACE(group_concat(c.sch_name),',',',') as schoolNameAll
+	  FROM se_public_user a
+	  left join se_public_school b on b.public_id = a.id
+	  left join se_school c on c.id = b.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="publicUser.id != null and publicUser.id.trim() != ''">
+        AND a.id = #{publicUser.id}
+      </if>
+      <if test="publicUser.schoolId != null">
+        AND b.school_id = #{publicUser.schoolId}
+      </if>
+      <if test="publicUser.pubName != null and publicUser.pubName.trim() != ''">
+        AND a.pub_name = #{publicUser.pubName}
+      </if>
+      <if test="publicUser.pubIdentity != null and publicUser.pubIdentity.trim() != ''">
+        AND a.pub_identity = #{publicUser.pubIdentity}
+      </if>
+      <if test="publicUser.pubPassword != null and publicUser.pubPassword.trim() != ''">
+        AND a.pub_password = #{publicUser.pubPassword}
+      </if>
+      <if test="publicUser.pubArea != null and publicUser.pubArea.trim() != ''">
+        AND a.pub_area = #{publicUser.pubArea}
+      </if>
+      <if test="publicUser.wxOpenid != null and publicUser.wxOpenid.trim() != ''">
+        AND a.wx_openid = #{publicUser.wxOpenid}
+      </if>
+      <if test="publicUser.qqOpenid != null and publicUser.qqOpenid.trim() != ''">
+        AND a.qq_openid = #{publicUser.qqOpenid}
+      </if>
+      <if test="publicUser.pubPic != null and publicUser.pubPic.trim() != ''">
+        AND a.pub_pic = #{publicUser.pubPic}
+      </if>
+      <if test="publicUser.pubPhone != null and publicUser.pubPhone.trim() != ''">
+        AND a.pub_phone = #{publicUser.pubPhone}
+      </if>
+      <if test="publicUser.nickName != null and publicUser.nickName.trim() != ''">
+        AND a.nick_name = #{publicUser.nickName}
+      </if>
+      <if test="publicUser.identityCard != null and publicUser.identityCard.trim() != ''">
+        AND a.identity_card = #{publicUser.identityCard}
+      </if>
+      <if test="publicUser.pubSign != null and publicUser.pubSign.trim() != ''">
+        AND a.pub_sign = #{publicUser.pubSign}
+      </if>
+      <if test="publicUser.remarks != null and publicUser.remarks.trim() != ''">
+        AND a.remarks = #{publicUser.remarks}
+      </if>
+      <if test="publicUser.lockFlag != null and publicUser.lockFlag.trim() != ''">
+        AND a.lock_flag = #{publicUser.lockFlag}
+      </if>
+      <if test="publicUser.createTime != null and publicUser.createTime.trim() != ''">
+        AND a.create_time = #{publicUser.createTime}
+      </if>
+      <if test="publicUser.updateTime != null and publicUser.updateTime.trim() != ''">
+        AND a.update_time = #{publicUser.updateTime}
+      </if>
+      <if test="publicUser.delFlag != null and publicUser.delFlag.trim() != ''">
+        AND a.del_flag = #{publicUser.delFlag}
+      </if>
+    </where>
+	  group by a.id
+  </select>
+
+
+
+</mapper>

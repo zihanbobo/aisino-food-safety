@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.UltravioletlightMapper">
+
+  <resultMap id="ultravioletlightMap" type="com.pig4cloud.pig.school.api.entity.account.Ultravioletlight">
+                  <id property="id" column="id"/>
+                        <result property="useTime" column="use_time"/>
+                        <result property="disinfectionStart" column="disinfection_start"/>
+                        <result property="disinfectionEnd" column="disinfection_end"/>
+                        <result property="disinfectionTime" column="disinfection_time"/>
+                        <result property="lampUsageTime" column="lamp_usage_time"/>
+                        <result property="username" column="username"/>
+                        <result property="reviewer" column="reviewer"/>
+                        <result property="isConfirm" column="is_confirm"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolId" column="school_id"/>
+            </resultMap>
+
+  <!--ultravioletlight简单分页查询-->
+  <select id="getUltravioletlightPage" resultMap="ultravioletlightMap">
+          SELECT
+                  id,
+                  use_time,
+                  disinfection_start,
+                  disinfection_end,
+                  disinfection_time,
+                  lamp_usage_time,
+                  username,
+                  reviewer,
+                  is_confirm,
+                  remarks,
+                  create_time,
+                  update_time,
+                  del_flag,
+                  school_id
+          FROM sl_ultravioletlight
+    <where>
+      1=1 and del_flag = '0'
+              <if test="ultravioletlight.id != null">
+          AND id = #{ultravioletlight.id}
+        </if>
+              <if test="ultravioletlight.useTime != null">
+          AND DATE_FORMAT(use_time,'%Y-%m-%d') = #{ultravioletlight.useTime}
+        </if>
+              <if test="ultravioletlight.disinfectionStart != null">
+          AND disinfection_start = #{ultravioletlight.disinfectionStart}
+        </if>
+              <if test="ultravioletlight.disinfectionEnd != null">
+          AND disinfection_end = #{ultravioletlight.disinfectionEnd}
+        </if>
+              <if test="ultravioletlight.disinfectionTime != null">
+          AND disinfection_time = #{ultravioletlight.disinfectionTime}
+        </if>
+              <if test="ultravioletlight.lampUsageTime != null">
+          AND lamp_usage_time = #{ultravioletlight.lampUsageTime}
+        </if>
+              <if test="ultravioletlight.username != null">
+          AND username = #{ultravioletlight.username}
+        </if>
+              <if test="ultravioletlight.reviewer != null and ultravioletlight.reviewer.trim() != ''">
+          AND reviewer = #{ultravioletlight.reviewer}
+        </if>
+              <if test="ultravioletlight.isConfirm != null and ultravioletlight.isConfirm.trim() != ''">
+          AND is_confirm = #{ultravioletlight.isConfirm}
+        </if>
+              <if test="ultravioletlight.remarks != null and ultravioletlight.remarks.trim() != ''">
+          AND remarks = #{ultravioletlight.remarks}
+        </if>
+              <if test="ultravioletlight.createTime != null">
+          AND create_time = #{ultravioletlight.createTime}
+        </if>
+              <if test="ultravioletlight.updateTime != null">
+          AND update_time = #{ultravioletlight.updateTime}
+        </if>
+              <if test="ultravioletlight.delFlag != null and ultravioletlight.delFlag.trim() != ''">
+          AND del_flag = #{ultravioletlight.delFlag}
+        </if>
+      <if test="ultravioletlight.schoolId != null">
+        AND school_id = #{ultravioletlight.schoolId}
+      </if>
+      ORDER BY use_time desc
+          </where>
+  </select>
+
+
+
+</mapper>

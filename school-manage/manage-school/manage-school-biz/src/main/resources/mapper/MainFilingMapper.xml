@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.MainFilingMapper">
+
+  <resultMap id="mainFilingMap" type="com.pig4cloud.pig.school.api.vo.recipe.MainFilingVO">
+                  <id property="id" column="id"/>
+                        <result property="supName" column="sup_name"/>
+                        <result property="supCreditcode" column="sup_creditcode"/>
+                        <result property="corName" column="cor_name"/>
+                        <result property="linkName" column="link_name"/>
+                        <result property="contact" column="contact"/>
+                        <result property="supType" column="sup_type"/>
+                        <result property="areaCode" column="area_code"/>
+                        <result property="addr" column="addr"/>
+                        <result property="phone" column="phone"/>
+                        <result property="zipCode" column="zip_code"/>
+                        <result property="bulicensePic" column="bulicense_pic"/>
+                        <result property="permitPic" column="permit_pic"/>
+                        <result property="elsePic" column="else_pic"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="schoolName" column="schoolName"/>
+                        <result property="bulicenseStart" column="bulicense_start"/>
+                        <result property="bulicenseEnd" column="bulicense_end"/>
+                        <result property="permitStart" column="permit_start"/>
+                        <result property="permitEnd" column="permit_end"/>
+                        <result property="regAuthority" column="reg_authority"/>
+                        <result property="issuanceDate" column="issuance_date"/>
+                        <result property="establishmentDate" column="establishment_date"/>
+                        <result property="businessScope" column="business_scope"/>
+                        <result property="licenseNumber" column="license_number"/>
+                        <result property="licenseAuthority" column="license_authority"/>
+                        <result property="licenseDate" column="license_date"/>
+                        <result property="principal" column="principal"/>
+                        <result property="licenseType" column="license_type"/>
+                        <result property="licenseScope" column="license_scope"/>
+                        <result property="businessPlace" column="business_place"/>
+                        <result property="businessType" column="business_type"/>
+  </resultMap>
+
+  <!--mainFiling简单分页查询-->
+  <select id="getMainFilingPage" resultMap="mainFilingMap">
+          SELECT
+                  a.id,
+                  a.sup_name,
+                  a.sup_creditcode,
+                  a.cor_name,
+                  a.link_name,
+                  a.contact,
+                  a.sup_type,
+                  a.area_code,
+                  a.addr,
+                  a.phone,
+                  a.zip_code,
+                  a.bulicense_pic,
+                  a.permit_pic,
+                  a.else_pic,
+                  a.remarks,
+                  a.create_time,
+                  a.update_time,
+                  a.del_flag,
+                  b.sch_name as schoolName,
+                  a.bulicense_start,
+                  a.bulicense_end,
+                  a.permit_start,
+                  a.permit_end,
+                  a.reg_authority,
+                  a.issuance_date,
+                  a.establishment_date,
+                  a.business_scope,
+                  a.license_number,
+                  a.license_authority,
+                  a.license_date,
+                  a.principal,
+                  a.license_type,
+                  a.license_scope,
+                  a.business_place,
+                   a.business_type
+              FROM sup_main_filing a
+              left join se_school b on b.id = a.school_id
+    <where>
+
+    1=1 and a.del_flag = '0'
+              <if test="mainFiling.id != null and mainFiling.id.trim() != ''">
+          AND a.id = #{mainFiling.id}
+        </if>
+            <if test="mainFiling.schoolId != null">
+              AND a.school_id = #{mainFiling.schoolId}
+        </if>
+              <if test="mainFiling.supName != null and mainFiling.supName.trim() != ''">
+          AND a.sup_name like concat('%',#{mainFiling.supName},'%')
+        </if>
+              <if test="mainFiling.supCreditcode != null and mainFiling.supCreditcode.trim() != ''">
+          AND a.sup_creditcode = #{mainFiling.supCreditcode}
+        </if>
+              <if test="mainFiling.corName != null and mainFiling.corName.trim() != ''">
+          AND a.cor_name = #{mainFiling.corName}
+        </if>
+              <if test="mainFiling.linkName != null and mainFiling.linkName.trim() != ''">
+          AND a.link_name = #{mainFiling.linkName}
+        </if>
+              <if test="mainFiling.contact != null and mainFiling.contact.trim() != ''">
+          AND a.contact = #{mainFiling.contact}
+        </if>
+              <if test="mainFiling.supType != null and mainFiling.supType.trim() != ''">
+          AND a.sup_type = #{mainFiling.supType}
+        </if>
+              <if test="mainFiling.areaCode != null and mainFiling.areaCode.trim() != ''">
+          AND a.area_code = #{mainFiling.areaCode}
+        </if>
+              <if test="mainFiling.addr != null and mainFiling.addr.trim() != ''">
+          AND a.addr = #{mainFiling.addr}
+        </if>
+              <if test="mainFiling.phone != null and mainFiling.phone.trim() != ''">
+          AND a.phone = #{mainFiling.phone}
+        </if>
+              <if test="mainFiling.zipCode != null and mainFiling.zipCode.trim() != ''">
+          AND a.zip_code = #{mainFiling.zipCode}
+        </if>
+              <if test="mainFiling.bulicensePic != null and mainFiling.bulicensePic.trim() != ''">
+          AND a.bulicense_pic = #{mainFiling.bulicensePic}
+        </if>
+              <if test="mainFiling.permitPic != null and mainFiling.permitPic.trim() != ''">
+          AND a.permit_pic = #{mainFiling.permitPic}
+        </if>
+              <if test="mainFiling.elsePic != null and mainFiling.elsePic.trim() != ''">
+          AND a.else_pic = #{mainFiling.elsePic}
+        </if>
+              <if test="mainFiling.createTime != null and mainFiling.createTime.trim() != ''">
+          AND a.create_time = #{mainFiling.createTime}
+        </if>
+              <if test="mainFiling.updateTime != null and mainFiling.updateTime.trim() != ''">
+          AND a.update_time = #{mainFiling.updateTime}
+        </if>
+              <if test="mainFiling.delFlag != null and mainFiling.delFlag.trim() != ''">
+          AND a.del_flag = #{mainFiling.delFlag}
+        </if>
+            <!--<if test="mainFiling.delFlag != null and mainFiling.delFlag.trim() != ''">
+              AND a.del_flag = #{mainFiling.delFlag}
+            </if>
+            <if test="mainFiling.delFlag != null and mainFiling.delFlag.trim() != ''">
+              AND a.del_flag = #{mainFiling.delFlag}
+            </if>
+            <if test="mainFiling.delFlag != null and mainFiling.delFlag.trim() != ''">
+              AND a.del_flag = #{mainFiling.delFlag}
+            </if>
+            <if test="mainFiling.delFlag != null and mainFiling.delFlag.trim() != ''">
+              AND a.del_flag = #{mainFiling.delFlag}
+            </if>-->
+          </where>
+  </select>
+
+	<!-- 通过食材ID，查询供应商信息-->
+	<select id="listMainsByFoodId" resultMap="listMainsByFoodId"><!-- 原BaseResultMap-->
+      select a.*
+      from sup_main_filing a
+      inner join sup_food_main b on b.main_id = a.id
+      where 1=1 and a.del_flag = '0' and b.food_id in (#{foodId})
+  </select>
+  <!-- 封装返回字段为HashMap -->
+  <resultMap id="listMainsByFoodId" type="HashMap">
+    <id property="id" column="id"/>
+    <result property="supName" column="sup_name"/>
+  </resultMap>
+</mapper>

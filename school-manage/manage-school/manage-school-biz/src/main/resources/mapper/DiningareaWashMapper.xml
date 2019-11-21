@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.DiningareaWashMapper">
+
+  <resultMap id="diningareaWashMap" type="com.pig4cloud.pig.school.api.vo.account.DiningareaWashVO">
+    <id property="id" column="id"/>
+    <result property="dwName" column="dw_name"/>
+    <result property="dwDate" column="dw_date"/>
+    <result property="dwStart" column="dw_start"/>
+    <result property="dwEnd" column="dw_end"/>
+    <result property="remarks" column="remarks"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="delFlag" column="del_flag"/>
+    <result property="schoolId" column="school_id"/>
+    <result property="schoolName" column="schoolName"/>
+  </resultMap>
+
+  <!--diningareaWash简单分页查询-->
+  <select id="getDiningareaWashPage" resultMap="diningareaWashMap">
+    SELECT
+                  a.id,
+                  a.school_id,
+    a.dw_name,
+    a.dw_date,
+    a.dw_start,
+    a.dw_end,
+    a.dw_timelength,
+    a.dw_person,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.sch_name as schoolName
+              FROM sl_diningarea_wash a
+    left join se_school b on b.id = a.school_id
+    <where>
+    1=1 and a.del_flag = '0'
+              <if test="diningareaWash.id != null and diningareaWash.id.trim() != ''">
+          AND a.id = #{diningareaWash.id}
+        </if>
+              <if test="diningareaWash.schoolId != null">
+          AND a.school_id = #{diningareaWash.schoolId}
+        </if>
+              <if test="diningareaWash.dwName != null and diningareaWash.dwName.trim() != ''">
+          AND a.dw_name = #{diningareaWash.dwName}
+        </if>
+              <if test="diningareaWash.dwDate != null and diningareaWash.dwDate.trim() != ''">
+          AND DATE_FORMAT(a.dw_date,'%Y-%m-%d') = #{diningareaWash.dwDate}
+        </if>
+              <if test="diningareaWash.dwStart != null and diningareaWash.dwStart.trim() != ''">
+          AND a.ew_start = #{diningareaWash.dwStart}
+        </if>
+              <if test="diningareaWash.dwEnd != null and diningareaWash.dwEnd.trim() != ''">
+          AND a.ew_end = #{diningareaWash.dwEnd}
+        </if>
+              <if test="diningareaWash.dwTimelength != null and diningareaWash.dwTimelength.trim() != ''">
+          AND a.dw_timelength = #{diningareaWash.dwTimelength}
+        </if>
+              <if test="diningareaWash.dwPerson != null and diningareaWash.dwPerson.trim() != ''">
+          AND a.dw_person = #{diningareaWash.dwPerson}
+        </if>
+              <if test="diningareaWash.remarks != null and diningareaWash.remarks.trim() != ''">
+          AND a.remarks = #{diningareaWash.remarks}
+        </if>
+              <if test="diningareaWash.createTime != null and diningareaWash.createTime.trim() != ''">
+          AND a.create_time = #{diningareaWash.createTime}
+        </if>
+              <if test="diningareaWash.updateTime != null and diningareaWash.updateTime.trim() != ''">
+          AND a.update_time = #{diningareaWash.updateTime}
+        </if>
+              <if test="diningareaWash.delFlag != null and diningareaWash.delFlag.trim() != ''">
+          AND a.del_flag = #{diningareaWash.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

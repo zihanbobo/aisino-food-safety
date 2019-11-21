@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.RegulatorMapper">
+
+  <resultMap id="regulatorMap" type="com.pig4cloud.pig.school.api.entity.regulator.Regulator">
+                  <id property="id" column="id"/>
+                        <result property="regUserid" column="reg_userid"/>
+                        <result property="regName" column="reg_name"/>
+                        <result property="regAddress" column="reg_address"/>
+                        <result property="regArea" column="reg_area"/>
+                        <result property="regTel" column="reg_tel"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+            </resultMap>
+
+  <!--regulator简单分页查询-->
+  <select id="getRegulatorPage" resultMap="regulatorMap">
+    SELECT
+                  id,
+                        reg_userid,
+                        reg_name,
+                        reg_address,
+                        reg_area,
+                        reg_tel,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag
+              FROM se_regulator
+    <where>
+              <if test="regulator.id != null and regulator.id.trim() != ''">
+          AND id = #{regulator.id}
+        </if>
+              <if test="regulator.regUserid != null and regulator.regUserid.trim() != ''">
+          AND reg_userid = #{regulator.regUserid}
+        </if>
+              <if test="regulator.regName != null and regulator.regName.trim() != ''">
+          AND reg_name = #{regulator.regName}
+        </if>
+              <if test="regulator.regAddress != null and regulator.regAddress.trim() != ''">
+          AND reg_address = #{regulator.regAddress}
+        </if>
+              <if test="regulator.regArea != null and regulator.regArea.trim() != ''">
+          AND reg_area = #{regulator.regArea}
+        </if>
+              <if test="regulator.regTel != null and regulator.regTel.trim() != ''">
+          AND reg_tel = #{regulator.regTel}
+        </if>
+              <if test="regulator.remarks != null and regulator.remarks.trim() != ''">
+          AND remarks = #{regulator.remarks}
+        </if>
+              <if test="regulator.createTime != null and regulator.createTime.trim() != ''">
+          AND create_time = #{regulator.createTime}
+        </if>
+              <if test="regulator.updateTime != null and regulator.updateTime.trim() != ''">
+          AND update_time = #{regulator.updateTime}
+        </if>
+              <if test="regulator.delFlag != null and regulator.delFlag.trim() != ''">
+          AND del_flag = #{regulator.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+
+</mapper>

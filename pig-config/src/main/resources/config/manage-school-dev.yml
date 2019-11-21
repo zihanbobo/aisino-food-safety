@@ -1,0 +1,33 @@
+security:
+  oauth2:
+    client:
+      client-id: schoolMan
+      client-secret: schoolMan
+      scope: server
+
+# 数据源
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: school_fs
+    password: school_fs@2019
+    url: jdbc:mysql://101.201.148.215:3306/school_fs?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+
+# 直接放行URL
+ignore:
+  urls:
+    - /actuator/**
+    - /school/**
+    - /schoolcustom/**
+    - /daily/**
+    - /mainfiling/**
+    - /announcement/**
+    - /regulatoryopinion/**
+    - /projectmanage/**
+    - /campus/**
+    - /welHeadmaster/**
+    - /accompanydinner/**
+    - /ultravioletLight/**
+    - /analysisData/**
+    - /trendAnalysis/**

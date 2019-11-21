@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.portal.mapper.FeedbackMapper">
+
+  <resultMap id="feedbackMap" type="com.pig4cloud.pig.portal.api.entity.Feedback">
+	  <id property="id" column="id"/>
+                        <result property="schoolId" column="school_id"/>
+                        <result property="userId" column="user_id"/>
+                        <result property="opTitle" column="op_title"/>
+                        <result property="opContent" column="op_content"/>
+                        <result property="opTime" column="op_time"/>
+                        <result property="opName" column="op_name"/>
+                        <result property="opEmail" column="op_email"/>
+                        <result property="opTel" column="op_tel"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="responseTime" column="response_time"/>
+                        <result property="responseContent" column="response_content"/>
+                        <result property="isResponse" column="is_response"/>
+            </resultMap>
+
+  <!--feedback简单分页查询-->
+  <select id="getFeedbackPage" resultMap="feedbackMap">
+    SELECT
+                  id,
+                        school_id,
+                        user_id,
+                        op_title,
+                        op_content,
+                        op_time,
+                        op_name,
+                        op_email,
+                        op_tel,
+                        remarks,
+                        create_time,
+                        update_time,
+                        del_flag,
+                        response_time,
+                        response_content,
+                        is_response
+              FROM site_feedback
+    <where>
+              <if test="feedback.id != null and feedback.id.trim() != ''">
+          AND id = #{feedback.id}
+        </if>
+              <if test="feedback.schoolId != null and feedback.schoolId.trim() != ''">
+          AND school_id = #{feedback.schoolId}
+        </if>
+              <if test="feedback.userId != null and feedback.userId.trim() != ''">
+          AND user_id = #{feedback.userId}
+        </if>
+              <if test="feedback.opTitle != null and feedback.opTitle.trim() != ''">
+          AND op_title = #{feedback.opTitle}
+        </if>
+              <if test="feedback.opContent != null and feedback.opContent.trim() != ''">
+          AND op_content = #{feedback.opContent}
+        </if>
+              <if test="feedback.opTime != null and feedback.opTime.trim() != ''">
+          AND op_time = #{feedback.opTime}
+        </if>
+              <if test="feedback.opName != null and feedback.opName.trim() != ''">
+          AND op_name = #{feedback.opName}
+        </if>
+              <if test="feedback.opEmail != null and feedback.opEmail.trim() != ''">
+          AND op_email = #{feedback.opEmail}
+        </if>
+              <if test="feedback.opTel != null and feedback.opTel.trim() != ''">
+          AND op_tel = #{feedback.opTel}
+        </if>
+              <if test="feedback.remarks != null and feedback.remarks.trim() != ''">
+          AND remarks = #{feedback.remarks}
+        </if>
+              <if test="feedback.createTime != null and feedback.createTime.trim() != ''">
+          AND create_time = #{feedback.createTime}
+        </if>
+              <if test="feedback.updateTime != null and feedback.updateTime.trim() != ''">
+          AND update_time = #{feedback.updateTime}
+        </if>
+              <if test="feedback.delFlag != null and feedback.delFlag.trim() != ''">
+          AND del_flag = #{feedback.delFlag}
+        </if>
+              <if test="feedback.responseTime != null and feedback.responseTime.trim() != ''">
+          AND response_time = #{feedback.responseTime}
+        </if>
+              <if test="feedback.responseContent != null and feedback.responseContent.trim() != ''">
+          AND response_content = #{feedback.responseContent}
+        </if>
+              <if test="feedback.isResponse != null and feedback.isResponse.trim() != ''">
+          AND is_response = #{feedback.isResponse}
+        </if>
+          </where>
+  </select>
+
+  <select id="getFeedbackForP" resultMap="feedbackMap2">
+    select
+    a.id as id,
+    a.user_id as userId,
+    a.op_title as opTitle,
+    a.op_content as opContent,
+    a.create_time as feedbackTime,
+    a.update_time as responseTime,
+    a.op_name as opName,
+    a.op_email as opEmail,
+    a.op_tel as opTel,
+    a.response_content as responseContent,
+    a.is_response as isResponse
+    from site_feedback a
+    <where>
+      1=1 and a.del_flag = '0'
+        AND a.is_response = 1
+      <if test="userId != null ">
+        AND a.user_Id = #{userId}
+      </if>
+    </where>
+  </select>
+
+  <resultMap id="feedbackMap2" type="HashMap">
+    <result property="id" column="id"/>
+    <result property="userId" column="userId"/>
+    <result property="opTitle" column="opTitle"/>
+    <result property="opContent" column="opContent"/>
+    <result property="feedbackTime" column="feedbackTime"/>
+    <result property="responseTime" column="responseTime"/>
+    <result property="opName" column="opName"/>
+    <result property="opEmail" column="opEmail"/>
+    <result property="opTel" column="opTel"/>
+    <result property="responseContent" column="responseContent"/>
+    <result property="isResponse" column="isResponse"/>
+  </resultMap>
+
+</mapper>

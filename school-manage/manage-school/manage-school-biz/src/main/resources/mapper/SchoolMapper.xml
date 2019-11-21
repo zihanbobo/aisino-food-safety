@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~
+  ~      Copyright (c) 2018-2025, lengleng All rights reserved.
+  ~
+  ~  Redistribution and use in source and binary forms, with or without
+  ~  modification, are permitted provided that the following conditions are met:
+  ~
+  ~ Redistributions of source code must retain the above copyright notice,
+  ~  this list of conditions and the following disclaimer.
+  ~  Redistributions in binary form must reproduce the above copyright
+  ~  notice, this list of conditions and the following disclaimer in the
+  ~  documentation and/or other materials provided with the distribution.
+  ~  Neither the name of the pig4cloud.com developer nor the names of its
+  ~  contributors may be used to endorse or promote products derived from
+  ~  this software without specific prior written permission.
+  ~  Author: lengleng (wangiegie@gmail.com)
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SchoolMapper">
+
+  <resultMap id="schoolMap" type="com.pig4cloud.pig.school.api.vo.SchoolVO">
+                  <id property="id" column="id"/>
+                        <result property="schoolUserid" column="school_userid"/>
+                        <result property="schoolProjectid" column="school_projectid"/>
+                        <result property="schName" column="sch_name"/>
+                        <result property="schAddress" column="sch_address"/>
+                        <result property="liveIdentifier" column="live_identifier"/>
+                        <result property="recipeIdentifier" column="recipe_identifier"/>
+                        <result property="schArea" column="sch_area"/>
+                        <result property="schCity" column="sch_city"/>
+                        <result property="schWebsite" column="sch_website"/>
+                        <result property="schQrcode" column="sch_qrcode"/>
+                        <result property="schTel" column="sch_tel"/>
+                        <result property="schPrincipal" column="sch_principal"/>
+                        <result property="schPic" column="sch_pic"/>
+                        <result property="remarks" column="remarks"/>
+                        <result property="createTime" column="create_time"/>
+                        <result property="updateTime" column="update_time"/>
+                        <result property="delFlag" column="del_flag"/>
+                        <result property="projectName" column="projectName"/>
+					    <collection property="mealListAll" ofType="com.pig4cloud.pig.school.api.entity.selseal.SelMeal"
+							  select="com.pig4cloud.pig.school.mapper.SelMealMapper.listMealBySchoolId" column="id">
+					    </collection>
+            </resultMap>
+
+  <!--school简单分页查询-->
+  <select id="getSchoolPage" resultMap="schoolMap">
+    SELECT
+                  a.id,
+    a.school_userid,
+    a.school_projectid,
+    a.sch_name,
+    a.sch_address,
+    a.live_identifier,
+    a.recipe_identifier,
+    a.sch_area,
+    a.sch_city,
+    a.sch_website,
+    a.sch_qrcode,
+    a.sch_tel,
+    a.sch_principal,
+    a.sch_pic,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.project_name as projectName
+              FROM se_school a
+    left join se_project_manage b on b.id = a.school_projectid
+    <where>
+    1=1 and a.del_flag = '0'
+              <if test="school.id != null and school.id.trim() != ''">
+          AND a.id = #{school.id}
+        </if>
+              <if test="school.schoolUserid != null and school.schoolUserid.trim() != ''">
+          AND a.school_userid = #{school.schoolUserid}
+        </if>
+              <if test="school.schName != null and school.schName.trim() != ''">
+		  AND a.sch_name LIKE CONCAT('%',#{school.schName},'%')
+        </if>
+              <if test="school.schAddress != null and school.schAddress.trim() != ''">
+          AND a.sch_address = #{school.schAddress}
+        </if>
+              <if test="school.liveIdentifier != null and school.liveIdentifier.trim() != ''">
+		  AND a.live_identifier LIKE CONCAT('%',#{school.liveIdentifier},'%')
+        </if>
+              <if test="school.schArea != null and school.schArea.trim() != ''">
+          AND a.sch_area = #{school.schArea}
+        </if>
+              <if test="school.schCity != null and school.schCity.trim() != ''">
+          AND a.sch_city = #{school.schCity}
+        </if>
+              <if test="school.schWebsite != null and school.schWebsite.trim() != ''">
+          AND a.sch_website = #{school.schWebsite}
+        </if>
+              <if test="school.schQrcode != null and school.schQrcode.trim() != ''">
+          AND a.sch_qrcode = #{school.schQrcode}
+        </if>
+              <if test="school.schTel != null and school.schTel.trim() != ''">
+          AND a.sch_tel = #{school.schTel}
+        </if>
+              <if test="school.schPrincipal != null and school.schPrincipal.trim() != ''">
+          AND a.sch_principal = #{school.schPrincipal}
+        </if>
+              <if test="school.schPic != null and school.schPic.trim() != ''">
+          AND a.sch_pic = #{school.schPic}
+        </if>
+              <if test="school.remarks != null and school.remarks.trim() != ''">
+          AND a.remarks = #{school.remarks}
+        </if>
+              <if test="school.createTime != null and school.createTime.trim() != ''">
+          AND a.create_time = #{school.createTime}
+        </if>
+              <if test="school.updateTime != null and school.updateTime.trim() != ''">
+          AND a.update_time = #{school.updateTime}
+        </if>
+              <if test="school.delFlag != null and school.delFlag.trim() != ''">
+          AND a.del_flag = #{school.delFlag}
+        </if>
+          </where>
+  </select>
+
+
+	<!--学校分页查询（带套餐）-->
+	<select id="getSchoolVosPage" resultMap="schoolMap">
+		SELECT
+		a.id,
+    a.school_userid,
+    a.school_projectid,
+    a.sch_name,
+    a.sch_address,
+    a.live_identifier,
+    a.recipe_identifier,
+    a.sch_area,
+    a.sch_city,
+    a.sch_website,
+    a.sch_qrcode,
+    a.sch_tel,
+    a.sch_principal,
+    a.sch_pic,
+    a.remarks,
+    a.create_time,
+    a.update_time,
+    a.del_flag,
+    b.project_name as projectName
+    FROM se_school a
+    left join se_project_manage b on b.id = a.school_projectid
+		<where>
+      1=1 and a.del_flag = '0'
+      <if test="query.isUseridNull != null and query.isUseridNull != '' and query.isUseridNull.trim() != ''  and query.isUseridNull=='1'.toString()">
+        AND (a.school_userid = "" or a.school_userid is null)
+      </if>
+			<if test="query.schName != null and query.schName != ''">
+				and a.sch_name LIKE CONCAT('%',#{query.schName},'%')
+			</if>
+		</where>
+		ORDER BY a.create_time DESC
+	</select>
+
+  <!--app-live -获取学校信息-->
+  <select id="getSchoolEasyInfo" resultType="Map">
+    SELECT
+    s.id,
+    s.sch_name as schName,
+    d.label as officeNature,
+    d2.label as schoolType,
+    s.introduction ,
+    s.sch_address as schAddress
+    FROM se_school s
+    left join sys_dict d on s.office_nature = d.value and d.type = 'office_nature'
+    left join sys_dict d2 on s.school_type = d2.value and d2.type = 'school_type'
+    <where>
+       s.id = #{query.schName}
+    </where>
+  </select>
+</mapper>
