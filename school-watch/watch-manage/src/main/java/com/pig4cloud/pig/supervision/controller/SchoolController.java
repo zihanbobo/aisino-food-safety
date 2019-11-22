@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class SchoolController {
 
 	private final RemoteLiveService remoteLiveService;
+	private final RemoteSchoolService remoteSchoolService;
 
 	/**
 	 * 查询直播信息学校
@@ -45,6 +46,18 @@ public class SchoolController {
   public R getIoTLivePathWatch(@RequestParam(value = "eqId") Integer eqId) {
     R ioTLivePathWatch = remoteLiveService.getIoTLivePathWatch(eqId, SecurityConstants.FROM_IN);
     return new R<>(ioTLivePathWatch.getData());
+  }
+  
+  /**
+   * @Description //获取监管端趋势分页页面学校统计信息
+   * @Date 14:38 2019/11/22
+   * @Param []
+   * @return com.pig4cloud.pig.common.core.util.R
+   **/
+  
+  @GetMapping("getAnalysisSchoolData")
+  public R getAnalysisSchoolData(){
+    return remoteSchoolService.getAnalysisSchoolData();
   }
 
 }

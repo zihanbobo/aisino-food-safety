@@ -178,4 +178,13 @@
        s.id = #{query.schName}
     </where>
   </select>
+
+  <select id="getSchoolDataByType" parameterType="int" resultType="map">
+    select case school_type when '0' then '幼儿园' when '1' then '小学' when '2' then '初中'
+        when '3' then '高中' else '' end as schoolType,
+           ifnull(count(1),0) as schoolNum from se_school where find_in_set(sch_area,getChildRegion(#{areaCode})) > 0 group by school_type
+  </select>
+  <select id="getAreaSchoolAndStuNum" resultType="java.util.Map" parameterType="java.lang.Integer">
+    select ifnull(count(1),0) as schoolNum, ifnull(sum(stu_number),0) as stuNum from se_school where find_in_set(sch_area,getChildRegion(#{areaCode})) > 0
+  </select>
 </mapper>

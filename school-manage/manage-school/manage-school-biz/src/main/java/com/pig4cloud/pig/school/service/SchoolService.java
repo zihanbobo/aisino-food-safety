@@ -78,4 +78,13 @@ public interface SchoolService extends IService<School> {
    * @return
    */
   Map getSchoolEasyInfo(Integer id);
+  
+  /**
+   * @Description //获取监管端趋势分析
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  
+  Map getAnalysisSchoolData(Integer areaCode);
 }
