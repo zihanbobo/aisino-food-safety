@@ -627,8 +627,7 @@ public class UserController {
   @GetMapping(value = {"/getUserInfo"})
   public R getUserInfo() {
     String username = SecurityUtils.getUser().getUsername();
-    SysUser user = userService.getOne(Wrappers.<SysUser>query()
-      .lambda().eq(SysUser::getUsername, username));
+    Map<String,Object> user = userService.getUserByUserName(username);
     if (user == null) {
       return new R<>(Boolean.FALSE, "获取当前用户信息失败");
     }

@@ -438,5 +438,11 @@
 		ORDER BY `user`.create_time DESC
 	</select>
 
+  <select id="getUserByUserName" resultType="map" parameterType="string">
+    select user_id as userId, username, password, phone, avatar, dept_id as deptId,
+           union_id as unionId, user_type as userType, is_admin as isAdmin, position,
+           real_name as realName, area_code as areaCode, getRegionStr(area_code) as areaName,
+           user_level as userLevel from sys_user where username = #{userName} limit 1
+  </select>
 
 </mapper>

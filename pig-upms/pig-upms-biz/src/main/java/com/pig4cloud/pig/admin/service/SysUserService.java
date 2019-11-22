@@ -20,12 +20,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pig4cloud.pig.admin.api.dto.UserDTO;
+import com.pig4cloud.pig.admin.api.dto.UserDetail;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
 import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.vo.UserVO;
 import com.pig4cloud.pig.common.core.util.R;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lengleng
@@ -46,7 +48,7 @@ public interface SysUserService extends IService<SysUser> {
    * @param sysUser 用户
    * @return userInfo
    */
-  UserInfo getUserInfo2(SysUser sysUser);
+  UserDetail getUserInfo2(Map<String,Object> sysUser);
 
 	/**
 	 * 分页查询用户信息（含有角色信息）
@@ -135,8 +137,14 @@ public interface SysUserService extends IService<SysUser> {
 	 * @return success/fail
 	 */
 	public UserVO homeLogin(SysUser user);
-
-
+  /**
+   * @Description //根据用户名查询用户信息
+   * @Date 11:19 2019/11/22
+   * @Param [userName]
+   * @return java.util.Map<java.lang.String,java.lang.Object>
+   **/
+  
+  Map<String,Object> getUserByUserName(String userName);
 
 
 }

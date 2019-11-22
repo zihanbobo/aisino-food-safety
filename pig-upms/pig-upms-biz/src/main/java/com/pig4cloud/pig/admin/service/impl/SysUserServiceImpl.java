@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pig4cloud.pig.admin.api.dto.UserDTO;
+import com.pig4cloud.pig.admin.api.dto.UserDetail;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
 import com.pig4cloud.pig.admin.api.entity.*;
 import com.pig4cloud.pig.admin.api.vo.MenuVO;
@@ -45,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -125,11 +127,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
    * @return
    */
   @Override
-  public UserInfo getUserInfo2(SysUser sysUser) {
-    UserInfo userInfo = new UserInfo();
+  public UserDetail getUserInfo2(Map<String,Object> sysUser) {
+    UserDetail userInfo = new UserDetail();
     userInfo.setSysUser(sysUser);
     //设置角色列表  （ID）
-    List<String> roleCodes = sysRoleService.listRolesByUserId(sysUser.getUserId())
+    List<String> roleCodes = sysRoleService.listRolesByUserId((Integer) sysUser.get("userId"))
       .stream()
       .map(SysRole::getRoleCode)
       .collect(Collectors.toList());
@@ -330,7 +332,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		return baseMapper.homeLogin(user);
 	}
 
-
+	/**
+	 * @Description //根据用户名获取个人信息
+	 * @Date 11:20 2019/11/22
+	 * @Param [userName]
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 **/
+	
+  @Override
+  public Map<String,Object> getUserByUserName(String userName){
+	  return baseMapper.getUserByUserName(userName);
+  }
 
 
 
