@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.SchoolDetailsMapper">
+
+  <!--学校信息上-->
+  <select id="getSchoolInformation" resultType="Map">
+    select a.id as id,a.sch_name as schoolName,a.sch_address as schAddress,
+    getRegionStr(a.sch_area) as schArea,b.label as 'schoolType',c.label as 'officeNature ' from se_school a
+    left join (
+    select * from sys_dict where del_flag='0' and type='school_type'
+    ) b on b.value = a.sch_city
+    left join (
+    select * from sys_dict where del_flag='0' and type='office_nature'
+    ) c on c.value = a.office_nature
+    <where>1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        and
+        a.id=#{map.schoolId}
+      </if>
+    </where>
+  </select>
+  <!--预警数量-->
+  <select id="getWarningNumber" resultType="Map">
+    SELECT count(a.id) warningNumber
+    from ck_early_warning a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        and
+        a.school_id=#{map.schoolId}
+      </if>
+    </where>
+  </select>
+  <!--报警数量-->
+  <select id="getAlarmNumber" resultType="Map">
+    SELECT count(a.id) alarmNumber
+    from ck_early_alarm a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        and
+        a.school_id=#{map.schoolId}
+      </if>
+    </where>
+  </select>
+
+
+  <!--学校资质信息-->
+  <select id="getSchoolQualification" resultType="Map">
+    SELECT
+    ss.sch_name ,
+    b.reg_name,
+    c.edu_name,
+    ss.sch_address AS address,
+    ss.sch_principal AS principal,
+    ss.sch_area AS area,
+    ss.sch_tel AS tel,
+    ss.rating_score AS ratingScore,
+    CASE
+
+    WHEN ss.quantitative IN ( 1 ) THEN
+    'A'
+    WHEN ss.quantitative IN ( 2 ) THEN
+    'B'
+    WHEN ss.quantitative = '3' THEN
+    'C'
+    WHEN ss.quantitative = '4' THEN
+    'D' ELSE ''
+    END AS quantitative
+    FROM
+    se_school ss
+    left join se_regulator b on b.reg_area=ss.sch_area
+    left join se_education c on c.edu_area=ss.sch_area
+    <where>
+      <if test="map.schoolId != null">
+        ss.id=#{map.schoolId}
+      </if>
+      and ss.del_flag='0'
+    </where>
+  </select>
+
+  <!--供应商信息-->
+  <select id="getSupplierInformation" resultType="Map">
+    select
+    smf.id as id,
+    smf.sup_name as name,
+    smf.license_number
+    from sup_main_filing smf
+    <where>
+      <if test="map.schoolId != null">
+        smf.school_id=#{map.schoolId}
+      </if>
+      and smf.del_flag='0'
+    </where>
+  </select>
+
+  <!--许可数-->
+  <select id="getLicense" resultType="Map">
+    select
+    count(smf.id) as LicenseTotal
+
+    from sup_main_filing smf
+    where
+    <if test="map.schoolId != null">
+      smf.school_id=#{map.schoolId}
+    </if>
+    and smf.del_flag='0'
+    and smf.permit_end > now()
+    and smf.permit_start &lt; now()
+  </select>
+
+  <!--营业数-->
+  <select id="getOpen" resultType="Map">
+    select
+    count(smf.id) as OpenTotal
+
+    from sup_main_filing smf
+    where
+    <if test="map.schoolId != null">
+      smf.school_id=#{map.schoolId}
+    </if>
+    and smf.del_flag='0'
+    and smf.bulicense_end > now()
+    and smf.bulicense_start &lt; now()
+  </select>
+
+  <!--供应商总数-->
+  <select id="getTotal" resultType="Map">
+    select
+    count(smf.id) as Total
+    from sup_main_filing smf
+    <where>
+      <if test="map.schoolId != null">
+        smf.school_id=#{map.schoolId}
+      </if>
+      and smf.del_flag='0'
+    </where>
+  </select>
+
+  <!--大厨信息--><!--返回是map-->
+  <select id="getChefInformation" resultType="Map">
+    SELECT
+    ifnull(a.user_id,0)as userId,
+    ifnull(a.real_name,'无') AS realName,
+    ifnull(b.label,'无')AS label,
+    ifnull(a.health_number,0) as healthNumber
+    FROM
+    sys_user a
+    LEFT JOIN ( SELECT * FROM sys_dict WHERE del_flag = '0' AND type = 'position' ) b ON b.VALUE
+    = a.position
+    <where>
+      1=1
+      AND a.del_flag = '0'
+      AND a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      and a.position = '1'
+    </where>
+  </select>
+
+  <!--食品安全人员信息--><!--返回是map-->
+  <select id="getFoodSafetyInformation" resultType="Map">
+    select ifnull(a.user_id,0)as userId,
+    ifnull(a.real_name,'无') AS realName,
+    ifnull(b.label,'无')AS label,
+    ifnull(a.health_number,0) as healthNumber from sys_user a
+    left join (select * from sys_dict where del_flag='0' and type='position')b on b.value = a.position
+    <where>a.del_flag = '0'
+      and a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      and a.position = '2'
+    </where>
+  </select>
+  <!--陪餐人员信息--><!--返回是map-->
+  <select id="getFoodEscortInformation" resultType="Map">
+    select ifnull(a.user_id,0)as userId,
+    ifnull(a.real_name,'无') AS realName,
+    ifnull(b.label,'无')AS label,
+    ifnull(a.health_number,0) as healthNumber from sys_user a
+    left join (select * from sys_dict where del_flag='0' and type='position')b on b.value = a.position
+    <where>a.del_flag = '0'
+      and a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      and a.position = '3'
+    </where>
+  </select>
+
+
+  <!--各种类人员数量-->
+  <select id="getManNumber" resultType="Map">
+    SELECT
+    count(a.user_id) number,
+    b.label AS label
+    FROM
+    sys_user a
+    LEFT JOIN ( SELECT * FROM sys_dict WHERE del_flag = '0' AND type = 'position' ) b ON b.
+    VALUE
+    = a.position
+    <where>
+      a.del_flag = '0'
+      AND a.user_type = '2'
+      <if test="map.schoolId != null">
+        and a.union_id = #{map.schoolId}
+      </if>
+      GROUP BY a.position
+    </where>
+  </select>
+  <!--人员总数和晨检合格率-->
+  <select id="getMorningCheck" resultType="Map">
+    SELECT
+    count( a.user_id ) AS 'total',
+    ifnull( CONVERT ( sum( a.ischen ) / count( a.user_id ), DECIMAL ( 15, 2 ) ), 0 ) AS 'eqRatio'
+    FROM
+    (
+    SELECT
+    a.user_id,
+    CASE
+    a.morning_check
+    WHEN '1' THEN
+    1 ELSE 0
+    END AS 'ischen'
+    FROM
+    sys_user a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.union_id = #{map.schoolId}
+      </if>
+    </where>
+    ) a
+  </select>
+  <!--健康证数量-->
+  <select id="getHealthCheck" resultType="Map">
+    select count(a.user_id) healthCard
+    from sys_user a
+    <where>
+      a.lock_flag='0'
+      and a.del_flag ='0'
+      and a.user_type='2'
+      <if test="map.schoolId != null">
+        and a.union_id=#{map.schoolId}
+      </if>
+    </where>
+    and a.health_endtime >NOW()
+    and a.health_starttime &lt; NOW()
+  </select>
+
+
+  <!--设备信息-->
+  <select id="getDeviceInformation" resultType="Map">
+    SELECT b.label,a.brand,
+    a.start_date,
+    a.use_year,
+    a.restaurant_name
+    from vd_device a
+    LEFT join(SELECT *
+    from sys_dict sd
+    <where>sd.del_flag='0'
+    </where>
+    ) b on b.id=a.device_type
+    <if test="map.schoolId != null">
+      and a.school_id=#{map.schoolId}
+    </if>
+    <where>
+      and a.del_flag='0'
+    </where>
+  </select>
+
+  <!--设备数量和比率--> <!--返回是map-->
+  <select id="getEqOperationRatio" resultType="Map">
+    select count(a.id)as 'total',ifnull(convert(sum(a.isPassed)/count(a.id),DECIMAL(15,2)),0)as 'eqRatio',
+    ifnull( CONVERT ( sum( a.isWell ) / count( a.id ), DECIMAL ( 15, 2 ) ), 0 ) AS 'eqWell'
+    from (
+    select a.id,
+    case a.is_passed when '1' then 1 else 0 end as 'isPassed',
+    CASE
+    a.run_well
+    WHEN '1' THEN
+    1 ELSE 0
+    END AS 'isWell'
+    from vd_device a
+    <where>
+      1=1 and a.del_flag='0'
+      <if test="map.schoolId != null">
+        and a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    )a
+  </select>
+
+  <!--食材信息-->
+  <select id="getIngredientsInformation" resultType="Map">
+    SELECT
+    vsi.food_id,
+    vsi.foodName,
+    b.pur_time as time,
+    b.qualified
+    FROM
+    view_sup_ingredients_filing vsi
+    RIGHT join
+    (
+    SELECT
+    a.pur_time,
+    CASE
+    WHEN ppf.is_qualified='1' THEN
+    '合格'
+    ELSE
+    '不合格'
+    END as qualified,
+    ppf.filing_id
+
+    FROM
+    pur_purchase_filing ppf
+    LEFT JOIN ( SELECT * FROM pur_purchase_main ppm WHERE ppm.del_flag = 0
+      <if test="map.schoolId != null">
+        and ppm.school_id = #{map.schoolId}
+      </if>
+   ) a ON a.id = ppf.pur_id
+    <where>
+      ppf.is_del = 0
+      <if test="map.startingTime != null&amp;map.endTime != null ">
+        AND a.pur_time BETWEEN #{map.startingTime} AND #{map.endTime}
+      </if>
+    </where>
+    ) b ON b.filing_id = vsi.food_id
+
+  </select>
+
+
+  <!--台账统计--><!--返回是map-->
+  <select id="getAccount" resultType="Map">
+    select
+    (select ifnull(sum(a.isSample),0)as 'sampleRecord' from (
+    select a.school_id as schoolId,c.sch_name as schoolName,a.rd_date as rdDate,
+    CASE WHEN max(b.sr_type) ='0' THEN 0
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN 1
+    ELSE 1 END AS isSample,
+    CASE WHEN max(b.sr_type) ='0' THEN '未留样'
+    WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '部分留样'
+    ELSE '全部留样'
+    END AS isSampleZ
+    from re_daily a
+    left join re_daily_source b on b.daily_id = a.id
+    left join se_school c on c.id = a.school_id
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    group by a.rd_date
+    order by a.rd_date desc
+    ) a )as'sampleRecord',
+
+
+    (select count(*) from sl_dishwash_note
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'dishwashNote',
+
+
+    (select count(*) from sl_accompany_dinner
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'accompanyDinner',
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'equipmentWash',
+
+
+    (select count(*) from sl_food_additive
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'foodAdditive',
+    (select count(*) from sl_diningarea_wash
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'diningareaWash',
+
+    (select count(*) from sl_kitwaste_treatment
+    <where>
+      1=1 and del_flag = '0'
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'kitwasteTreatment'
+
+
+  </select>
+
+
+  <!--历史报警信息-->
+  <select id="getHistoricalAlarm" resultType="Map">
+    SELECT
+    CASE
+
+    WHEN
+    alarm IN ( 1 ) THEN
+    '营业执照'
+    WHEN alarm IN ( 2 ) THEN
+    '许可证'
+    WHEN alarm IN ( '3', '4' ) THEN
+    a.human
+    WHEN alarm IN ( '5', '6', '7' ) THEN
+    a.food_name ELSE ''
+    END AS tital,
+    CASE
+
+    WHEN alarm IN ( '1', '2' ) THEN
+    '证照报警'
+    WHEN alarm IN ( '3', '4' ) THEN
+    '人员报警'
+    WHEN alarm IN ( '5', '6', '7' ) THEN
+    '食材报警' ELSE ''
+    END AS type,
+    c.label AS label,
+    a.alarm_time AS time,
+    a.supplier_name AS supplier,
+    b.sch_name AS schoolName,
+    b.id AS schoolId
+
+    from ck_early_alarm a
+    LEFT JOIN ( SELECT a.* FROM se_school a WHERE 1 = 1 AND a.del_flag = '0' ) b ON b.id = a.school_id
+    LEFT JOIN (
+    SELECT
+    *
+    FROM
+    sys_dict a
+    WHERE
+    1 = 1
+    AND a.del_flag = '0'
+    AND a.type = 'alarm'
+    ORDER BY
+    a.sort
+    ) c ON c.
+    VALUE
+    = a.alarm
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+      <if test="map.schoolId != null">
+        AND b.id = #{map.schoolId}
+      </if>
+    </where>
+
+  </select>
+
+  <!--历史预警信息-->
+  <select id="getHistoricalWarning" resultType="Map">
+    select
+    CASE
+
+    WHEN
+    early_warning IN ( 1 ) THEN
+    '营业执照'
+    WHEN early_warning IN ( 2 ) THEN
+    '许可证'
+    WHEN early_warning = '3' THEN
+    a.human
+    WHEN early_warning = '4' THEN
+    date_format( a.purchase_time, '%Y-%m-%d' ) ELSE ''
+    END AS tital,
+    CASE
+
+    WHEN early_warning IN ( '1', '2' ) THEN
+    '证照预警'
+    WHEN early_warning IN ( 3 ) THEN
+    '人员预警'
+    WHEN early_warning IN ( '4' ) THEN
+    '食材预警' ELSE ''
+    END AS type,
+    d.description AS title,
+    a.early_time AS time,
+    a.supplier_name,
+    b.sch_name AS schoolName,
+    b.id AS schoolId
+    from ck_early_warning a
+    LEFT JOIN ( SELECT a.* FROM se_school a WHERE 1 = 1 AND a.del_flag = '0' ) b ON b.id = a.school_id
+    LEFT JOIN (
+    SELECT
+    *
+    FROM
+    sys_dict a
+    WHERE
+    1 = 1
+    AND a.del_flag = '0'
+    AND a.type = 'early_warning'
+    ORDER BY
+    a.sort
+    ) d ON d.
+    VALUE
+    = a.early_warning
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+      <if test="map.schoolId != null">
+        AND b.id = #{map.schoolId}
+      </if>
+    </where>
+
+  </select>
+
+</mapper>

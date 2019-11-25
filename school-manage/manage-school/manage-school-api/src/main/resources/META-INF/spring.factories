@@ -2,8 +2,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.pig4cloud.pig.school.api.feign.fallback.RemoteSchoolServiceFallbackImpl,\
   com.pig4cloud.pig.school.api.feign.fallback.RemoteRecipeServiceFallbackImpl,\
   com.pig4cloud.pig.school.api.feign.fallback.RemoteStatisticsServiceFallbackImpl,\
-  com.pig4cloud.pig.school.api.feign.fallback.SchoolDetailsServiceFallbackImpl,\
   com.pig4cloud.pig.school.api.feign.factory.RemoteSchoolServiceFallbackFactory,\
   com.pig4cloud.pig.school.api.feign.factory.RemoteRecipeServiceFallbackFactory,\
-  com.pig4cloud.pig.school.api.feign.factory.SchoolDetailsServiceFallbackFactory,\
   com.pig4cloud.pig.school.api.feign.factory.RemoteStatisticsServiceFallbackFactory

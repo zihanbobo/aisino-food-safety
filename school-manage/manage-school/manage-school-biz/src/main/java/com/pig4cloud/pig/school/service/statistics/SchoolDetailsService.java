@@ -15,11 +15,21 @@ import java.util.Map;
  */
 public interface SchoolDetailsService extends IService<EarlyAlarm> {
 
+  //学校信息上
+  Map getSchoolInformation(@Param("map") Map map);
   //学校资质信息
   Map getSchoolQualification(@Param("map") Map map);
-  //根据学校id获得供应商信息
-  List<Map> getSupplierInformation(@Param("map") Map map);
+  //供应商信息
+  Map getSupplierInformation(@Param("map") Map map);
+  //人员信息
+  Map getPersonnelInformation(@Param("map") Map map);
+  //设备信息
+  Map getDeviceInformation(@Param("map") Map map);
+  //食材信息
+  List getIngredientsInformation(@Param("map") Map map);
+  //台账信息
+  Map getAccount(@Param("map") Map map);
+  //历史报警
+  Map getHistoricalAlarm(@Param("map") Map map);
 
-  //学校资质信息
-  List<Map> getSuppliersum(@Param("map") Map map);
 }

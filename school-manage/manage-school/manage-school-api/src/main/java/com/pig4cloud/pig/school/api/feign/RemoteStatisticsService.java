@@ -113,4 +113,47 @@ public interface RemoteStatisticsService {
                         @RequestParam(value="limit")Integer limit,
                         @RequestHeader(SecurityConstants.FROM) String from);
 
+
+
+
+
+
+  //学校信息上
+  @GetMapping("/analysisData/getSchoolInformation")
+  R getSchoolInformation(@RequestParam(value = "schoolId") String schoolId,
+                         @RequestHeader(SecurityConstants.FROM) String from);
+
+  //学校资质信息
+  @GetMapping("/analysisData/getSchoolQualification")
+  R getSchoolQualification(@RequestParam(value = "schoolId") String schoolId,
+                         @RequestHeader(SecurityConstants.FROM) String from);
+  //供应商信息
+  @GetMapping("/analysisData/getSupplierInformation")
+  R getSupplierInformation(@RequestParam(value = "schoolId") String schoolId,
+                                   @RequestHeader(SecurityConstants.FROM) String from);
+
+  //人员信息
+  @GetMapping("/analysisData/getPersonnelInformation")
+  R getPersonnelInformation(@RequestParam(value = "schoolId") String schoolId,
+                           @RequestHeader(SecurityConstants.FROM) String from);
+  //设备信息
+  @GetMapping("/analysisData/getDeviceInformation")
+  R getDeviceInformation(@RequestParam(value = "schoolId") String schoolId,
+                      @RequestHeader(SecurityConstants.FROM) String from);
+  //食材信息
+  @GetMapping("/analysisData/getIngredientsInformation")
+  R getIngredientsInformation(@RequestParam(value = "schoolId") String schoolId,
+                              @RequestParam(value = "startingTime") String startingTime,
+                              @RequestParam(value = "endTime") String endTime,
+               @RequestHeader(SecurityConstants.FROM) String from);
+  //台账信息
+  @GetMapping("/analysisData/getAccount")
+  R getAccount(@RequestParam(value = "schoolId") String schoolId,
+                       @RequestHeader(SecurityConstants.FROM) String from);
+  //历史报警
+  @GetMapping("/analysisData/getHistoricalAlarm")
+  R getHistoricalAlarm(@RequestParam(value = "schoolId") String schoolId,
+                       @RequestParam(value = "year") String year,
+                          @RequestHeader(SecurityConstants.FROM) String from);
+
 }

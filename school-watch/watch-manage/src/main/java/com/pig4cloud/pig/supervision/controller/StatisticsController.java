@@ -3,14 +3,9 @@ package com.pig4cloud.pig.supervision.controller;
 import com.pig4cloud.pig.admin.api.feign.RemoteUserService;
 import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.core.util.R;
-import com.pig4cloud.pig.common.security.annotation.Inner;
-import com.pig4cloud.pig.school.api.entity.message.Announcement;
-import com.pig4cloud.pig.school.api.entity.message.RegulatoryOpinion;
 import com.pig4cloud.pig.school.api.feign.RemoteSchoolService;
 import com.pig4cloud.pig.school.api.feign.RemoteStatisticsService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -176,4 +171,60 @@ public class StatisticsController {
   }
 
 
+
+
+
+
+  //学校信息上
+  @GetMapping("/getSchoolInformation")
+  public R getSchoolInformation(@RequestParam(value="schoolId")String schoolId) {
+    return new R<>(remoteStatisticsService.getSchoolInformation(schoolId, SecurityConstants.FROM_IN));
+  }
+  //学校资质信息
+  @GetMapping("/getSchoolQualification")
+  public R getSchoolQualification(@RequestParam(value="schoolId")String schoolId) {
+    return new R<>(remoteStatisticsService.getSchoolQualification(schoolId, SecurityConstants.FROM_IN));
+  }
+
+  //供应商信息
+  @GetMapping("/getSupplierInformation")
+  public R getSupplierInformation(@RequestParam(value="schoolId")String schoolId){
+    return new R<>(remoteStatisticsService.getSupplierInformation( schoolId, SecurityConstants.FROM_IN ));
+  }
+  //人员信息
+  @GetMapping("/getPersonnelInformation")
+  public R getPersonnelInformation(@RequestParam(value="schoolId")String schoolId){
+    return new R<>(remoteStatisticsService.getPersonnelInformation( schoolId, SecurityConstants.FROM_IN ));
+  }
+
+  //学校设备信息
+  @GetMapping("/getDeviceInformation")
+  public R getDeviceInformation(@RequestParam(value="schoolId")String schoolId){
+    return new R<>(remoteStatisticsService.getDeviceInformation( schoolId, SecurityConstants.FROM_IN ));
+  }
+
+  //食材信息
+  @GetMapping("/getIngredientsInformation")
+  public R getIngredientsInformation(@RequestParam(value="schoolId")String schoolId,
+                                     @RequestParam(value="startingTime",required = false)String startingTime,
+                                     @RequestParam(value="endTime",required = false)String endTime){
+    if(startingTime==null){
+      startingTime = "1900-01-01";
+    }
+    if(endTime==null){
+      endTime = "3333-01-01";
+    }
+    return new R<>(remoteStatisticsService.getIngredientsInformation( schoolId, startingTime,endTime,SecurityConstants.FROM_IN ));
+  }
+
+  //台账信息
+  @GetMapping("/getAccount")
+  public R getAccount(@RequestParam(value="schoolId")String schoolId){
+    return new R<>(remoteStatisticsService.getAccount( schoolId, SecurityConstants.FROM_IN ));
+  }
+  //历史报警
+  @GetMapping("/getHistoricalAlarm")
+  public R getHistoricalAlarm(@RequestParam(value="year")String year,@RequestParam(value="schoolId")String schoolId){
+    return new R<>(remoteStatisticsService.getHistoricalAlarm( schoolId, year,SecurityConstants.FROM_IN ));
+  }
 }

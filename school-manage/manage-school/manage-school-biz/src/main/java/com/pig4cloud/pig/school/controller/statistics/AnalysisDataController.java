@@ -3,6 +3,7 @@ package com.pig4cloud.pig.school.controller.statistics;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.school.service.statistics.AnalysisDataService;
+import com.pig4cloud.pig.school.service.statistics.SchoolDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -120,4 +121,79 @@ public class AnalysisDataController {
     return new R<>(analysisDataService.getAlarmsArea(map));
   }
 
+
+
+  private final SchoolDetailsService schoolDetailsService;
+
+  //学校信息上
+  @Inner
+  @GetMapping("/getSchoolInformation")
+  public R getSchoolInformation(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getSchoolInformation(map));
+  }
+
+  //学校资质信息
+  @Inner
+  @GetMapping("/getSchoolQualification")
+  public R getSchoolQualification(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getSchoolQualification(map));
+  }
+
+  //供应商信息
+  @Inner
+  @GetMapping("/getSupplierInformation")
+  public R getSupplierInformation(@RequestParam(value="schoolId")String schoolId){
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getSupplierInformation( map ));
+  }
+
+  //人员信息
+  @Inner
+  @GetMapping("/getPersonnelInformation")
+  public R getPersonnelInformation(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getPersonnelInformation(map));
+  }
+  //设备信息
+  @Inner
+  @GetMapping("/getDeviceInformation")
+  public R getDeviceInformation(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getDeviceInformation(map));
+  }
+  //食材信息
+  @Inner
+  @GetMapping("/getIngredientsInformation")
+  public R getIngredientsInformation(@RequestParam(value="schoolId")String schoolId,
+                                     @RequestParam(value="startingTime")String startingTime,
+                                     @RequestParam(value="endTime")String endTime) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    map.put("startingTime",startingTime);
+    map.put("endTime",endTime);
+    return new R<>(schoolDetailsService.getIngredientsInformation(map));
+  }
+  //台账信息
+  @Inner
+  @GetMapping("/getAccount")
+  public R getAccount(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getAccount(map));
+  }
+  //历史报警
+  @Inner
+  @GetMapping("/getHistoricalAlarm")
+  public R getHistoricalAlarm(@RequestParam(value="schoolId")String schoolId) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("schoolId",schoolId);
+    return new R<>(schoolDetailsService.getHistoricalAlarm(map));
+  }
 }

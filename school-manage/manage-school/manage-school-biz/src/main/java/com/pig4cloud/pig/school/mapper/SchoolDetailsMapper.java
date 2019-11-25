@@ -31,15 +31,42 @@ import java.util.Map;
  */
 public interface SchoolDetailsMapper extends BaseMapper<EarlyAlarm> {
 
+  //学校信息上
+  Map getSchoolInformation(@Param("map") Map map);
+  Map getWarningNumber(@Param("map") Map map);
+  Map getAlarmNumber(@Param("map") Map map);
   //学校资质信息
   Map getSchoolQualification(@Param("map") Map map);
-  //根据学校id获得供应商信息
+  //供应商信息
   List<Map> getSupplierInformation(@Param("map") Map map);
-
-  //学校资质信息
-  Map getxuke(@Param("map") Map map);
-  //学校资质信息
-  Map getyingye(@Param("map") Map map);
+  //许可数
+  Map getLicense(@Param("map") Map map);
+  //营业数
+  Map getOpen(@Param("map") Map map);
   //供应商总数
-  Map getzong(@Param("map") Map map);
+  Map getTotal(@Param("map") Map map);
+  //大厨信息
+  List<Map> getChefInformation(@Param("map") Map map);
+  //食品安全人员信息
+  List<Map> getFoodSafetyInformation(@Param("map") Map map);
+  //陪餐人员信息
+  List<Map> getFoodEscortInformation(@Param("map") Map map);
+  //各种类人员数量
+  List getManNumber(@Param("map") Map map);
+  //人员总数和晨检合格率
+  Map getMorningCheck(@Param("map") Map map);
+  //健康证数量
+  Map getHealthCheck(@Param("map") Map map);
+  //设备信息
+  List getDeviceInformation(@Param("map") Map map);
+  //设备数量和比率
+  Map getEqOperationRatio(@Param("map") Map map);
+  //台账统计
+  Map getAccount(@Param("map") Map map);
+  //食材信息
+  List getIngredientsInformation(@Param("map") Map map);
+  //报警信息
+  List getHistoricalAlarm(@Param("map") Map map);
+  //预警信息
+  List getHistoricalWarning(@Param("map") Map map);
 }

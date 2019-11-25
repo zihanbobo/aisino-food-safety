@@ -106,4 +106,64 @@ public class RemoteStatisticsServiceFallbackImpl implements RemoteStatisticsServ
     log.error("feign 监管端-预警报警分析-预警数量统计&报警数量统计(根据月查询):{}", month, cause);
     return null;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+  @Override
+  public R getSchoolInformation(String schoolId, String from) {
+    log.error("feign 获得学校信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getSchoolQualification(String schoolId, String from) {
+    log.error("feign 获得学校资质信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getSupplierInformation(String schoolId, String from) {
+    log.error("feign 获得供应商信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getPersonnelInformation(String schoolId, String from) {
+    log.error("feign 获得人员信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getDeviceInformation(String schoolId, String from) {
+    log.error("feign 获得设备信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getIngredientsInformation(String schoolId,String startingTime,String endTime, String from) {
+    log.error("feign 获得食材信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getAccount(String schoolId, String from) {
+    log.error("feign 获得台账信息失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getHistoricalAlarm(String schoolId, String year,String from) {
+    log.error("feign 获得历史报警失败:{}", schoolId, cause);
+    return null;
+  }
+
 }
