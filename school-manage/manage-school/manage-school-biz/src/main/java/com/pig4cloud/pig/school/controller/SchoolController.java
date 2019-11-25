@@ -2,14 +2,20 @@ package com.pig4cloud.pig.school.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pig4cloud.pig.admin.api.dto.UserInfo;
 import com.pig4cloud.pig.admin.api.entity.SysDeptRelation;
+import com.pig4cloud.pig.admin.api.feign.RemoteUserService;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
+import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.Inner;
+import com.pig4cloud.pig.common.security.service.PigUser;
+import com.pig4cloud.pig.common.security.util.SecurityUtils;
 import com.pig4cloud.pig.school.api.dto.SchoolDTO;
 import com.pig4cloud.pig.school.api.entity.School;
 import com.pig4cloud.pig.school.service.SchoolService;
+import com.pig4cloud.pig.school.service.project.ProjectManageService;
 import lombok.AllArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +39,7 @@ import java.util.stream.Collectors;
 public class SchoolController {
 
   private final SchoolService schoolService;
+  private final RemoteUserService remoteUserService;
 
   /**
    * 简单分页查询
@@ -54,6 +61,16 @@ public class SchoolController {
    */
   @GetMapping("/page")
   public R getSchoolPage(Page page, SchoolDTO schoolDTO) {
+    // 权限控制
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();  // 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    Integer userId= userInfo.getSysUser().getUserId();
+    Boolean isAisinoSub = remoteUserService.isAisinoSub(userId, SecurityConstants.FROM_IN);
+    if(isAisinoSub){
+      schoolDTO.setUserId(userId);
+    }
     return new R<>(schoolService.getSchoolWithMealPage(page, schoolDTO));
   }
 

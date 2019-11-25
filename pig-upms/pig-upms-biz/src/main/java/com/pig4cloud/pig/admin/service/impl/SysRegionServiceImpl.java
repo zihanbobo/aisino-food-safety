@@ -14,40 +14,26 @@
  * limitations under the License.
  */
 
-package com.pig4cloud.pig.admin.api.dto;
+package com.pig4cloud.pig.admin.service.impl;
 
-import com.pig4cloud.pig.admin.api.entity.SysUser;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.List;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.pig4cloud.pig.admin.api.entity.SysDict;
+import com.pig4cloud.pig.admin.api.entity.SysRegion;
+import com.pig4cloud.pig.admin.mapper.SysDictMapper;
+import com.pig4cloud.pig.admin.mapper.SysRegionMapper;
+import com.pig4cloud.pig.admin.service.SysDictService;
+import com.pig4cloud.pig.admin.service.SysRegionService;
+import org.springframework.stereotype.Service;
 
 /**
+ * <p>
+ * 字典表 服务实现类
+ * </p>
+ *
  * @author lengleng
- * @date 2019/2/1
+ * @since 2019/2/1
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class UserDTO extends SysUser {
-	/**
-	 * 角色ID
-	 */
-	private List<Integer> role;
-
-	private Integer deptId;
-
-	/**
-	 * 新密码
-	 */
-	private String newpassword1;
-
-  // 角色号
-  private String roleCode;
-
-  // 等于1就是不查看用户
-  private String notFindIsAdmin;
-
-  // 是否为航信子公司管理(1是0/空否)
-  private String isAisinoSub;
+@Service
+public class SysRegionServiceImpl extends ServiceImpl<SysRegionMapper, SysRegion> implements SysRegionService {
 
 }

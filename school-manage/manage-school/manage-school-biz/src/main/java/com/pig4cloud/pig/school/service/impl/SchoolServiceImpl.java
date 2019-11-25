@@ -172,4 +172,32 @@ public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> impleme
   public Map getSchoolEasyInfo(Integer id) {
     return baseMapper.getSchoolEasyInfo(id);
   }
+  
+  /**
+   * @Description //获取监管端趋势分析
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @Override
+  public Map<String,Object> getAnalysisSchoolData(Integer areaCode){
+      Map<String,Object> data = baseMapper.getAreaSchoolAndStuNum(areaCode);
+      if (data != null){
+        List<Map<String,Object>> list = baseMapper.getSchoolDataByType(areaCode);
+        data.put("place",list);
+      }
+      return data;
+  }
+  
+  /**
+   * @Description //获取监管端趋势分析页面食堂相关信息
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @Override
+  public Map<String,Object> getMesshallMessageByArea(Integer areaCode){
+    Map<String,Object> data = baseMapper.getMesshallMessageByArea(areaCode);
+    return data;
+  }
 }

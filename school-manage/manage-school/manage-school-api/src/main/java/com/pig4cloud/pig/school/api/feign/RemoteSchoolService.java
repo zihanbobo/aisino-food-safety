@@ -113,5 +113,11 @@ public interface RemoteSchoolService {
                  @RequestParam(value = "current")Integer current,
                  @RequestParam(value = "userId")Integer userId,
                  @RequestHeader(SecurityConstants.FROM) String from);
+  
+  @GetMapping("/campus/getAnalysisSchoolData")
+  R getAnalysisSchoolData();
+  
+  @GetMapping("/campus/getMesshallMessageByArea")
+  R getMesshallMessageByArea();
 
 }

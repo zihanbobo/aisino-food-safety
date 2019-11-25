@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.school.api.dto.SchoolDTO;
 import com.pig4cloud.pig.school.api.entity.School;
 import com.pig4cloud.pig.school.api.vo.SchoolVO;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -52,4 +53,27 @@ public interface SchoolMapper extends BaseMapper<School> {
 	IPage<List<SchoolVO>> getSchoolVosPage(Page page, @Param("query") SchoolDTO schoolDTO);
 
   Map getSchoolEasyInfo(Integer id);
+  
+  /**
+   * @Description //根据区划返回各类学校的数量
+   * @Date 14:10 2019/11/22
+   * @Param [areaCode]
+   * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+   **/
+  
+  List<Map<String,Object>> getSchoolDataByType(Integer areaCode);
+  /**
+   * @Description //根据区划返回区域内学校和学生的数量
+   * @Date 14:10 2019/11/22
+   * @Param [areaCode]
+   * @return java.util.Map<java.lang.String,java.lang.Object>
+   **/
+  Map<String,Object> getAreaSchoolAndStuNum(Integer areaCode);
+  /**
+   * @Description //根据区划返回区域内食堂相关信息
+   * @Date 14:10 2019/11/22
+   * @Param [areaCode]
+   * @return java.util.Map<java.lang.String,java.lang.Object>
+   **/
+  Map<String,Object> getMesshallMessageByArea(Integer areaCode);
 }

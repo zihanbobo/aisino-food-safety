@@ -84,5 +84,17 @@ public class LiveController {
   public R getLiveInfoByLiveId(@RequestParam(value = "liveId") Integer liveId) {
     return remoteLiveService.getLiveInfoByLiveId(liveId, SecurityConstants.FROM_IN);
   }
+  
+  /**
+   * @Description //获取直播地址
+   * @Date 9:56 2019/11/22
+   * @Param [eqId]
+   * @return com.pig4cloud.pig.common.core.util.R
+   **/
+  
+  @PostMapping("/getLivePath")
+  public R getLivePath(@RequestParam(value = "eqId") Integer eqId) {
+    return remoteLiveService.getIoTLivePathWatch(eqId,SecurityConstants.FROM_IN);
+  }
 
 }

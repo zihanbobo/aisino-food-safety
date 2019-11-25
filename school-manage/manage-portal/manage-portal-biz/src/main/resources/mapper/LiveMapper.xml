@@ -128,7 +128,7 @@
 
   <select id="getLiveMain" parameterType="java.util.List" resultType="map">
     SELECT
-    a.id,
+    a.id,a.eq_id as eqId,
     s.sch_name as schName,
     a.school_id as schoolId,
     a.image_url as imageUrl,
@@ -159,7 +159,7 @@
 
   <select id="getLiveList" resultType="map">
     SELECT
-    a.id,
+    a.id,a.eq_id as eqId,
     a.image_url as imageUrl,
     v.eq_area as eqArea
     FROM vd_live a
@@ -172,7 +172,7 @@
 
   <select id="getLiveInfo" resultType="map">
     SELECT
-    a.id,
+    a.id,a.eq_id as eqId,
     s.sch_name as schName,
     a.school_id as schoolId,
     a.image_url as imageUrl,

@@ -25,6 +25,7 @@ import com.pig4cloud.pig.admin.api.vo.UserVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -77,4 +78,12 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return list
 	 */
 	UserVO homeLogin(@Param("query") SysUser user);
+	/**
+	 * @Description //根据用户名获取用户信息
+	 * @Date 11:18 2019/11/22
+	 * @Param [userName]
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 **/
+	
+	Map<String,Object> getUserByUserName(String userName);
 }

@@ -3,6 +3,7 @@ package com.pig4cloud.pig.school.controller.school;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
+import com.pig4cloud.pig.admin.api.entity.SysUser;
 import com.pig4cloud.pig.admin.api.feign.RemoteUserService;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
 import com.pig4cloud.pig.common.core.constant.SecurityConstants;
@@ -304,5 +305,43 @@ public class CampusController {
   public List<Map> getdeviceInforsum(@RequestParam(value = "schoolId")Integer schoolId) {
     return welcomeService.getdeviceInforsum( schoolId );
   }
+  
+  /**
+   * @Description //获取监管端趋势分析
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @GetMapping("/getAnalysisSchoolData")
+  public R getAnalysisSchoolData(){
+    String username = SecurityUtils.getUser().getUsername();
+    Map<String,Object> data = null;
+    R<UserInfo> userInfoR = remoteUserService.info(username,SecurityConstants.FROM_IN);
+    if (userInfoR != null && userInfoR.getData() != null){
+      String areaCode = userInfoR.getData().getSysUser().getAreaCode();
+      data = schoolService.getAnalysisSchoolData(Integer.parseInt(areaCode));
+    }
+    return new R(data);
+  }
+  
+  /**
+   * @Description //获取监管端趋势分析页面食堂相关信息
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @GetMapping("/getMesshallMessageByArea")
+  public R getMesshallMessageByArea(){
+    String username = SecurityUtils.getUser().getUsername();
+    Map<String,Object> data = null;
+    R<UserInfo> userInfoR = remoteUserService.info(username,SecurityConstants.FROM_IN);
+    if (userInfoR != null && userInfoR.getData() != null){
+      String areaCode = userInfoR.getData().getSysUser().getAreaCode();
+      data = schoolService.getMesshallMessageByArea(Integer.parseInt(areaCode));
+    }
+    return new R(data);
+  }
+  
+  
 }
 
