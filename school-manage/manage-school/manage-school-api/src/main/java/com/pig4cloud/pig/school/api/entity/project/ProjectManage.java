@@ -26,6 +26,10 @@ private static final long serialVersionUID = 1L;
     @TableId
     private Integer id;
     /**
+   * 项目子公司管理员id
+   */
+    private Integer userId;
+    /**
    * 项目名称
    */
     private String projectName;

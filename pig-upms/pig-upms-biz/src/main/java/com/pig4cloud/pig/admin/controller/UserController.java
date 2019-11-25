@@ -24,12 +24,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pig4cloud.pig.admin.api.dto.UserDTO;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
-import com.pig4cloud.pig.admin.api.entity.SysDict;
-import com.pig4cloud.pig.admin.api.entity.SysUser;
-import com.pig4cloud.pig.admin.api.entity.SysUserRole;
+import com.pig4cloud.pig.admin.api.entity.*;
 import com.pig4cloud.pig.admin.api.vo.SysUserVO;
 import com.pig4cloud.pig.admin.api.vo.UserVO;
 import com.pig4cloud.pig.admin.service.SysDictService;
+import com.pig4cloud.pig.admin.service.SysRoleService;
 import com.pig4cloud.pig.admin.service.SysUserRoleService;
 import com.pig4cloud.pig.admin.service.SysUserService;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
@@ -39,6 +38,7 @@ import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import com.pig4cloud.pig.common.security.util.SecurityUtils;
+import com.pig4cloud.pig.portal.api.entity.CommentPraise;
 import com.pig4cloud.pig.portal.api.entity.PublicUser;
 import com.pig4cloud.pig.school.api.entity.School;
 import com.pig4cloud.pig.school.api.entity.recipe.MainFiling;
@@ -66,107 +66,107 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @RequestMapping("/user")
 public class UserController {
-	private final SysUserService userService;
-	private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder();
+  private final SysUserService userService;
+  private static final PasswordEncoder ENCODER = new BCryptPasswordEncoder();
 
-	// Feign学校服务
+  // Feign学校服务
   private final RemoteSchoolService remoteSchoolService;
   private final SysUserRoleService sysUserRoleService;
   private final SysUserService sysUserService;
   private final SysDictService sysDictService;
+  private final SysRoleService sysRoleService;
 
-	/**
-	 * 获取当前用户全部信息
-	 *
-	 * @return 用户信息
-	 */
-	@GetMapping(value = {"/info"})
-	public R info() {
-		String username = SecurityUtils.getUser().getUsername();
-		SysUser user = userService.getOne(Wrappers.<SysUser>query()
-			.lambda().eq(SysUser::getUsername, username));
-		if (user == null) {
-			return new R<>(Boolean.FALSE, "获取当前用户信息失败");
-		}
-		return new R<>(userService.getUserInfo(user));
-	}
+  /**
+   * 获取当前用户全部信息
+   *
+   * @return 用户信息
+   */
+  @GetMapping(value = {"/info"})
+  public R info() {
+    String username = SecurityUtils.getUser().getUsername();
+    SysUser user = userService.getOne(Wrappers.<SysUser>query()
+      .lambda().eq(SysUser::getUsername, username));
+    if (user == null) {
+      return new R<>(Boolean.FALSE, "获取当前用户信息失败");
+    }
+    return new R<>(userService.getUserInfo(user));
+  }
 
-	/**
-	 * 获取指定用户全部信息
-	 *
-	 * @return 用户信息
-	 */
-	@Inner
-	@GetMapping("/info/{username}")
-	public R info(@PathVariable String username) {
-		SysUser user = userService.getOne(Wrappers.<SysUser>query()
-			.lambda().eq(SysUser::getUsername, username));
-		if (user == null) {
-			return new R<>(Boolean.FALSE, String.format("用户信息为空 %s", username));
-		}
-		return new R<>(userService.getUserInfo(user));
-	}
+  /**
+   * 获取指定用户全部信息
+   *
+   * @return 用户信息
+   */
+  @Inner
+  @GetMapping("/info/{username}")
+  public R info(@PathVariable String username) {
+    SysUser user = userService.getOne(Wrappers.<SysUser>query()
+      .lambda().eq(SysUser::getUsername, username));
+    if (user == null) {
+      return new R<>(Boolean.FALSE, String.format("用户信息为空 %s", username));
+    }
+    return new R<>(userService.getUserInfo(user));
+  }
 
-	/**
-	 * 通过ID查询用户信息
-	 *
-	 * @param id ID
-	 * @return 用户信息
-	 */
-	@GetMapping("/{id}")
-	public R user(@PathVariable Integer id) {
+  /**
+   * 通过ID查询用户信息
+   *
+   * @param id ID
+   * @return 用户信息
+   */
+  @GetMapping("/{id}")
+  public R user(@PathVariable Integer id) {
 
-	  return new R<>(userService.getUserVoById(id));
-	}
+    return new R<>(userService.getUserVoById(id));
+  }
 
-	/**
-	 * 根据用户名查询用户信息
-	 *
-	 * @param username 用户名
-	 * @return
-	 */
-	@GetMapping("/details/{username}")
-	public R user(@PathVariable String username) {
-		SysUser condition = new SysUser();
-		condition.setUsername(username);
-		return new R<>(userService.getOne(new QueryWrapper<>(condition)));
-	}
+  /**
+   * 根据用户名查询用户信息
+   *
+   * @param username 用户名
+   * @return
+   */
+  @GetMapping("/details/{username}")
+  public R user(@PathVariable String username) {
+    SysUser condition = new SysUser();
+    condition.setUsername(username);
+    return new R<>(userService.getOne(new QueryWrapper<>(condition)));
+  }
 
 
-	/**
-	 * 删除用户信息
-	 *
-	 * @param id ID
-	 * @return R
-	 */
-	@SysLog("删除用户信息")
-	@DeleteMapping("/{id}")
-	@PreAuthorize("@pms.hasPermission('sys_user_del')")
-	public R userDel(@PathVariable Integer id) {
+  /**
+   * 删除用户信息
+   *
+   * @param id ID
+   * @return R
+   */
+  @SysLog("删除用户信息")
+  @DeleteMapping("/{id}")
+  @PreAuthorize("@pms.hasPermission('sys_user_del')")
+  public R userDel(@PathVariable Integer id) {
     SysUser sysUser = userService.getById(id);
-    remoteSchoolService.schoolUserId(sysUser.getUserId(),sysUser.getUnionId(),"2", SecurityConstants.FROM_IN);
-		return new R<>(userService.removeUserById(sysUser));
-	}
+    remoteSchoolService.schoolUserId(sysUser.getUserId(), sysUser.getUnionId(), "2", SecurityConstants.FROM_IN);
+    return new R<>(userService.removeUserById(sysUser));
+  }
 
-	/**
-	 * 添加用户
-	 *
-	 * @param userDto 用户信息
-	 * @return success/false
-	 */
+  /**
+   * 添加用户
+   *
+   * @param userDto 用户信息
+   * @return success/false
+   */
 //	@SysLog("添加用户")
 //	@PostMapping
 //	@PreAuthorize("@pms.hasPermission('sys_user_add')")
 //	public R user(@RequestBody UserDTO userDto) {
 //		return new R<>(userService.saveUser(userDto));
 //	}
-
-	@SysLog("添加用户")
-	@PostMapping
+  @SysLog("添加用户")
+  @PostMapping
 //	@PreAuthorize("@pms.hasPermission('sys_user_add')")
-	public R user(@RequestBody UserDTO userDto) {
+  public R user(@RequestBody UserDTO userDto) {
     // 权限控制
-    String username = SecurityUtils.getUser().getUsername();	// 当前登录用户昵称
+    String username = SecurityUtils.getUser().getUsername();  // 当前登录用户昵称
     SysUser user = userService.getOne(Wrappers.<SysUser>query()
       .lambda().eq(SysUser::getUsername, username));
     UserInfo userInfo = userService.getUserInfo(user);
@@ -174,12 +174,12 @@ public class UserController {
     String isAdmin = userInfo.getSysUser().getIsAdmin();
 
     // 用户类型等于校园端&超级管理员则为校园端。
-    if("2".equals(userType)&&"1".equals(isAdmin)) {
+    if ("2".equals(userType) && "1".equals(isAdmin)) {
       userDto.setUserType("2");
       userDto.setUnionId(userInfo.getSysUser().getUnionId());
     }
     //如果是航信管理端新增的学校超级管理员
-    if(userDto.getUnionId()!=null){
+    if (userDto.getUnionId() != null) {
       userDto.setUserType("2");
     }
     SysUser sysUser = new SysUser();
@@ -196,24 +196,24 @@ public class UserController {
       }).collect(Collectors.toList());
     boolean b = sysUserRoleService.saveBatch(userRoleList);
 
-    if(sysUser.getUnionId()!=null){
+    if (sysUser.getUnionId() != null) {
       // 处理绑定学校
-      remoteSchoolService.schoolUserId(sysUser.getUserId(),sysUser.getUnionId(),"1", SecurityConstants.FROM_IN);
+      remoteSchoolService.schoolUserId(sysUser.getUserId(), sysUser.getUnionId(), "1", SecurityConstants.FROM_IN);
     }
     return new R<>(b);
-	}
+  }
 
 
-	/**
-	 * 更新用户信息
-	 *
-	 * @param userDto 用户信息
-	 * @return R
-	 */
-	@SysLog("更新用户信息")
-	@PutMapping
-	@PreAuthorize("@pms.hasPermission('sys_user_edit')")
-	public R updateUser(@Valid @RequestBody UserDTO userDto) {
+  /**
+   * 更新用户信息
+   *
+   * @param userDto 用户信息
+   * @return R
+   */
+  @SysLog("更新用户信息")
+  @PutMapping
+  @PreAuthorize("@pms.hasPermission('sys_user_edit')")
+  public R updateUser(@Valid @RequestBody UserDTO userDto) {
     Integer userId = userDto.getUserId();
     SysUser oldUser = userService.getById(userId);
     Integer oldUnionId = oldUser.getUnionId();
@@ -222,93 +222,93 @@ public class UserController {
 
 
     // 有用户id以及学校绑定的id
-    if(!"null".equals(String.valueOf(oldUnionId))&&!"null".equals(String.valueOf(newUnionId))){
+    if (!"null".equals(String.valueOf(oldUnionId)) && !"null".equals(String.valueOf(newUnionId))) {
       // 先解绑
-      if(oldUnionId!=newUnionId){
-        remoteSchoolService.schoolUserId(userDto.getUserId(),oldUnionId,"2", SecurityConstants.FROM_IN);
-        remoteSchoolService.schoolUserId(userDto.getUserId(),newUnionId,"1", SecurityConstants.FROM_IN);
+      if (oldUnionId != newUnionId) {
+        remoteSchoolService.schoolUserId(userDto.getUserId(), oldUnionId, "2", SecurityConstants.FROM_IN);
+        remoteSchoolService.schoolUserId(userDto.getUserId(), newUnionId, "1", SecurityConstants.FROM_IN);
       }
     }
     return new R<>(userService.updateUser(userDto));
-	}
+  }
 
-	/**
-	 * 分页查询用户
-	 *
-	 * @param page    参数集
-	 * @param userDTO 查询参数列表
-	 * @return 用户集合
-	 */
-	@GetMapping("/page")
-	public R getUserPage(Page page, UserDTO userDTO) {
+  /**
+   * 分页查询用户
+   *
+   * @param page    参数集
+   * @param userDTO 查询参数列表
+   * @return 用户集合
+   */
+  @GetMapping("/page")
+  public R getUserPage(Page page, UserDTO userDTO) {
     // 权限控制
-    String username = SecurityUtils.getUser().getUsername();	// 当前登录用户昵称
+    String username = SecurityUtils.getUser().getUsername();  // 当前登录用户昵称
     SysUser user = userService.getOne(Wrappers.<SysUser>query()
       .lambda().eq(SysUser::getUsername, username));
     UserInfo userInfo = userService.getUserInfo(user);
     String userType = userInfo.getSysUser().getUserType();
     String isAdmin = userInfo.getSysUser().getIsAdmin();
     // 判断类型(航信校园)
-    if("1".equals(userType)&&!"1".equals(isAdmin)){
+    if ("1".equals(userType) && !"1".equals(isAdmin)) {
       userDTO.setUserType("1");
-    }else{
+    } else {
       userDTO.setUserType("2");
       userDTO.setUnionId(userInfo.getSysUser().getUnionId());
     }
-		return new R<>(userService.getUserWithRolePage(page, userDTO));
-	}
+    return new R<>(userService.getUserWithRolePage(page, userDTO));
+  }
 
-	/**
-	 * 修改个人信息
-	 *
-	 * @param userDto userDto
-	 * @return success/false
-	 */
-	@SysLog("修改个人信息")
-	@PutMapping("/edit")
-	public R updateUserInfo(@Valid @RequestBody UserDTO userDto) {
+  /**
+   * 修改个人信息
+   *
+   * @param userDto userDto
+   * @return success/false
+   */
+  @SysLog("修改个人信息")
+  @PutMapping("/edit")
+  public R updateUserInfo(@Valid @RequestBody UserDTO userDto) {
     // 如果是超级管理员在操作
-    if(StringUtils.isEmpty(userDto.getIsAdmin())){
+    if (StringUtils.isEmpty(userDto.getIsAdmin())) {
       Integer userId = userDto.getUserId(); // 当前用户的id(固定不变的)
       Integer unionId = userDto.getUnionId();// 所关联的学校id(可能会变化)
     }
 
-		return userService.updateUserInfo(userDto);
-	}
+    return userService.updateUserInfo(userDto);
+  }
 
-	/**
-	 * @param username 用户名称
-	 * @return 上级部门用户列表
-	 */
-	@GetMapping("/ancestor/{username}")
-	public R listAncestorUsers(@PathVariable String username) {
-		return new R<>(userService.listAncestorUsersByUsername(username));
-	}
+  /**
+   * @param username 用户名称
+   * @return 上级部门用户列表
+   */
+  @GetMapping("/ancestor/{username}")
+  public R listAncestorUsers(@PathVariable String username) {
+    return new R<>(userService.listAncestorUsersByUsername(username));
+  }
 
 
-	/**
-	 * 账号密码
-	 *
-	 * @return 账号密码
-	 */
-	@PostMapping("/homeLogin")
-	public R homeLogin(@RequestBody String username,@RequestBody String password) {
-		SysUser sysUser = new SysUser();
-		sysUser.setUsername(username);
-		if(StringUtils.isEmpty(username)||StringUtils.isEmpty(password)){
-			return new R<>(CommonConstants.FAIL,null,"未传入账号密码");
-		}
-		SysUser user = userService.getOne(Wrappers.<SysUser>query()
-			.lambda().eq(SysUser::getUsername, username));
-		if (user == null) {
-			return new R<>(CommonConstants.FAIL,null,String.format("用户信息为空 %s", username));
-		}
-		if (ENCODER.matches(password, user.getPassword())) {
-			return new R<>(userService.getUserInfo(user));
-		}else{
-			return new R<>(CommonConstants.FAIL,null,"账号密码错误");
-		}
-	}
+  /**
+   * 账号密码
+   *
+   * @return 账号密码
+   */
+  @PostMapping("/homeLogin")
+  public R homeLogin(@RequestBody String username, @RequestBody String password) {
+    SysUser sysUser = new SysUser();
+    sysUser.setUsername(username);
+    if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+      return new R<>(CommonConstants.FAIL, null, "未传入账号密码");
+    }
+    SysUser user = userService.getOne(Wrappers.<SysUser>query()
+      .lambda().eq(SysUser::getUsername, username));
+    if (user == null) {
+      return new R<>(CommonConstants.FAIL, null, String.format("用户信息为空 %s", username));
+    }
+    if (ENCODER.matches(password, user.getPassword())) {
+      return new R<>(userService.getUserInfo(user));
+    } else {
+      return new R<>(CommonConstants.FAIL, null, "账号密码错误");
+    }
+  }
 
   /**
    * 分页查询用户
@@ -320,7 +320,7 @@ public class UserController {
   @GetMapping("/pageCook")
   public R getUserPageCook(Page page, UserDTO userDTO) {
     PigUser user = SecurityUtils.getUser();
-    String username = user.getUsername();	// 当前登录用户昵称
+    String username = user.getUsername();  // 当前登录用户昵称
     R<UserInfo> result = info(username);
     UserInfo userInfo = result.getData();
     String userType = userInfo.getSysUser().getUserType();
@@ -342,7 +342,7 @@ public class UserController {
   @GetMapping("/getUserPageDinner")
   public R getUserPageDinner(Page page, UserDTO userDTO) {
     PigUser user = SecurityUtils.getUser();
-    String username = user.getUsername();	// 当前登录用户昵称
+    String username = user.getUsername();  // 当前登录用户昵称
     R<UserInfo> result = info(username);
     UserInfo userInfo = result.getData();
     String userType = userInfo.getSysUser().getUserType();
@@ -353,6 +353,7 @@ public class UserController {
     userDTO.setPosition("3");//
     return new R<>(userService.getUserWithRolePage(page, userDTO));
   }
+
   /**
    * 分页查询学校人员(采购计划)
    *
@@ -363,7 +364,7 @@ public class UserController {
   @GetMapping("/getSchoolUser")
   public R getSchoolUser(Page page, UserDTO userDTO) {
     PigUser user = SecurityUtils.getUser();
-    String username = user.getUsername();	// 当前登录用户昵称
+    String username = user.getUsername();  // 当前登录用户昵称
     R<UserInfo> result = info(username);
     UserInfo userInfo = result.getData();
     String userType = userInfo.getSysUser().getUserType();
@@ -389,12 +390,21 @@ public class UserController {
   @GetMapping("/pageUserSchool")
   public R getPageUserSchool(Page page, UserDTO userDTO) {
     // 权限控制
-    String username = SecurityUtils.getUser().getUsername();	// 当前登录用户昵称
+    String username = SecurityUtils.getUser().getUsername();  // 当前登录用户昵称
     SysUser user = userService.getOne(Wrappers.<SysUser>query()
       .lambda().eq(SysUser::getUsername, username));
-    UserInfo userInfo = userService.getUserInfo(user);
-    String userType = userInfo.getSysUser().getUserType();
-    String isAdmin = userInfo.getSysUser().getIsAdmin();
+    Integer userId = user.getUserId();
+    // 是否是子管理员(true是false否)
+    Boolean isAisinoSub = isAisinoSub(userId);
+    String userType = user.getUserType();
+    String isAdmin = user.getIsAdmin();
+    if(isAisinoSub){
+      userDTO.setIsAisinoSub("1");
+      userDTO.setUserId(userId);
+    }
+//    UserInfo userInfo = userService.getUserInfo(user);
+//    String userType = userInfo.getSysUser().getUserType();
+//    String isAdmin = userInfo.getSysUser().getIsAdmin();
     userDTO.setUserType("2");
     userDTO.setIsAdmin("1");
     return new R<>(userService.getUserWithRolePage(page, userDTO));
@@ -633,5 +643,41 @@ public class UserController {
     }
     return new R<>(userService.getUserInfo2(user));
   }
+  /**
+   * 分页查询航信子用户
+   *
+   * @param page    参数集
+   * @param userDTO 查询参数列表
+   * @return 用户集合
+   */
+  @GetMapping("/listUserSubPage")
+  public R listUserSubPage(Page page, UserDTO userDTO) {
+    userDTO.setUserType("1");
+    userDTO.setRoleCode("aisino_sub");
+    return new R<>(userService.getUserWithRolePageMarket(page, userDTO));
+  }
 
+  /**
+   * 查询是否是航信子用户
+   *
+   * @param userId    用户Id
+   * @return Boolean
+   */
+  @Inner
+  @GetMapping("/isAisinoSub")
+  public Boolean isAisinoSub(@RequestParam(value = "userId")Integer userId) {
+    SysRole sysRole = sysRoleService.getOne(Wrappers.<SysRole>query().lambda()
+      .eq(SysRole::getDelFlag, '0')
+      .eq(SysRole::getRoleCode, "aisino_sub"));
+    if(sysRole==null){
+      return false;
+    }
+    List<SysUserRole> list = sysUserRoleService.list(Wrappers.<SysUserRole>query().lambda()
+      .eq(SysUserRole::getRoleId, sysRole.getRoleId())
+      .eq(SysUserRole::getUserId, userId));
+    if(list!=null&&list.size()>0){
+      return true;
+    }
+    return false;
+  }
 }

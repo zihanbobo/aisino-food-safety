@@ -158,6 +158,9 @@
 			<if test="query.schName != null and query.schName != ''">
 				and a.sch_name LIKE CONCAT('%',#{query.schName},'%')
 			</if>
+      <if test="query.userId != null">
+        and b.user_id = #{query.userId}
+      </if>
 		</where>
 		ORDER BY a.create_time DESC
 	</select>

@@ -282,7 +282,21 @@
     FROM
     sys_user AS a
     LEFT JOIN sys_dept AS d ON d.dept_id = a.dept_id
-    left join se_school c on c.id = a.union_id
+<!--    inner join (select a.* from se_school a left join se_project_manage b on b.id = a.school_projectid
+      <if test="query.userId != null and query.userId == '1'.toString()">
+        where b.user_id = #{query.userId}
+      </if>
+    )c on c.id = a.union_id -->
+    <choose>
+      <when test="query.isAisinoSub != null and query.isAisinoSub == '1'.toString()">
+        inner join (select a.* from se_school a left join se_project_manage b on b.id = a.school_projectid
+        where b.user_id = #{query.userId} )c on c.id = a.union_id
+      </when>
+      <otherwise>
+        left join (select a.* from se_school a left join se_project_manage b on b.id = a.school_projectid
+        )c on c.id = a.union_id
+      </otherwise>
+    </choose>
     left join (select a.* from sys_dict a where 1=1 and a.del_flag = '0' and a.type='position')  e on e.value = a.position
 		<where>
 		1=1 and a.del_flag = '0'

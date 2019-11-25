@@ -44,6 +44,10 @@ public class UserDTO extends SysUser {
   // 角色号
   private String roleCode;
 
+  // 等于1就是不查看用户
+  private String notFindIsAdmin;
 
-  private String notFindIsAdmin;  // 等于1就是不查看用户
+  // 是否为航信子公司管理(1是0/空否)
+  private String isAisinoSub;
+
 }

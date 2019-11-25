@@ -30,9 +30,16 @@ import java.io.Serializable;
 public class ProjectManageVO extends ProjectManage implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private Integer schoolCount;  //该项目所绑定的学校数量
+	// 该项目所绑定的学校数量
+	private Integer schoolCount;
 
-  private String schoolNameAll; //学校名称集合(,分隔)
+  // 学校名称集合(,分隔)
+  private String schoolNameAll;
 
+  // 真实姓名
+  private String realName;
+
+  // 绑定情况
+  private String isBind;
 
 }

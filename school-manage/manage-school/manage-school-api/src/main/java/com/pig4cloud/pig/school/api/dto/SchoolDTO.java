@@ -42,4 +42,8 @@ public class SchoolDTO extends School {
 	private String mealListAll2;
 
 	private String isUseridNull;  // 是否只显示没有超级管理员的学校（1就是需要查）
+
+	private Integer userId;  // 用户id
+
+
 }

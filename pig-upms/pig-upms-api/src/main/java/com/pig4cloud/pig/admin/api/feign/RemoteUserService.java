@@ -89,9 +89,9 @@ public interface RemoteUserService {
 
 
 
-  // h5数据采集获取单个用户信息
-  @GetMapping("/user/getHumanById")
-  R getHumanById(@RequestParam(value = "userId")Integer userId,
+  // 查询是否是航信子用户
+  @GetMapping("/user/isAisinoSub")
+  Boolean isAisinoSub(@RequestParam(value = "userId")Integer userId,
                  @RequestHeader(SecurityConstants.FROM) String from);
 
 
