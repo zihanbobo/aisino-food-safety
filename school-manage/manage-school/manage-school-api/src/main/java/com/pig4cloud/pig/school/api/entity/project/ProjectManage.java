@@ -34,7 +34,15 @@ private static final long serialVersionUID = 1L;
    */
     private String projectName;
     /**
-   * 区划号
+   * 省区划号
+   */
+    private String province;
+    /**
+   * 市区划号
+   */
+    private String cityCode;
+    /**
+   * 区/县号
    */
     private String areaCode;
     /**

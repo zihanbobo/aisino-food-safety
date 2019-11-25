@@ -8,6 +8,8 @@
                   <id property="id" column="id"/>
                         <result property="projectName" column="project_name"/>
                         <result property="userId" column="user_id"/>
+                        <result property="province" column="province"/>
+                        <result property="cityCode" column="city_code"/>
                         <result property="areaCode" column="area_code"/>
                         <result property="remarks" column="remarks"/>
                         <result property="createTime" column="create_time"/>
@@ -15,7 +17,7 @@
                         <result property="delFlag" column="del_flag"/>
                         <result property="schoolCount" column="schoolCount"/>
                         <result property="isBind" column="isBind"/>
-
+                        <result property="locationName" column="locationName"/>
             </resultMap>
 
   <!--projectManage简单分页查询-->
@@ -23,12 +25,15 @@
     select  a.id,
       a.user_id,
       a.project_name,
+      a.province,
+      a.city_code,
       a.area_code,
       a.remarks,
       a.create_time,
       a.update_time,
       a.del_flag,
       a.realName,
+      a.locationName,
       sum(a.schoolNumber) as 'schoolCount',
       REPLACE(group_concat(a.schoolName),',',',') as schoolNameAll,
       a.isBind from (
@@ -36,12 +41,15 @@
         a.id,
         a.user_id,
         a.project_name,
+        a.province,
+        a.city_code,
         a.area_code,
         a.remarks,
         a.create_time,
         a.update_time,
         a.del_flag,
         c.real_name as realName,
+        (select getRegionStr(a.area_code)) as 'locationName',
         case when b.id is not null then 1 else 0 end 'schoolNumber',
         case when c.user_id is not null then '已绑定' else '未绑定' end as 'isBind',
         b.sch_name as schoolName
@@ -73,7 +81,7 @@
         </if>
           </where>
       )a
-      group by a.id,user_id,a.project_name,a.area_code,a.remarks,a.create_time,a.update_time,a.realName,a.isBind
+      group by a.id,user_id,a.project_name,a.province,a.city_code,a.area_code,a.remarks,a.create_time,a.update_time,a.realName,a.locationName,a.isBind
   </select>
 
 

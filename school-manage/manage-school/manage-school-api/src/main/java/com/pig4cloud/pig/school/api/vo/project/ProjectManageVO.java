@@ -42,4 +42,7 @@ public class ProjectManageVO extends ProjectManage implements Serializable {
   // 绑定情况
   private String isBind;
 
+  // 所属区域
+  private String locationName;
+
 }

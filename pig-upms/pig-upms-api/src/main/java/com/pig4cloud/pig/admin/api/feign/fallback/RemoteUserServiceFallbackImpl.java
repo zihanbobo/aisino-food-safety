@@ -110,6 +110,12 @@ public class RemoteUserServiceFallbackImpl implements RemoteUserService {
   }
 
   @Override
+  public R getHumanById(Integer userId, String from) {
+    log.error("feign 获取用户信息失败", cause);
+    return null;
+  }
+
+  @Override
   public Boolean isAisinoSub(Integer userId, String from) {
     log.error("feign 判断用户是否为航信子公司管理信息失败", cause);
     return null;
