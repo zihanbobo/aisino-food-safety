@@ -59,5 +59,17 @@ public class SchoolController {
   public R getAnalysisSchoolData(){
     return remoteSchoolService.getAnalysisSchoolData();
   }
+  
+  /**
+   * @Description //获取监管端趋势分页页面食堂统计信息
+   * @Date 14:38 2019/11/22
+   * @Param []
+   * @return com.pig4cloud.pig.common.core.util.R
+   **/
+  
+  @GetMapping("getMesshallMessageByArea")
+  public R getMesshallMessageByArea(){
+    return remoteSchoolService.getMesshallMessageByArea();
+  }
 
 }

@@ -87,4 +87,13 @@ public interface SchoolService extends IService<School> {
    **/
   
   Map getAnalysisSchoolData(Integer areaCode);
+  
+  /**
+   * @Description //获取监管端趋势分析页面食堂相关信息
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  
+  Map getMesshallMessageByArea(Integer areaCode);
 }

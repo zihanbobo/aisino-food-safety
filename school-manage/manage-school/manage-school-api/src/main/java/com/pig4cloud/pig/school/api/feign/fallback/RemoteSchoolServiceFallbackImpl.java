@@ -127,5 +127,11 @@ public class RemoteSchoolServiceFallbackImpl implements RemoteSchoolService {
     log.error("feign 查询监管端趋势学校信息失败", cause);
     return null;
   }
+  
+  @Override
+  public R getMesshallMessageByArea(){
+    log.error("feign 查询监管端趋势食堂信息失败", cause);
+    return null;
+  }
 
 }

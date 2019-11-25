@@ -188,4 +188,16 @@ public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> impleme
       }
       return data;
   }
+  
+  /**
+   * @Description //获取监管端趋势分析页面食堂相关信息
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @Override
+  public Map<String,Object> getMesshallMessageByArea(Integer areaCode){
+    Map<String,Object> data = baseMapper.getMesshallMessageByArea(areaCode);
+    return data;
+  }
 }

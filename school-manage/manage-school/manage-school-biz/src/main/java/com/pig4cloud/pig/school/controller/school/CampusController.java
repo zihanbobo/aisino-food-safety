@@ -323,5 +323,25 @@ public class CampusController {
     }
     return new R(data);
   }
+  
+  /**
+   * @Description //获取监管端趋势分析页面食堂相关信息
+   * @Date 13:55 2019/11/22
+   * @Param
+   * @return
+   **/
+  @GetMapping("/getMesshallMessageByArea")
+  public R getMesshallMessageByArea(){
+    String username = SecurityUtils.getUser().getUsername();
+    Map<String,Object> data = null;
+    R<UserInfo> userInfoR = remoteUserService.info(username,SecurityConstants.FROM_IN);
+    if (userInfoR != null && userInfoR.getData() != null){
+      String areaCode = userInfoR.getData().getSysUser().getAreaCode();
+      data = schoolService.getMesshallMessageByArea(Integer.parseInt(areaCode));
+    }
+    return new R(data);
+  }
+  
+  
 }
 

@@ -187,4 +187,43 @@
   <select id="getAreaSchoolAndStuNum" resultType="java.util.Map" parameterType="java.lang.Integer">
     select ifnull(count(1),0) as schoolNum, ifnull(sum(stu_number),0) as stuNum from se_school where find_in_set(sch_area,getChildRegion(#{areaCode})) > 0
   </select>
+  <select id="getMesshallMessageByArea" resultType="map" parameterType="int">
+    SELECT
+      ifnull(sum(s1.messhall_number),0) as schoolCanteen,
+      ifnull(count(s2.foodCount),0) as foodSupplier,
+      s3.userRate as proportionHealth,
+      ifnull(sum(s4.ckCount),0) as spotCheck
+    FROM
+      (
+        SELECT
+          id,
+          messhall_number
+        FROM
+          se_school
+      ) s1 LEFT JOIN
+      (
+        SELECT
+          school_id,
+          count(1) as foodCount
+        FROM
+          sup_main_filing
+      ) s2 on s1.id = s2.school_id LEFT JOIN
+      (
+        SELECT
+          union_id,
+          count(health_number != '' or null)/count(1) as userRate
+        FROM
+          sys_user
+        WHERE
+          (position = 1 or position = 2 or position = 3)
+      ) s3 on s1.id = s3.union_id LEFT JOIN
+      (
+        SELECT
+          school_id as school_id2,
+          count(1) as ckCount
+        FROM
+          ck_food_inspection
+        GROUP BY school_id
+      ) s4 on s1.id = s4.school_id2 where s1.id IN (SELECT id FROM se_school where FIND_IN_SET(sch_area,getChildRegion(510000)))
+  </select>
 </mapper>

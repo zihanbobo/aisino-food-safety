@@ -69,4 +69,11 @@ public interface SchoolMapper extends BaseMapper<School> {
    * @return java.util.Map<java.lang.String,java.lang.Object>
    **/
   Map<String,Object> getAreaSchoolAndStuNum(Integer areaCode);
+  /**
+   * @Description //根据区划返回区域内食堂相关信息
+   * @Date 14:10 2019/11/22
+   * @Param [areaCode]
+   * @return java.util.Map<java.lang.String,java.lang.Object>
+   **/
+  Map<String,Object> getMesshallMessageByArea(Integer areaCode);
 }

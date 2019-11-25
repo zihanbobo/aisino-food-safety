@@ -116,5 +116,8 @@ public interface RemoteSchoolService {
   
   @GetMapping("/campus/getAnalysisSchoolData")
   R getAnalysisSchoolData();
+  
+  @GetMapping("/campus/getMesshallMessageByArea")
+  R getMesshallMessageByArea();
 
 }
