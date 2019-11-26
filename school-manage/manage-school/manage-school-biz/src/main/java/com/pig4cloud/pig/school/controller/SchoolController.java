@@ -1,5 +1,8 @@
 package com.pig4cloud.pig.school.controller;
 
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
@@ -12,6 +15,8 @@ import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import com.pig4cloud.pig.common.security.util.SecurityUtils;
+import com.pig4cloud.pig.portal.api.entity.live.Equipment;
+import com.pig4cloud.pig.portal.api.entity.live.Live;
 import com.pig4cloud.pig.school.api.dto.SchoolDTO;
 import com.pig4cloud.pig.school.api.entity.School;
 import com.pig4cloud.pig.school.service.SchoolService;
@@ -20,7 +25,9 @@ import lombok.AllArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +106,6 @@ public class SchoolController {
 //    return new R<>(schoolService.save(school));
 //  }
   public R save(@RequestBody SchoolDTO schoolDTO) {
-
     return new R<>(schoolService.saveSchool(schoolDTO));
   }
   /**
@@ -153,6 +159,41 @@ public class SchoolController {
     School school = schoolService.getById(schoolId);
     school.setSchoolUserid(userId);
     return new R<>(schoolService.save(school));
+  }
+
+  /**
+   * 批量导入接口
+   * @param file
+   * @param userId
+   * @param schoolId
+   * @return
+   * @throws IOException
+   */
+  @PostMapping("/schoolUpload")
+  public Map<String,Object> schoolUpload(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("userId") Integer userId,
+                                            @RequestParam("schoolId") Integer schoolId
+  ) throws IOException {
+    ExcelReader reader = ExcelUtil.getReader(file.getInputStream());
+    List<School> schoolList = reader.readAll(School.class);
+    // 判断循环下标
+    int count = 0;
+    School school = null;
+    for(int i=0;i<schoolList.size();i++){
+      school = schoolList.get(i);
+      if(count==0){
+        count++;
+        continue;
+      }
+      // 直播码与食谱码自动生成(8位)
+      school.setLiveIdentifier(RandomUtil.randomString(8));
+      school.setRecipeIdentifier(RandomUtil.randomString(8));
+      schoolService.save(school);
+      count++;
+    }
+    Map map = new HashMap();
+    map.put("count",count-1);
+    return map;
   }
 
   /**

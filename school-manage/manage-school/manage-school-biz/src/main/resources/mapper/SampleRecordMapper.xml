@@ -86,7 +86,8 @@
       CASE WHEN max(b.sr_type) ='0' THEN '未留样'
       WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN '部分留样'
       ELSE '全部留样'
-      END AS isSampleZ
+      END AS isSampleZ,
+      CONCAT('LY',DATE_FORMAT(a.rd_date,'%Y%m%d'),a.school_id) as 'srNumber'
       from re_daily a
       left join re_daily_source b on b.daily_id = a.id
       left join se_school c on c.id = a.school_id

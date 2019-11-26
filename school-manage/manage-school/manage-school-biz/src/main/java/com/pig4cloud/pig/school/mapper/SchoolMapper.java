@@ -76,4 +76,7 @@ public interface SchoolMapper extends BaseMapper<School> {
    * @return java.util.Map<java.lang.String,java.lang.Object>
    **/
   Map<String,Object> getMesshallMessageByArea(Integer areaCode);
+
+
+
 }

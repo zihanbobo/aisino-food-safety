@@ -18,6 +18,9 @@
                         <result property="schoolCount" column="schoolCount"/>
                         <result property="isBind" column="isBind"/>
                         <result property="locationName" column="locationName"/>
+                        <collection property="schoolList" ofType="HashMap"
+                                    select="com.pig4cloud.pig.school.mapper.ProjectManageMapper.listSchoolByProjectId" column="id">
+                        </collection>
             </resultMap>
 
   <!--projectManage简单分页查询-->
@@ -85,5 +88,10 @@
   </select>
 
 
+  <!--根据食谱id查询该道菜的主料-->
+  <select id="listSchoolByProjectId" resultType="Map">
+   select a.* from se_school a where 1=1 and a.del_flag = '0'
+    and a.school_projectid IN (#{id})
+    </select>
 
 </mapper>
