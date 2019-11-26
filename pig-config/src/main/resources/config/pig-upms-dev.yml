@@ -26,3 +26,4 @@ ignore:
     - /role/list/**
     - /common/**
     - /dict/**
+    - /region/**

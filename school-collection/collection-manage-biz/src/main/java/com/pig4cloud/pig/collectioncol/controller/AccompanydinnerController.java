@@ -16,7 +16,7 @@ import java.util.List;
 
 
 /**
- * h5数据采集
+ * h5数据采集陪餐信息
  *
  * @author -
  * @date 2019-08-29 11:23:11

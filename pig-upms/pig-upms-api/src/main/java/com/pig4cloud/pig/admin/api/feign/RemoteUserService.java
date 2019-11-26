@@ -97,5 +97,19 @@ public interface RemoteUserService {
   Boolean isAisinoSub(@RequestParam(value = "userId")Integer userId,
                  @RequestHeader(SecurityConstants.FROM) String from);
 
+  // 获取省信息
+  @GetMapping("/region/getProvinceForCol")
+  R<Object> getProvinceForCol(@RequestHeader(SecurityConstants.FROM) String from);
+
+  // 获取市信息
+  @GetMapping("/region/getCityForCol")
+  R<Object> getCityForCol(@RequestParam(value = "provice")String provice,
+                           @RequestHeader(SecurityConstants.FROM) String from);
+
+  // 获取区信息
+  @GetMapping("/region/getDistrictForCol")
+  R<Object> getDistrictForCol(@RequestParam(value = "district")String district,
+                           @RequestHeader(SecurityConstants.FROM) String from);
+
 
 }
