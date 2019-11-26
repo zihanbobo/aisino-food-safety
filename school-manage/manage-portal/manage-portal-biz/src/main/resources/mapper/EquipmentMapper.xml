@@ -27,6 +27,7 @@
     <result property="updateTime" column="update_time"/>
     <result property="delFlag" column="del_flag"/>
     <result property="username" column="username"/>
+    <result property="realname" column="realname"/>
     <result property="schoolname" column="schoolname"/>
   </resultMap>
 
@@ -54,6 +55,7 @@
     a.update_by_id,
     a.update_time,
     a.del_flag,
+    b.real_name as realname,
     b.username as username,
     c.sch_name as schoolname
     FROM vd_equipment a
