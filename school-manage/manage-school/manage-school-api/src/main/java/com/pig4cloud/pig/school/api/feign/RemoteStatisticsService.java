@@ -156,4 +156,46 @@ public interface RemoteStatisticsService {
                        @RequestParam(value = "year") String year,
                           @RequestHeader(SecurityConstants.FROM) String from);
 
+
+
+  //预警类型
+  @GetMapping("/analysisData/getWarningType")
+  R getWarningType(@RequestParam(value="year")String year,
+                   @RequestParam(value="regionalLevel")String regionalLevel,
+                   @RequestParam(value="areaCode")String areaCode,
+                   @RequestHeader(SecurityConstants.FROM) String from);
+
+  //全部预警
+  @GetMapping("/analysisData/getWarnings")
+  R getWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                @RequestParam(value="schoolName")String schoolName,
+                @RequestParam(value="startingTime")String startingTime,
+                @RequestParam(value="endTime")String endTime,
+                @RequestParam(value="year")String year,
+                @RequestParam(value="regionalLevel")String regionalLevel,
+                @RequestParam(value="areaCode")String areaCode,
+                @RequestParam(value = "Type") Integer Type,
+                @RequestHeader(SecurityConstants.FROM) String from);
+  //未接收预警
+  @GetMapping("/analysisData/getNotReceived")
+   R getNotReceived(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                    @RequestParam(value="schoolName")String schoolName,
+                    @RequestParam(value="startingTime")String startingTime,
+                    @RequestParam(value="endTime")String endTime,
+                    @RequestParam(value="year")String year,
+                    @RequestParam(value="regionalLevel")String regionalLevel,
+                    @RequestParam(value="areaCode")String areaCode,
+                    @RequestParam(value = "Type") Integer Type,
+                    @RequestHeader(SecurityConstants.FROM) String from);
+  //已接收预警
+  @GetMapping("/analysisData/getReceivedWarnings")
+   R getReceivedWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                         @RequestParam(value="schoolName")String schoolName,
+                         @RequestParam(value="startingTime")String startingTime,
+                         @RequestParam(value="endTime")String endTime,
+                         @RequestParam(value="year")String year,
+                         @RequestParam(value="regionalLevel")String regionalLevel,
+                         @RequestParam(value="areaCode")String areaCode,
+                         @RequestParam(value = "Type") Integer Type,
+                         @RequestHeader(SecurityConstants.FROM) String from);
 }

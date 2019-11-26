@@ -38,7 +38,9 @@ public interface SchoolDetailsMapper extends BaseMapper<EarlyAlarm> {
   //学校资质信息
   Map getSchoolQualification(@Param("map") Map map);
   //供应商信息
-  List<Map> getSupplierInformation(@Param("map") Map map);
+  List<Map<String,Object>> getSupplierInformation(@Param("map") Map map);
+  //根据供应商id获得学校名称
+  Map getSchoolName(@Param("map") Map map);
   //许可数
   Map getLicense(@Param("map") Map map);
   //营业数

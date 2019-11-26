@@ -1,9 +1,11 @@
 package com.pig4cloud.pig.school.controller.statistics;
 
+import com.pig4cloud.pig.common.core.constant.SecurityConstants;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.school.service.statistics.AnalysisDataService;
 import com.pig4cloud.pig.school.service.statistics.SchoolDetailsService;
+import com.pig4cloud.pig.school.service.statistics.WarningsService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -122,7 +124,7 @@ public class AnalysisDataController {
   }
 
 
-
+//学校详情
   private final SchoolDetailsService schoolDetailsService;
 
   //学校信息上
@@ -195,5 +197,91 @@ public class AnalysisDataController {
     Map<String,Object> map = new HashMap<String,Object>();
     map.put("schoolId",schoolId);
     return new R<>(schoolDetailsService.getHistoricalAlarm(map));
+  }
+
+
+
+
+  private final WarningsService warningsService;
+
+  //预警信息
+
+  //预警类型
+  @Inner
+  @GetMapping("/getWarningType")
+  public R getWarningType(@RequestParam(value="year")String year,
+                          @RequestParam(value="regionalLevel")String regionalLevel,
+                          @RequestParam(value="areaCode")String areaCode) {
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("year",year);//年
+    map.put("regionalLevel",regionalLevel);//监管用户等级(1全国2省3市4区)[暂时预留]
+    map.put("areaCode",areaCode);
+    return new R<>(warningsService.getWarningType(map));
+  }
+  //全部预警
+  @Inner
+  @GetMapping("/getWarnings")
+  public R getWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                       @RequestParam(value="schoolName")String schoolName,
+                       @RequestParam(value="startingTime")String startingTime,
+                       @RequestParam(value="endTime")String endTime,
+                       @RequestParam(value="year")String year,
+                       @RequestParam(value="regionalLevel")String regionalLevel,
+                       @RequestParam(value="areaCode")String areaCode,
+                       @RequestParam(value="Type")Integer Type){
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("WarningInfor",WarningInfor);//预警信息
+    map.put("schoolName",schoolName);
+    map.put("startingTime",startingTime);//开始时间
+    map.put("endTime",endTime);//结束时间
+    map.put("year",year);//年
+    map.put("regionalLevel",regionalLevel);//监管用户等级(1全国2省3市4区)[暂时预留]
+    map.put("areaCode",areaCode);
+    map.put("Type",Type);//预警类型
+    return new R<>(warningsService.getWarnings(map));
+  }
+  //未接收预警
+  @Inner
+  @GetMapping("/getNotReceived")
+  public R getNotReceived(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                          @RequestParam(value="schoolName")String schoolName,
+                          @RequestParam(value="startingTime")String startingTime,
+                          @RequestParam(value="endTime")String endTime,
+                          @RequestParam(value="year")String year,
+                          @RequestParam(value="regionalLevel")String regionalLevel,
+                          @RequestParam(value="areaCode")String areaCode,
+                          @RequestParam(value="Type")Integer Type){
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("WarningInfor",WarningInfor);//预警信息
+    map.put("schoolName",schoolName);
+    map.put("startingTime",startingTime);//开始时间
+    map.put("endTime",endTime);//结束时间
+    map.put("year",year);//年
+    map.put("regionalLevel",regionalLevel);//监管用户等级(1全国2省3市4区)[暂时预留]
+    map.put("areaCode",areaCode);
+    map.put("Type",Type);
+    return new R<>(warningsService.getNotReceived(map));
+  }
+  //已接收预警
+  @Inner
+  @GetMapping("/getReceivedWarnings")
+  public R getReceivedWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
+                               @RequestParam(value="schoolName")String schoolName,
+                               @RequestParam(value="startingTime")String startingTime,
+                               @RequestParam(value="endTime")String endTime,
+                               @RequestParam(value="year")String year,
+                               @RequestParam(value="regionalLevel")String regionalLevel,
+                               @RequestParam(value="areaCode")String areaCode,
+                               @RequestParam(value="Type")Integer Type){
+    Map<String,Object> map = new HashMap<String,Object>();
+    map.put("WarningInfor",WarningInfor);//预警信息
+    map.put("schoolName",schoolName);
+    map.put("startingTime",startingTime);//开始时间
+    map.put("endTime",endTime);//结束时间
+    map.put("year",year);//年
+    map.put("regionalLevel",regionalLevel);//监管用户等级(1全国2省3市4区)[暂时预留]
+    map.put("areaCode",areaCode);
+    map.put("Type",Type);
+    return new R<>(warningsService.getReceivedWarnings(map));
   }
 }

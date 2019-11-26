@@ -96,6 +96,25 @@
     </where>
   </select>
 
+  <select id="getSchoolName" resultType="Map">
+    SELECT a.id,a.sch_name as schName
+      from se_school a,
+      (select
+         b.school_id
+          from sup_main_filing b
+         <where>
+         <if test="map.supId != null">
+              b.id=#{map.supId}
+         </if>
+            and b.del_flag='0'
+         </where>
+            )
+            c
+            <where>a.del_flag='0'
+            and c.school_id=a.id
+            </where>
+</select>
+
   <!--许可数-->
   <select id="getLicense" resultType="Map">
     select

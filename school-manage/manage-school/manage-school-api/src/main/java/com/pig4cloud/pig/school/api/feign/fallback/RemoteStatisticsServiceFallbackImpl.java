@@ -166,4 +166,31 @@ public class RemoteStatisticsServiceFallbackImpl implements RemoteStatisticsServ
     return null;
   }
 
+  @Override
+  public R getWarningType(String year, String regionalLevel, String areaCode,String from) {
+    log.error("feign 获得预警类别失败:{}",  cause);
+    return null;
+  }
+
+  @Override
+  public R getWarnings(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
+                       String regionalLevel, String areaCode,Integer Type, String from) {
+    log.error("feign 获得全部预警失败:{}", Type, cause);
+    return null;
+  }
+
+  @Override
+  public R getNotReceived(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
+                          String regionalLevel, String areaCode,Integer Type, String from) {
+    log.error("feign 获得未接收预警失败:{}", Type, cause);
+    return null;
+  }
+
+  @Override
+  public R getReceivedWarnings(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
+                               String regionalLevel, String areaCode,Integer Type, String from) {
+    log.error("feign 获得已接受预警失败:{}", Type, cause);
+    return null;
+  }
+
 }

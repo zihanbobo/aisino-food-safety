@@ -227,4 +227,76 @@ public class StatisticsController {
   public R getHistoricalAlarm(@RequestParam(value="year")String year,@RequestParam(value="schoolId")String schoolId){
     return new R<>(remoteStatisticsService.getHistoricalAlarm( schoolId, year,SecurityConstants.FROM_IN ));
   }
+
+
+
+
+  //预警信息
+
+  //预警类型
+  @GetMapping("/getWarningType")
+  public R getWarningType(@RequestParam(value="year")String year,
+                          @RequestParam(value="regionalLevel")String regionalLevel,
+                          @RequestParam(value="areaCode")String areaCode){
+    R warningType = remoteStatisticsService.getWarningType(year,regionalLevel,areaCode, SecurityConstants.FROM_IN );
+    return new R<>(warningType.getData());
+  }
+  //全部预警
+  @GetMapping("/getWarnings")
+  public R getWarnings(@RequestParam(value="WarningInfor",required = false)Integer WarningInfor,
+                       @RequestParam(value="schoolName",required = false)String schoolName,
+                       @RequestParam(value="startingTime",required = false)String startingTime,
+                       @RequestParam(value="endTime",required = false)String endTime,
+                       @RequestParam(value="year")String year,
+                       @RequestParam(value="regionalLevel")String regionalLevel,
+                       @RequestParam(value="areaCode")String areaCode,
+                       @RequestParam(value="Type")Integer Type){
+    if(startingTime==null){
+      startingTime = "1900-01-01";
+    }
+    if(endTime==null){
+      endTime = "3333-01-01";
+    }
+    R warningType = remoteStatisticsService.getWarnings( WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+    return new R<>(warningType.getData());
+  }
+  //未接收预警
+  @GetMapping("/getNotReceived")
+  public R getNotReceived(@RequestParam(value="WarningInfor",required = false)Integer WarningInfor,
+                          @RequestParam(value="schoolName",required = false)String schoolName,
+                          @RequestParam(value="startingTime",required = false)String startingTime,
+                          @RequestParam(value="endTime",required = false)String endTime,
+                          @RequestParam(value="year")String year,
+                          @RequestParam(value="regionalLevel")String regionalLevel,
+                          @RequestParam(value="areaCode")String areaCode,
+                          @RequestParam(value="Type")Integer Type){
+    if(startingTime==null){
+      startingTime = "1900-01-01";
+    }
+    if(endTime==null){
+      endTime = "3333-01-01";
+    }
+    R warningType = remoteStatisticsService.getNotReceived(WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+    return new R<>(warningType.getData());
+  }
+  //已接收预警
+  @GetMapping("/getReceivedWarnings")
+  public R getReceivedWarnings(@RequestParam(value="WarningInfor",required = false)Integer WarningInfor,
+                               @RequestParam(value="schoolName",required = false)String schoolName,
+                               @RequestParam(value="startingTime",required = false)String startingTime,
+                               @RequestParam(value="endTime",required = false)String endTime,
+                               @RequestParam(value="year")String year,
+                               @RequestParam(value="regionalLevel")String regionalLevel,
+                               @RequestParam(value="areaCode")String areaCode,
+                               @RequestParam(value="Type")Integer Type){
+    if(startingTime==null){
+      startingTime = "1900-01-01";
+    }
+    if(endTime==null){
+      endTime = "3333-01-01";
+    }
+    R warningType = remoteStatisticsService.getReceivedWarnings(WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+    return new R<>(warningType.getData());
+  }
+
 }

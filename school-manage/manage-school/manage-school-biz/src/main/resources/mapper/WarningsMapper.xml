@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.pig4cloud.pig.school.mapper.WarningsMapper">
+
+  <!--预警类别-->
+  <select id="getWarningType" resultType="Map">
+    SELECT
+    VALUE
+      ,
+    CASE
+
+      WHEN `value` IN ( '1', '2' ) THEN
+      '证照预警'
+      WHEN `value` IN ( 3 ) THEN
+      '人员预警'
+      WHEN `value` IN ( '4' ) THEN
+      '食材预警' ELSE ''
+      END AS type,
+      a.description
+    FROM
+      sys_dict a
+    WHERE
+      a.type = 'early_warning'
+  </select>
+
+<!--报警类别统计-->
+  <select id="getAlarmTotalByYear" resultType="Map">
+    select ifnull(sum(a.personTotal),0) as 'personTotal',ifnull(sum(a.cardTotal),0) as 'cardTotal',ifnull(sum(a.foodTotal),0) as 'foodTotal' from (
+    select DATE_FORMAT(a.alarm_time,'%Y') as date,a.id,
+    case when alarm in (3,4) then 1 else 0 end as personTotal,
+    case when alarm in (1,2) then 1 else 0 end as cardTotal,
+    case when alarm in (5,6,7) then 1 else 0 end as foodTotal
+    from ck_early_alarm a,
+    (select a.* from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b
+    <where>
+      a.school_id=b.id and a.del_flag = '0' and b.del_flag='0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.alarm_time,'%Y') = #{map.year}
+      </if>
+    </where>
+    )a
+  </select>
+
+  <!--预警类别统计-->
+  <select id="getWarningTotalByYear" resultType="Map">
+    select ifnull(sum(a.personTotal),0) as 'personTotal',ifnull(sum(a.cardTotal),0) as 'cardTotal',ifnull(sum(a.foodTotal),0) as 'foodTotal' from (
+    select DATE_FORMAT(a.early_time,'%Y') as date,a.id,
+    case when early_warning in (3) then 1 else 0 end as personTotal,
+    case when early_warning in (1,2) then 1 else 0 end as cardTotal,
+    case when early_warning in (4) then 1 else 0 end as foodTotal
+    from ck_early_warning a,
+    (select a.* from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b
+    <where>
+      a.school_id=b.id and a.del_flag = '0' and b.del_flag='0'
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+    </where>
+    )a
+  </select>
+
+  <!--所有预警-->
+  <select id="getWarnings" resultType="Map">
+    SELECT d.*,
+    c.sch_name as schoolName,
+    c.supplier_name as supplierName,
+    c.early_time as time,
+    '未接收' as Status,
+    c.school_id as SchoolId
+    from (SELECT *
+    from ck_early_warning a,
+    (select a.id as sch_id,a.sch_name as schoolName from se_school a
+          <where>
+            1=1 and a.del_flag = '0'
+                <if test="map.areaCode != null">
+                    and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+                </if>
+          </where>
+              ) b
+    <where> a.del_flag='0'
+    and a.school_id=b.sch_id
+    <if test="map.startingTime != null&amp;map.endTime != null ">
+    AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
+    </if>
+    <if test="map.year != null">
+      and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+    </if>
+    <if test="map.WarningInfor != null">
+    and a.early_warning =#{map.WarningInfor}
+    </if>
+    </where>
+    )c,
+    (SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照预警'
+    WHEN `value` IN ( 3 ) THEN
+    '人员预警'
+    WHEN `value` IN ( '4' ) THEN
+    '食材预警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'early_warning')d
+    <where>
+    1=1
+      and c.early_warning=d.`VALUE`
+    <if test="map.schoolName != null">
+      and c.sch_name = #{map.schoolName}
+    </if>
+    </where>
+  </select>
+<!--同一预警数量-->
+  <select id="getSameWarning" resultType="Integer">
+    SELECT count(a.school_id) as sch_number
+    from ck_early_warning a,
+    (select a.id as sch_id,a.sch_name as schoolName from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b
+    <where> a.del_flag='0'
+      and a.school_id=b.sch_id
+      <if test="map.startingTime != null&amp;map.endTime != null ">
+        AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
+      </if>
+      <if test="map.year!= null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+      <if test="map.WarningInfor != null">
+        and a.early_warning =#{map.WarningInfor}
+      </if>
+      <if test="map.schoolId != null">
+        and a.school_id=#{map.schoolId}
+      </if>
+    </where>
+  </select>
+
+  <!--关联预警数量-->
+  <select id="getAssociationWarning" resultType="Map">
+    SELECT count(DISTINCT(a.school_id)) as school, count(a.id) as warning
+    from ck_early_warning a,
+    (select a.id as sch_id,a.sch_name as schoolName from se_school a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.areaCode != null">
+        and FIND_IN_SET(a.sch_area,(select getChildRegion(#{map.areaCode})))
+      </if>
+    </where>
+    ) b
+    <where> a.del_flag='0'
+      and a.school_id=b.sch_id
+      <if test="map.startingTime != null&amp;map.endTime != null ">
+        AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
+      </if>
+      <if test="map.year != null">
+        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
+      </if>
+      <if test="map.WarningInfor != null">
+        and a.early_warning =#{map.WarningInfor}
+      </if>
+    </where>
+
+  </select>
+
+
+  <!--没接收预警-->
+  <select id="getNotReceived" resultType="Map">
+
+  </select>
+
+  <!--已接收预警-->
+  <select id="getReceivedWarnings" resultType="Map">
+
+  </select>
+
+
+
+</mapper>

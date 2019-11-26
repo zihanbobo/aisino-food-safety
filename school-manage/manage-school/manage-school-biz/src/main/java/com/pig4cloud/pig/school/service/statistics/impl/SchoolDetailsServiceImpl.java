@@ -45,7 +45,16 @@ public class SchoolDetailsServiceImpl extends ServiceImpl<SchoolDetailsMapper, E
   @Override
   public Map getSupplierInformation(Map map) {
     Map a = new HashMap();
-    List<Map> supplierInformation = baseMapper.getSupplierInformation( map );
+    List<Map<String,Object>> supplierInformation = baseMapper.getSupplierInformation( map );
+    for(int i=0;i<supplierInformation.size();i++){
+      Map map1 = supplierInformation.get( i );
+      Object id = map1.get( "id" );
+      Map b = new HashMap();
+      b.put( "supId" ,id);
+      Map schoolName = baseMapper.getSchoolName( b );
+      map1.put( "school",schoolName );
+    }
+
     Map total = baseMapper.getTotal( map );//供应商总数
     Map open = baseMapper.getOpen( map ); //营业数
     Map license = baseMapper.getLicense( map );//许可数
