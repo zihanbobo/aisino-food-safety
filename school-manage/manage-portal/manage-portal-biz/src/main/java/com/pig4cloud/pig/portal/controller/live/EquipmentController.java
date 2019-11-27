@@ -64,7 +64,8 @@ public class EquipmentController {
     }else if("2".equals(userType)){
       equipment.setSchoolId(userInfo.getSysUser().getUnionId());
     }
-	  return  new R<>(equipmentService.getEquipmentPage(page,equipment));
+    IPage<Equipment> equipmentPage = equipmentService.getEquipmentPage(page, equipment);
+    return  new R<>(equipmentPage);
 	}
 
 
@@ -205,10 +206,4 @@ public class EquipmentController {
     }
     return new R<>(deviceInfoR);
   }
-
-
-
-
-
-
 }
