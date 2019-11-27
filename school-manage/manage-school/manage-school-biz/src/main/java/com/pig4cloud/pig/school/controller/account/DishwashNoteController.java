@@ -83,6 +83,7 @@ public class DishwashNoteController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     dishwashNote.setSchoolId(schoolId);
+    dishwashNote.setCreateId(userId);
     return new R<>(dishwashNoteService.save(dishwashNote));
   }
 
@@ -95,6 +96,11 @@ public class DishwashNoteController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_dishwashnote_edit')")
   public R update(@RequestBody DishwashNote dishwashNote){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    dishwashNote.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(dishwashNoteService.updateById(dishwashNote));
   }
 
@@ -108,6 +114,11 @@ public class DishwashNoteController {
   @PreAuthorize("@pms.hasPermission('sl_dishwashnote_del')")
   public R removeById(@PathVariable Integer id){
     DishwashNote dishwashNote = dishwashNoteService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    dishwashNote.setUpdateId(userInfo.getSysUser().getUserId());
     dishwashNote.setDelFlag("1");
     return new R<>(dishwashNoteService.updateById(dishwashNote));
   }

@@ -10,6 +10,7 @@ import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import com.pig4cloud.pig.common.security.util.SecurityUtils;
+import com.pig4cloud.pig.portal.api.entity.CommentPraise;
 import com.pig4cloud.pig.school.api.dto.account.SampleRecordDTO;
 import com.pig4cloud.pig.school.api.entity.account.SampleRecord;
 import com.pig4cloud.pig.school.api.entity.recipe.DailySource;
@@ -96,6 +97,13 @@ public class SampleRecordController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_samplerecord_edit')")
   public R update(@RequestBody DailySource dailySource){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    dailySource.setUpdateId(userInfo.getSysUser().getUserId());
+//    return new R<>(dailySourceService.updateById(dailySource));
+
     // lambda+mybatisplus更新指定对象
     return new R<>(dailySourceService.update(dailySource,Wrappers.<DailySource>update().lambda()
       .eq(DailySource::getDailyId, dailySource.getDailyId())

@@ -1,5 +1,6 @@
 package com.pig4cloud.pig.school.controller.project;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,8 +13,10 @@ import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import com.pig4cloud.pig.common.security.util.SecurityUtils;
 import com.pig4cloud.pig.school.api.entity.School;
+import com.pig4cloud.pig.school.api.entity.account.DishwashNote;
 import com.pig4cloud.pig.school.api.entity.project.ProjectManage;
 import com.pig4cloud.pig.school.api.vo.project.ProjectManageVO;
+import com.pig4cloud.pig.school.service.SchoolService;
 import com.pig4cloud.pig.school.service.project.ProjectManageService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +37,7 @@ import java.util.List;
 public class ProjectManageController {
 
   private final ProjectManageService projectManageService;
+  private final SchoolService schoolService;
   private final RemoteUserService remoteUserService;
 
   /**
@@ -67,6 +71,11 @@ public class ProjectManageController {
   @PostMapping
   @PreAuthorize("@pms.hasPermission('project_projectmanage_add')")
   public R save(@RequestBody ProjectManage projectManage){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    projectManage.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(projectManageService.save(projectManage));
   }
 
@@ -79,6 +88,11 @@ public class ProjectManageController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('project_projectmanage_edit')")
   public R update(@RequestBody ProjectManage projectManage){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    projectManage.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(projectManageService.updateById(projectManage));
   }
 
@@ -91,7 +105,23 @@ public class ProjectManageController {
   @DeleteMapping("/{id}")
   @PreAuthorize("@pms.hasPermission('project_projectmanage_del')")
   public R removeById(@PathVariable Integer id){
-    return new R<>(projectManageService.removeById(id));
+    ProjectManage projectManage = projectManageService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    projectManage.setUpdateId(userInfo.getSysUser().getUserId());
+    projectManage.setDelFlag("1");
+    // 清除该项目下的学校绑定
+    List<School> schoolList = schoolService.list(Wrappers.<School>query().lambda()
+      .eq(School::getDelFlag, "0")
+      .eq(School::getSchoolProjectid, id));
+    if (CollUtil.isNotEmpty(schoolList)) {
+      schoolList.stream()//.filter(school -> school.getSchoolProjectid().equals(id))
+        .forEach(school -> school.setSchoolProjectid(null));
+    }
+    schoolService.updateBatchById(schoolList);
+    return new R<>(projectManageService.updateById(projectManage));
   }
 
 

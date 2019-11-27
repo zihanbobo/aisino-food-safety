@@ -68,5 +68,13 @@ private static final long serialVersionUID = 1L;
      * 是否合格（1合格 2不合规）
      */
     private String isQualified;
+    /**
+     * 创建人id
+     */
+    private Integer createId;
+    /**
+     * 更新人id
+     */
+    private Integer updateId;
   
 }

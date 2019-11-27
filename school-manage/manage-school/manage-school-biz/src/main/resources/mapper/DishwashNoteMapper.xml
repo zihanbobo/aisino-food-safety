@@ -18,6 +18,8 @@
                         <result property="delFlag" column="del_flag"/>
                         <result property="schoolId" column="school_id"/>
                         <result property="schoolName" column="schoolName"/>
+    <result property="createId" column="create_id"/>
+    <result property="updateId" column="update_id"/>
             </resultMap>
 
   <!--dishwashNote简单分页查询-->
@@ -34,7 +36,9 @@
     a.create_time,
     a.update_time,
     a.del_flag,
-    b.sch_name as schoolName
+    b.sch_name as schoolName,
+    a.create_id,
+    a.update_id
               FROM sl_dishwash_note a
     left join se_school b on b.id = a.school_id
     <where>

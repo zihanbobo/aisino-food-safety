@@ -17,6 +17,8 @@
                         <result property="srCheckurl" column="sr_checkurl"/>
                         <result property="srPic" column="sr_pic"/>
                         <result property="isQualified" column="is_qualified"/>
+                        <result property="createId" column="create_id"/>
+                        <result property="updateId" column="update_id"/>
             </resultMap>
 
   <!--dailySource简单分页查询-->
@@ -33,7 +35,9 @@
                         sr_destroys,
                         sr_checkurl,
                         sr_pic,
-                        is_qualified
+                        is_qualified,
+                        a.create_id,
+                        a.update_id
               FROM re_daily_source
     <where>
               <if test="dailySource.dailyId != null and dailySource.dailyId.trim() != ''">

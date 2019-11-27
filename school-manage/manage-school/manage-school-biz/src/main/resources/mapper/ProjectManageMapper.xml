@@ -12,7 +12,9 @@
                         <result property="cityCode" column="city_code"/>
                         <result property="areaCode" column="area_code"/>
                         <result property="remarks" column="remarks"/>
+                        <result property="createId" column="create_id"/>
                         <result property="createTime" column="create_time"/>
+                        <result property="updateId" column="update_id"/>
                         <result property="updateTime" column="update_time"/>
                         <result property="delFlag" column="del_flag"/>
                         <result property="schoolCount" column="schoolCount"/>
@@ -32,7 +34,9 @@
       a.city_code,
       a.area_code,
       a.remarks,
+      a.create_id,
       a.create_time,
+      a.update_id,
       a.update_time,
       a.del_flag,
       a.realName,
@@ -48,7 +52,9 @@
         a.city_code,
         a.area_code,
         a.remarks,
+        a.create_id,
         a.create_time,
+        a.update_id,
         a.update_time,
         a.del_flag,
         c.real_name as realName,
@@ -84,7 +90,7 @@
         </if>
           </where>
       )a
-      group by a.id,user_id,a.project_name,a.province,a.city_code,a.area_code,a.remarks,a.create_time,a.update_time,a.realName,a.locationName,a.isBind
+      group by a.id,user_id,a.project_name,a.province,a.city_code,a.area_code,a.remarks,a.create_id,a.create_time,a.update_id,a.update_time,a.realName,a.locationName,a.isBind
   </select>
 
 

@@ -52,8 +52,13 @@ public class AccompanyDinnerController {
     UserInfo userInfo = result.getData();
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
+    String position = userInfo.getSysUser().getPosition();
+//    // 不是校长或者超级管理员看自己
+//    if(!"4".equals(position)&&!"5".equals(position)){
+//      accompanyDinner.setCreateId(userId);
+//    }
     accompanyDinner.setSchoolId(schoolId);
-	  return  new R<>(accompanyDinnerService.getAccompanyDinnerPage(page,accompanyDinner));
+	  return new R<>(accompanyDinnerService.getAccompanyDinnerPage(page,accompanyDinner));
 	}
 
 
@@ -83,6 +88,7 @@ public class AccompanyDinnerController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     accompanyDinner.setSchoolId(schoolId);
+    accompanyDinner.setCreateId(userId);
 		return new R<>(accompanyDinnerService.save(accompanyDinner));
 	}
 
@@ -95,6 +101,11 @@ public class AccompanyDinnerController {
 	@PutMapping
 	@PreAuthorize("@pms.hasPermission('sl_accompanydinner_edit')")
 	public R update(@RequestBody AccompanyDinner accompanyDinner){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    accompanyDinner.setUpdateId(userInfo.getSysUser().getUserId());
 		return new R<>(accompanyDinnerService.updateById(accompanyDinner));
 	}
 
@@ -108,6 +119,11 @@ public class AccompanyDinnerController {
 	@PreAuthorize("@pms.hasPermission('sl_accompanydinner_del')")
 	public R removeById(@PathVariable Integer id){
     AccompanyDinner accompanyDinner = accompanyDinnerService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    accompanyDinner.setUpdateId(userInfo.getSysUser().getUserId());
     accompanyDinner.setDelFlag("1");
     return new R<>(accompanyDinnerService.updateById(accompanyDinner));
 	}

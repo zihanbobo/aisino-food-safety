@@ -147,7 +147,7 @@ public class UserController {
     SysUser sysUser = userService.getById(id);
     String userType = sysUser.getUserType();
     String isAdmin = sysUser.getIsAdmin();
-    if("1".equals(userType)&&"1".equals(isAdmin)){
+    if("2".equals(userType)&&"1".equals(isAdmin)){
       remoteSchoolService.schoolUserId(sysUser.getUserId(), sysUser.getUnionId(), "2", SecurityConstants.FROM_IN);
     }
     return new R<>(userService.removeUserById(sysUser));
