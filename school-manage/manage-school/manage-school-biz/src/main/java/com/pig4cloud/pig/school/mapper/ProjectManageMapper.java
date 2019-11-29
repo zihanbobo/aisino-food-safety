@@ -3,9 +3,13 @@ package com.pig4cloud.pig.school.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pig4cloud.pig.school.api.entity.School;
 import com.pig4cloud.pig.school.api.entity.project.ProjectManage;
+import com.pig4cloud.pig.school.api.entity.recipe.IngredientsFiling;
 import com.pig4cloud.pig.school.api.vo.project.ProjectManageVO;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 管理端-项目管理
@@ -21,5 +25,12 @@ public interface ProjectManageMapper extends BaseMapper<ProjectManage> {
     */
   IPage<ProjectManageVO> getProjectManagePage(Page page, @Param("projectManage") ProjectManage projectManage);
 
+  /**
+   * 通过项目ID，查询学校信息
+   *
+   * @param id
+   * @return
+   */
+  List<School> listSchoolByProjectId(Integer id);
 
 }

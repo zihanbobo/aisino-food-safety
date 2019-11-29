@@ -74,6 +74,14 @@ private static final long serialVersionUID = 1L;
    */
     private String remarks;
     /**
+     * 创建人id
+     */
+    private Integer createId;
+    /**
+     * 更新人id
+     */
+    private Integer updateId;
+    /**
    * 创建时间
    */
     private LocalDateTime createTime;

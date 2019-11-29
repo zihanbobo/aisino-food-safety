@@ -21,6 +21,8 @@
                         <result property="delFlag" column="del_flag"/>
                         <result property="schoolName" column="schoolName"/>
                         <result property="realName" column="realName"/>
+                        <result property="createId" column="create_id"/>
+                        <result property="updateId" column="update_id"/>
             </resultMap>
 
   <!--accompanyDinner简单分页查询-->
@@ -36,6 +38,8 @@
       a.ad_person,
       a.ad_pic,
       a.remarks,
+      a.create_id,
+      a.update_id,
       a.create_time,
       a.update_time,
       a.del_flag,
@@ -98,6 +102,8 @@
     a.ad_person,
     a.ad_pic,
     a.remarks,
+    a.create_id,
+    a.update_id,
     a.create_time,
     a.update_time,
     a.del_flag,

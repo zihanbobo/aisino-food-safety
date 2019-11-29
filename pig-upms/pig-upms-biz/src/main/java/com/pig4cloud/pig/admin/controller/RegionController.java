@@ -95,5 +95,50 @@ public class RegionController {
     ));
   }
 
+  /**
+   * 查询省(h5数据采集)
+   *
+   * @return 省列表
+   */
+  @Inner
+  @GetMapping("/getProvinceForCol")
+  public R listRegionForCol() {
+    List<String> list = new ArrayList<String>();
+    list.add("000000");
+    list.add("910000");
+    return new R<>(sysRegionService.list(Wrappers
+      .<SysRegion>query().lambda()
+      .eq(SysRegion::getPCode, "100000")
+      .notIn(SysRegion::getCode,list)
+    ));
+  }
+
+  /**
+   * 查询市(h5数据采集)
+   *
+   * @return 市列表
+   */
+  @Inner
+  @GetMapping("/getCityForCol")
+  public R listCityForCol(@RequestParam(value = "provice")String provice) {
+    return new R<>(sysRegionService.list(Wrappers
+      .<SysRegion>query().lambda()
+      .eq(SysRegion::getPCode, provice)
+    ));
+  }
+
+  /**
+   * 查询区/县(h5数据采集)
+   *
+   * @return 区列表
+   */
+  @Inner
+  @GetMapping("/getDistrictForCol")
+  public R listDistrictForCol(@RequestParam(value = "district")String district) {
+    return new R<>(sysRegionService.list(Wrappers
+      .<SysRegion>query().lambda()
+      .eq(SysRegion::getPCode, district)
+    ));
+  }
 
 }

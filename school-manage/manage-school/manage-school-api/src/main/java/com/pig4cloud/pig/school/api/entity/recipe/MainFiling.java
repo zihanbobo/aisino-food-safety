@@ -72,20 +72,28 @@ private static final long serialVersionUID = 1L;
    */
     private String supType;
     /**
-   * 所属区划号
-   */
+     * 省区划号
+     */
+    private String province;
+    /**
+     * 市区划号
+     */
+    private String cityCode;
+    /**
+     * 区/县号
+     */
     private String areaCode;
     /**
-   * 地址
-   */
+     * 详细地址
+     */
     private String addr;
     /**
-   * 手机
-   */
+     * 手机
+     */
     private String phone;
     /**
-   * 邮编
-   */
+     * 邮编
+     */
     private String zipCode;
     /**
    * 营业执照照片

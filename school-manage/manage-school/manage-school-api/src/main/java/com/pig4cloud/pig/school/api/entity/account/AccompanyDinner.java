@@ -78,6 +78,14 @@ public class AccompanyDinner extends Model<AccompanyDinner> {
 	 */
 	private String remarks;
 	/**
+	 * 创建人id
+	 */
+	private Integer createId;
+	/**
+	 * 更新人id
+	 */
+	private Integer updateId;
+	/**
 	 * 创建时间
 	 */
 	private LocalDateTime createTime;
@@ -89,5 +97,4 @@ public class AccompanyDinner extends Model<AccompanyDinner> {
 	 * 是否删除  -1：已删除  0：正常
 	 */
 	private String delFlag;
-
 }

@@ -31,6 +31,8 @@
                         <result property="linkName" column="link_name"/>
                         <result property="contact" column="contact"/>
                         <result property="supType" column="sup_type"/>
+                        <result property="province" column="province"/>
+                        <result property="cityCode" column="city_code"/>
                         <result property="areaCode" column="area_code"/>
                         <result property="addr" column="addr"/>
                         <result property="phone" column="phone"/>
@@ -71,6 +73,8 @@
                   a.link_name,
                   a.contact,
                   a.sup_type,
+                  a.province,
+                  a.city_code,
                   a.area_code,
                   a.addr,
                   a.phone,
@@ -127,6 +131,12 @@
         </if>
               <if test="mainFiling.supType != null and mainFiling.supType.trim() != ''">
           AND a.sup_type = #{mainFiling.supType}
+        </if>
+        <if test="mainFiling.province != null and mainFiling.province.trim() != ''">
+          AND a.province = #{mainFiling.province}
+        </if>
+        <if test="mainFiling.cityCode != null and mainFiling.cityCode.trim() != ''">
+          AND a.city_code = #{mainFiling.cityCode}
         </if>
               <if test="mainFiling.areaCode != null and mainFiling.areaCode.trim() != ''">
           AND a.area_code = #{mainFiling.areaCode}

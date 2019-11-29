@@ -17,6 +17,7 @@
 package com.pig4cloud.pig.school.service.impl;
 
 import cn.hutool.core.collection.IterUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -89,6 +90,9 @@ public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> impleme
     School school = new School();
     BeanUtils.copyProperties(schoolDTO, school);
     school.setDelFlag(CommonConstants.STATUS_NORMAL);
+    // 直播码与食谱码自动生成(8位)
+    school.setLiveIdentifier(RandomUtil.randomString(8));
+    school.setRecipeIdentifier(RandomUtil.randomString(8));
     baseMapper.insert(school);
 
     // Hutool判断服务是否为空
@@ -100,22 +104,10 @@ public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> impleme
         SchoolMeal schoolMeal = new SchoolMeal();
         schoolMeal.setSchoolId(school.getId());
         schoolMeal.setMealId(Integer.parseInt(String.valueOf(map.get("mealId"))));
-//				schoolMeal.setStartDate(LocalDate.now());
-//				schoolMeal.setEndDate(LocalDate.now().plusYears(1));	//增加一年
         schoolMeal.setStartDate(LocalDate.parse(String.valueOf(map.get("startDate")), DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         schoolMeal.setEndDate(LocalDate.parse(String.valueOf(map.get("endDate")), DateTimeFormatter.ofPattern("yyyy-MM-dd")));  //增加一年
         return schoolMeal;
       }).collect(Collectors.toList());
-
-//		List<SchoolMeal> schoolList = schoolDTO.getMealList()
-//			.stream().map(mealId -> {
-//				SchoolMeal schoolMeal = new SchoolMeal();
-//				schoolMeal.setSchoolId(schoolDTO.getId());
-//				schoolMeal.setMealId(mealId);
-//				schoolMeal.setStartDate(LocalDate.now());
-//				schoolMeal.setEndDate(LocalDate.now().plusYears(1));	//增加一年
-//				return schoolMeal;
-//			}).collect(Collectors.toList());
     return schoolMealService.saveBatch(schoolList);
   }
 

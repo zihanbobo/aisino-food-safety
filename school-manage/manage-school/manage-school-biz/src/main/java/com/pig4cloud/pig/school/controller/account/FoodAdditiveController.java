@@ -81,6 +81,7 @@ public class FoodAdditiveController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     foodAdditive.setSchoolId(schoolId);
+    foodAdditive.setCreateId(userId);
     return new R<>(foodAdditiveService.save(foodAdditive));
   }
 
@@ -93,6 +94,11 @@ public class FoodAdditiveController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_foodadditive_edit')")
   public R update(@RequestBody FoodAdditive foodAdditive){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    foodAdditive.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(foodAdditiveService.updateById(foodAdditive));
   }
 
@@ -106,6 +112,11 @@ public class FoodAdditiveController {
   @PreAuthorize("@pms.hasPermission('sl_foodadditive_del')")
   public R removeById(@PathVariable Integer id){
     FoodAdditive foodAdditive = foodAdditiveService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    foodAdditive.setUpdateId(userInfo.getSysUser().getUserId());
     foodAdditive.setDelFlag("1");
     return new R<>(foodAdditiveService.updateById(foodAdditive));
   }

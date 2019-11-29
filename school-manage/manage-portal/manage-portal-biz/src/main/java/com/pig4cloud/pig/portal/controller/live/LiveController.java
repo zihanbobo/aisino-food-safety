@@ -270,7 +270,7 @@ public class LiveController {
   @GetMapping("/getIoTLivePathWatch")
   public R getIoTLivePathWatch(@RequestParam(value="eqId", required = false) Integer eqId){
     Map map = new HashMap();
-//    Live live = liveService.getById(id);
+    //Live live = liveService.getById(id);
     Equipment equipment = equipmentService.getById(eqId);
     String deviceName = equipment.getEqAdmin();
     QueryDeviceDetailResponse a1ZQwIdRsw0 = DefaultAcsClientUtil.queryDeviceDetail("a1ZQwIdRsw0", deviceName);

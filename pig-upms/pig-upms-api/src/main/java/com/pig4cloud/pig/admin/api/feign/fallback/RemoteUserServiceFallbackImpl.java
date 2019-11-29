@@ -121,4 +121,21 @@ public class RemoteUserServiceFallbackImpl implements RemoteUserService {
     return null;
   }
 
+  @Override
+  public R<Object> getProvinceForCol(String from) {
+    log.error("feign 查询省信息(h5数据采集)", cause);
+    return null;
+  }
+
+  @Override
+  public R<Object> getCityForCol(String provice,String from) {
+    log.error("feign 查询市信息(h5数据采集)", cause);
+    return null;
+  }
+
+  @Override
+  public R<Object> getDistrictForCol(String district,String from) {
+    log.error("feign 查询区信息(h5数据采集)", cause);
+    return null;
+  }
 }

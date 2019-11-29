@@ -19,4 +19,6 @@ public class EquipmentVO extends Equipment implements Serializable {
 
     private String schoolname;	//学校名称
 
+    private String realname; //真实姓名
+
 }

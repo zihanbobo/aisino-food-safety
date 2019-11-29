@@ -19,6 +19,8 @@
                         <result property="updateTime" column="update_time"/>
                         <result property="delFlag" column="del_flag"/>
                         <result property="schoolId" column="school_id"/>
+                        <result property="createId" column="create_id"/>
+                        <result property="updateId" column="update_id"/>
             </resultMap>
 
   <!--ultravioletlight简单分页查询-->
@@ -37,7 +39,9 @@
                   create_time,
                   update_time,
                   del_flag,
-                  school_id
+                  school_id,
+                  create_id,
+                  update_id
           FROM sl_ultravioletlight
     <where>
       1=1 and del_flag = '0'

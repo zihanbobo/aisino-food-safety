@@ -31,6 +31,8 @@
                         <result property="schAddress" column="sch_address"/>
                         <result property="liveIdentifier" column="live_identifier"/>
                         <result property="recipeIdentifier" column="recipe_identifier"/>
+                        <result property="province" column="province"/>
+                        <result property="cityCode" column="city_code"/>
                         <result property="schArea" column="sch_area"/>
                         <result property="schCity" column="sch_city"/>
                         <result property="schWebsite" column="sch_website"/>
@@ -42,6 +44,13 @@
                         <result property="createTime" column="create_time"/>
                         <result property="updateTime" column="update_time"/>
                         <result property="delFlag" column="del_flag"/>
+                        <result property="introduction" column="introduction"/>
+                        <result property="officeNature" column="office_nature"/>
+                        <result property="schoolType" column="school_type"/>
+                        <result property="stuNumber" column="stu_number"/>
+                        <result property="messhallNumber" column="messhall_number"/>
+                        <result property="quantitative" column="quantitative"/>
+                        <result property="ratingScore" column="rating_score"/>
                         <result property="projectName" column="projectName"/>
 					    <collection property="mealListAll" ofType="com.pig4cloud.pig.school.api.entity.selseal.SelMeal"
 							  select="com.pig4cloud.pig.school.mapper.SelMealMapper.listMealBySchoolId" column="id">
@@ -58,6 +67,8 @@
     a.sch_address,
     a.live_identifier,
     a.recipe_identifier,
+    a.province,
+    a.city_code,
     a.sch_area,
     a.sch_city,
     a.sch_website,
@@ -69,6 +80,13 @@
     a.create_time,
     a.update_time,
     a.del_flag,
+    a.introduction,
+    a.office_nature,
+    a.school_type,
+    a.stu_number,
+    a.messhall_number,
+    a.quantitative,
+    a.rating_score,
     b.project_name as projectName
               FROM se_school a
     left join se_project_manage b on b.id = a.school_projectid
@@ -136,6 +154,8 @@
     a.sch_address,
     a.live_identifier,
     a.recipe_identifier,
+    a.province,
+    a.city_code,
     a.sch_area,
     a.sch_city,
     a.sch_website,
@@ -147,6 +167,13 @@
     a.create_time,
     a.update_time,
     a.del_flag,
+    a.introduction,
+    a.office_nature,
+    a.school_type,
+    a.stu_number,
+    a.messhall_number,
+    a.quantitative,
+    a.rating_score,
     b.project_name as projectName
     FROM se_school a
     left join se_project_manage b on b.id = a.school_projectid

@@ -48,6 +48,26 @@ public class SourceController {
 		return new R<>(remoteSchoolService.getById(school.getId(),SecurityConstants.FROM_IN));
 	}
 
+  /**
+   * 查询直播信息学校(11-26新增)
+   * @return
+   */
+  @GetMapping("/getLiveSchoolPortal")
+  public R getLiveSchoolWatch(@RequestParam(value = "schoolId") Integer schoolId) {
+    R liveSchoolWatch = remoteLiveService.getLiveSchoolWatch(schoolId, SecurityConstants.FROM_IN);
+    return new R<>(liveSchoolWatch.getData());
+  }
+
+  /**
+   * 查询直播流地址(11-26新增)
+   * @return
+   */
+  @GetMapping("/getIoTLivePathPortal")
+  public R getIoTLivePathWatch(@RequestParam(value = "eqId") Integer eqId) {
+    R ioTLivePathWatch = remoteLiveService.getIoTLivePathWatch(eqId, SecurityConstants.FROM_IN);
+    return new R<>(ioTLivePathWatch.getData());
+  }
+
 	/**
 	 * 公众用户根据学校标识码绑定学校
 	 * @return

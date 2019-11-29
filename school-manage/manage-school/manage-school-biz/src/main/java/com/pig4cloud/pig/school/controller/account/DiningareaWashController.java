@@ -50,8 +50,8 @@ public class DiningareaWashController {
     if("1".equals(userType)){
     }else if("2".equals(userType)){
       diningareaWash.setSchoolId(userInfo.getSysUser().getUnionId());
+      diningareaWash.setCreateId(userInfo.getSysUser().getUserId());
     }
-    Map<String, Object> map = new HashMap<>();
     return  new R<>(diningareaWashService.getDiningareaWashPage(page,diningareaWash));
   }
 
@@ -82,6 +82,7 @@ public class DiningareaWashController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     diningareaWash.setSchoolId(schoolId);
+    diningareaWash.setCreateId(userId);
     return new R<>(diningareaWashService.save(diningareaWash));
   }
 
@@ -94,6 +95,11 @@ public class DiningareaWashController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_diningareawash_edit')")
   public R update(@RequestBody DiningareaWash diningareaWash){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    diningareaWash.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(diningareaWashService.updateById(diningareaWash));
   }
 
@@ -107,6 +113,11 @@ public class DiningareaWashController {
   @PreAuthorize("@pms.hasPermission('sl_diningareawash_del')")
   public R removeById(@PathVariable Integer id){
     DiningareaWash diningareaWash = diningareaWashService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    diningareaWash.setUpdateId(userInfo.getSysUser().getUserId());
     diningareaWash.setDelFlag("1");
     return new R<>(diningareaWashService.updateById(diningareaWash));
   }

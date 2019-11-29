@@ -145,7 +145,11 @@ public class UserController {
   @PreAuthorize("@pms.hasPermission('sys_user_del')")
   public R userDel(@PathVariable Integer id) {
     SysUser sysUser = userService.getById(id);
-    remoteSchoolService.schoolUserId(sysUser.getUserId(), sysUser.getUnionId(), "2", SecurityConstants.FROM_IN);
+    String userType = sysUser.getUserType();
+    String isAdmin = sysUser.getIsAdmin();
+    if("2".equals(userType)&&"1".equals(isAdmin)){
+      remoteSchoolService.schoolUserId(sysUser.getUserId(), sysUser.getUnionId(), "2", SecurityConstants.FROM_IN);
+    }
     return new R<>(userService.removeUserById(sysUser));
   }
 

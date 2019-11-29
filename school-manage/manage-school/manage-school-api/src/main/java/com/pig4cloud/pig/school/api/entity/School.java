@@ -70,16 +70,24 @@ private static final long serialVersionUID = 1L;
    */
     private String recipeIdentifier;
     /**
-   * 学校区划号
-   */
+     * 省区划号
+     */
+    private String province;
+    /**
+     * 市区划号
+     */
+    private String cityCode;
+    /**
+     * 学校区划号
+     */
     private String schArea;
     /**
-   * 学校驻地城乡类型(1主城区 2城乡结合区3镇中心区4镇乡结合区5特殊区域6乡中心区7村庄)
-   */
+     * 学校驻地城乡类型(1主城区 2城乡结合区3镇中心区4镇乡结合区5特殊区域6乡中心区7村庄)
+     */
     private String schCity;
     /**
-   * 学校网站地址
-   */
+     * 学校网站地址
+     */
     private String schWebsite;
     /**
    * 学校二维码地址
@@ -121,9 +129,26 @@ private static final long serialVersionUID = 1L;
 	 * 办公性质(字典表：0-公办，1-私办)
 	 */
 	private String officeNature;
+
 	/**
-	 * 办公性质(字典表：0-公办，1-私办)
+	 * 学校类型(字典表：0-幼儿园，1-小学，2-初中，3-高中)
 	 */
 	private String schoolType;
+	/**
+	 * 学生数量
+	 */
+	private String stuNumber;
+  /**
+   * 食堂数量
+   */
+  private String messhallNumber;
+  /**
+   * 量化评级(字典表 1A2B3C4D）
+   */
+  private String quantitative;
+  /**
+   * 量化评级分数(0-100)
+   */
+  private String ratingScore;
 
 }

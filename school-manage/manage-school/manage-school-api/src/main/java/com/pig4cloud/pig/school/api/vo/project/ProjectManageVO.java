@@ -21,6 +21,8 @@ import com.pig4cloud.pig.school.api.entity.project.ProjectManage;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author 谢松哲
@@ -45,4 +47,6 @@ public class ProjectManageVO extends ProjectManage implements Serializable {
   // 所属区域
   private String locationName;
 
+  // 学校列表
+  private List<Map> schoolList;
 }

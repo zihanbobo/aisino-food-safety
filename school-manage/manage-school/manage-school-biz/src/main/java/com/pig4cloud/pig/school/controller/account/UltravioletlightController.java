@@ -12,6 +12,7 @@ import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.common.security.service.PigUser;
 import com.pig4cloud.pig.common.security.util.SecurityUtils;
 import com.pig4cloud.pig.school.api.entity.account.AccompanyDinner;
+import com.pig4cloud.pig.school.api.entity.account.KitwasteTreatment;
 import com.pig4cloud.pig.school.api.entity.account.Ultravioletlight;
 import com.pig4cloud.pig.school.api.vo.account.AccompanyDinnerVO;
 import com.pig4cloud.pig.school.service.account.UltravioletlightService;
@@ -84,6 +85,7 @@ public class UltravioletlightController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     ultravioletlight.setSchoolId(schoolId);
+    ultravioletlight.setCreateId(userId);
     return new R<>(ultravioletlightService.save(ultravioletlight));
   }
 
@@ -96,6 +98,11 @@ public class UltravioletlightController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('schoolMan_ultravioletlight_edit')")
   public R update(@RequestBody Ultravioletlight ultravioletlight){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    ultravioletlight.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(ultravioletlightService.updateById(ultravioletlight));
   }
 
@@ -108,7 +115,14 @@ public class UltravioletlightController {
   @DeleteMapping("/{id}")
   @PreAuthorize("@pms.hasPermission('schoolMan_ultravioletlight_del')")
   public R removeById(@PathVariable Integer id){
-    return new R<>(ultravioletlightService.removeById(id));
+    Ultravioletlight ultravioletlight = ultravioletlightService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    ultravioletlight.setUpdateId(userInfo.getSysUser().getUserId());
+    ultravioletlight.setDelFlag("1");
+    return new R<>(ultravioletlightService.updateById(ultravioletlight));
   }
 
 

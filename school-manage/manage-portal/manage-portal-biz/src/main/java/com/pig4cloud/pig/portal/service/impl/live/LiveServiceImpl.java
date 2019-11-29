@@ -72,7 +72,7 @@ public class LiveServiceImpl extends ServiceImpl<LiveMapper, Live> implements Li
   }
   /**
    * app-live 获取直播信息
-   * @param liveId
+   * @param schoolId
    * @return
    */
   @Override

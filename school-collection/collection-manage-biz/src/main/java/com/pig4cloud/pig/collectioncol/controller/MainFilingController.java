@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 /**
- * h5数据采集陪餐信息
+ * h5数据采集供应商信息
  *
  * @author -
  * @date 2019-08-29 11:23:11
@@ -180,7 +180,7 @@ public class MainFilingController {
   }
 
   /**
-   * h5数据采集查询该学校的所有供应商信息
+   * h5数据采集查询字典表信息
    * @return
    */
   @GetMapping("/getDictByTypeW")

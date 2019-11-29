@@ -1,6 +1,7 @@
 package com.pig4cloud.pig.school.controller.account;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.admin.api.dto.UserInfo;
 import com.pig4cloud.pig.admin.api.feign.RemoteUserService;
@@ -77,6 +78,7 @@ public class KitwasteTreatmentController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     kitwasteTreatment.setSchoolId(schoolId);
+    kitwasteTreatment.setCreateId(userId);
     return new R<>(kitwasteTreatmentService.save(kitwasteTreatment));
   }
 
@@ -89,6 +91,11 @@ public class KitwasteTreatmentController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_kitwastetreatment_edit')")
   public R update(@RequestBody KitwasteTreatment kitwasteTreatment){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    kitwasteTreatment.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(kitwasteTreatmentService.updateById(kitwasteTreatment));
   }
 
@@ -102,7 +109,12 @@ public class KitwasteTreatmentController {
   @PreAuthorize("@pms.hasPermission('sl_kitwastetreatment_del')")
   public R removeById(@PathVariable String id){
     KitwasteTreatment kitwasteTreatment = kitwasteTreatmentService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    kitwasteTreatment.setUpdateId(userInfo.getSysUser().getUserId());
     kitwasteTreatment.setDelFlag("1");
     return new R<>(kitwasteTreatmentService.updateById(kitwasteTreatment));
-}
+  }
 }

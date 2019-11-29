@@ -82,6 +82,7 @@ public class EquipmentWashController {
     Integer userId = userInfo.getSysUser().getUserId();
     Integer schoolId = userInfo.getSysUser().getUnionId();
     equipmentWash.setSchoolId(schoolId);
+    equipmentWash.setCreateId(userId);
     return new R<>(equipmentWashService.save(equipmentWash));
   }
 
@@ -94,6 +95,11 @@ public class EquipmentWashController {
   @PutMapping
   @PreAuthorize("@pms.hasPermission('sl_equipmentwash_edit')")
   public R update(@RequestBody EquipmentWash equipmentWash){
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    equipmentWash.setUpdateId(userInfo.getSysUser().getUserId());
     return new R<>(equipmentWashService.updateById(equipmentWash));
   }
 
@@ -107,6 +113,11 @@ public class EquipmentWashController {
   @PreAuthorize("@pms.hasPermission('sl_equipmentwash_del')")
   public R removeById(@PathVariable String id){
     EquipmentWash equipmentWash = equipmentWashService.getById(id);
+    PigUser user = SecurityUtils.getUser();
+    String username = user.getUsername();	// 当前登录用户昵称
+    R<UserInfo> result = remoteUserService.info(username, SecurityConstants.FROM_IN);
+    UserInfo userInfo = result.getData();
+    equipmentWash.setUpdateId(userInfo.getSysUser().getUserId());
     equipmentWash.setDelFlag("1");
     return new R<>(equipmentWashService.updateById(equipmentWash));
   }
