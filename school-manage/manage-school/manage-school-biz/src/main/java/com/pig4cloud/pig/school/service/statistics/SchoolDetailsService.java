@@ -1,5 +1,7 @@
 package com.pig4cloud.pig.school.service.statistics;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pig4cloud.pig.school.api.entity.check.EarlyAlarm;
 import org.apache.ibatis.annotations.Param;
@@ -26,10 +28,15 @@ public interface SchoolDetailsService extends IService<EarlyAlarm> {
   //设备信息
   Map getDeviceInformation(@Param("map") Map map);
   //食材信息
-  List getIngredientsInformation(@Param("map") Map map);
+  IPage<List<Map>> getIngredientsInformation(Page page, @Param("map") Map map);
   //台账信息
   Map getAccount(@Param("map") Map map);
   //历史报警
-  Map getHistoricalAlarm(@Param("map") Map map);
-
+  IPage<List<Map>> getHistoricalAlarm(Page page,@Param("map") Map map);
+  //历史报警(供应商)详情
+  Map getHistoryDetails(@Param("map") Map map);
+  //历史报警(食材)详情
+  Map getHistoryFood(@Param("map") Map map);
+  //历史报警(人员)详情
+  Map getHistoryMan(@Param("map") Map map);
 }

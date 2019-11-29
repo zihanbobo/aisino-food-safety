@@ -149,7 +149,7 @@ public class RemoteStatisticsServiceFallbackImpl implements RemoteStatisticsServ
   }
 
   @Override
-  public R getIngredientsInformation(String schoolId,String startingTime,String endTime, String from) {
+  public R getIngredientsInformation(Integer page, Integer size,String schoolId,String startingTime,String endTime, String from) {
     log.error("feign 获得食材信息失败:{}", schoolId, cause);
     return null;
   }
@@ -161,8 +161,26 @@ public class RemoteStatisticsServiceFallbackImpl implements RemoteStatisticsServ
   }
 
   @Override
-  public R getHistoricalAlarm(String schoolId, String year,String from) {
+  public R getHistoricalAlarm(Integer page, Integer size,String schoolId,String from) {
     log.error("feign 获得历史报警失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getHistoryFood(String schoolId, Integer iswarning, Integer warningId, String from) {
+    log.error("feign 获得历史报警详情(食材)失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getHistoryDetails(String schoolId,Integer iswarning,Integer warningId, String from) {
+    log.error("feign 获得历史报警详情(供应商)失败:{}", schoolId, cause);
+    return null;
+  }
+
+  @Override
+  public R getHistoryMan(String schoolId, Integer iswarning, Integer warningId, String from) {
+    log.error("feign 获得历史报警详情(人员)失败:{}", schoolId, cause);
     return null;
   }
 
@@ -173,24 +191,24 @@ public class RemoteStatisticsServiceFallbackImpl implements RemoteStatisticsServ
   }
 
   @Override
-  public R getWarnings(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
-                       String regionalLevel, String areaCode,Integer Type, String from) {
+  public R getWarnings(String dealWith,Integer WarningInfor,String schoolName,String startingTime,String endTime,Integer page,
+                       Integer size,String regionalLevel, String areaCode,Integer Type, String from) {
     log.error("feign 获得全部预警失败:{}", Type, cause);
     return null;
   }
 
   @Override
-  public R getNotReceived(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
-                          String regionalLevel, String areaCode,Integer Type, String from) {
-    log.error("feign 获得未接收预警失败:{}", Type, cause);
+  public R getAlarmType(String year, String regionalLevel, String areaCode, String from) {
+    log.error("feign 获得报警类别失败:{}",  cause);
     return null;
   }
 
   @Override
-  public R getReceivedWarnings(Integer WarningInfor,String schoolName,String startingTime,String endTime,String year,
-                               String regionalLevel, String areaCode,Integer Type, String from) {
-    log.error("feign 获得已接受预警失败:{}", Type, cause);
+  public R getAlarms(Integer AlarmInfor, String schoolName, String startingTime, String endTime,
+                     Integer page, Integer size, String regionalLevel, String areaCode, Integer Type, String from) {
+    log.error("feign 获得全部报警失败:{}", Type, cause);
     return null;
   }
+
 
 }

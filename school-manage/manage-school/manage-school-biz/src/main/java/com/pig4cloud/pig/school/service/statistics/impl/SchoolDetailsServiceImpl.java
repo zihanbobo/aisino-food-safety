@@ -1,14 +1,12 @@
 package com.pig4cloud.pig.school.service.statistics.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pig4cloud.pig.school.api.entity.check.EarlyAlarm;
-import com.pig4cloud.pig.school.mapper.AnalysisDataMapper;
 import com.pig4cloud.pig.school.mapper.SchoolDetailsMapper;
-import com.pig4cloud.pig.school.service.statistics.AnalysisDataService;
 import com.pig4cloud.pig.school.service.statistics.SchoolDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 
@@ -97,9 +95,8 @@ public class SchoolDetailsServiceImpl extends ServiceImpl<SchoolDetailsMapper, E
 
   //食材信息
   @Override
-  public List getIngredientsInformation(Map map) {
-
-    return baseMapper.getIngredientsInformation( map );
+  public IPage<List<Map>> getIngredientsInformation(Page page, Map map) {
+    return baseMapper.getIngredientsInformation( page,map );
   }
 
   //台账信息
@@ -110,13 +107,116 @@ public class SchoolDetailsServiceImpl extends ServiceImpl<SchoolDetailsMapper, E
 
   //历史报警
   @Override
-  public Map getHistoricalAlarm(Map map) {
-    Map a = new HashMap();
-    List historicalAlarm = baseMapper.getHistoricalAlarm( map );//报警信息
-    List getHistoricalWarning = baseMapper.getHistoricalWarning( map );//预警信息
-    a.put( "historicalAlarm", historicalAlarm);
-    a.put( "getHistoricalWarning", getHistoricalWarning);
-    return a;
+  public IPage<List<Map>> getHistoricalAlarm(Page page,Map map) {
+    //报警信息
+    IPage<List<Map>> historicalAlarm =  baseMapper.getHistoricalAlarm(page, map );
+    List<List<Map>> records = historicalAlarm.getRecords();
+    for(int i=0;i<records.size();i++) {
+      Map maps = (Map) records.get( i );
+      Object id = maps.get( "alarm" );
+      Map b = new HashMap();
+      b.put( "supId", id );
+      Map schoolName = baseMapper.getSchoolName( b );
+      maps.put( "school", schoolName );
+    }
+    return historicalAlarm;
   }
 
+  //历史报警(供应商)详情
+  @Override
+  public Map getHistoryDetails(Map map) {
+    Integer iswarning = (Integer) map.get( "iswarning" );
+
+    Map a = new HashMap();
+    if (iswarning== 0){
+      //是预警
+
+      Map basicInformationW = baseMapper.getBasicInformationW( map );
+      Object early_warning = basicInformationW.get( "early_warning" );
+      map.put( "early_warning", early_warning);
+      Integer sameWarning = baseMapper.getSameWarning( map );
+      a.put( "sameWarning",sameWarning );
+      a.put( "basicInformationW" ,basicInformationW);
+      Object sup_id = basicInformationW.get( "sup_id" );
+      Map map1 = new HashMap<>();
+      map1.put( "supId",sup_id );
+      Map schoolName = baseMapper.getSchoolName( map1 );
+      a.put( "schoolName",schoolName );
+    }
+    else {
+      //是报警
+      Map basicInformationA = baseMapper.getBasicInformationA( map );
+      Object alarm = basicInformationA.get( "alarm" );
+      map.put( "alarm", alarm);
+      Integer sameAlarm = baseMapper.getSameAlarm( map );
+      a.put( "sameWarning",sameAlarm );
+      a.put( "basicInformationA" ,basicInformationA);
+      Object sup_id = basicInformationA.get( "sup_id" );
+      Map map1 = new HashMap<>();
+      map1.put( "supId",sup_id );
+      Map schoolName = baseMapper.getSchoolName( map1 );
+      a.put( "schoolName",schoolName );
+    }
+    List historyAlarm = baseMapper.getHistoryDetailsA( map );
+    List historyWarning = baseMapper.getHistoryDetailsW( map );
+    a.put( "historyAlarm", historyAlarm);
+    a.put( "historyWarning",historyWarning );
+    return a;
+  }
+  //历史报警(食材)详情
+  @Override
+  public Map getHistoryFood(Map map) {
+    Integer iswarning = (Integer) map.get( "iswarning" );
+    if (iswarning== 0){
+      //是预警
+      Map foodInformationW = baseMapper.getFoodInformationW( map );
+      Object early_warning = foodInformationW.get( "early_warning" );
+      Object foodId = foodInformationW.get( "foodId" );
+      map.put( "early_warning", early_warning);
+      map.put( "foodId", foodId);
+      List<Map> schNameFood = baseMapper.getSchNameFood( map );
+      Integer sameWarning = baseMapper.getSameWarning( map );
+      foodInformationW.put( "schNameFood",schNameFood );
+      foodInformationW.put( "sameWarning",sameWarning );
+      return foodInformationW;
+
+    }
+    else {
+      //是报警
+      Map foodInformationA = baseMapper.getFoodInformationA( map );
+      Object alarm = foodInformationA.get( "alarm" );
+      Object foodId = foodInformationA.get( "foodId" );
+      map.put( "foodId", foodId);
+      map.put( "alarm", alarm);
+      List<Map> schNameFood = baseMapper.getSchNameFood( map );
+      Integer sameAlarm = baseMapper.getSameAlarm( map );
+      foodInformationA.put( "sameWarning",sameAlarm );
+      foodInformationA.put( "schNameFood",schNameFood );
+      return foodInformationA;
+    }
+  }
+  //历史报警(人员)详情
+  @Override
+  public Map getHistoryMan(Map map) {
+    Integer iswarning = (Integer) map.get( "iswarning" );
+    if (iswarning== 0){
+      //是预警
+      Map manInformationW = baseMapper.getManInformationW( map );
+      Object early_warning = manInformationW.get( "early_warning" );
+      map.put( "early_warning", early_warning);
+      Integer sameWarning = baseMapper.getSameWarning( map );
+      manInformationW.put( "sameWarning",sameWarning );
+      return manInformationW;
+
+    }
+    else {
+      //是报警
+      Map manInformationA = baseMapper.getManInformationA( map );
+      Object alarm = manInformationA.get( "alarm" );
+      map.put( "alarm", alarm);
+      Integer sameAlarm = baseMapper.getSameAlarm( map );
+      manInformationA.put( "sameWarning",sameAlarm );
+      return manInformationA;
+    }
+  }
 }

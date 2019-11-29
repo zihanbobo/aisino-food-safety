@@ -1,5 +1,7 @@
 package com.pig4cloud.pig.school.service.statistics.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pig4cloud.pig.school.api.entity.check.EarlyAlarm;
 import com.pig4cloud.pig.school.mapper.WarningsMapper;
@@ -37,10 +39,11 @@ public class WarningsServiceImpl extends ServiceImpl<WarningsMapper, EarlyAlarm>
   }
   //所有预警
   @Override
-  public List<Map> getWarnings(Map map) {
-    List<Map> warnings = baseMapper.getWarnings( map );
-    for(int i=0;i<warnings.size();i++){
-      Map map1 = warnings.get( i );
+  public IPage<List<Map>> getWarnings(Page page, Map map) {
+    IPage<List<Map>> warnings = baseMapper.getWarnings( page, map );
+    List<List<Map>> records = warnings.getRecords();
+    for(int i=0;i<records.size();i++){
+      Map map1 = (Map)records.get( i );
       Object value = map1.get( "VALUE" );
       Object schoolId = map1.get( "SchoolId" );
       map.put( "schoolId", schoolId);
@@ -52,18 +55,41 @@ public class WarningsServiceImpl extends ServiceImpl<WarningsMapper, EarlyAlarm>
       map1.put( "sameWarning",sameWarning );
       map1.put( "school",school );
       map1.put( "warning", warning);
-      warnings.set( i,map1 );
+      /*List a=new ArrayList(  );
+      a.add(map1);
+      records.set( i,a );*/
     }
     return warnings;
   }
-  //没接收预警
+
+
   @Override
-  public List getNotReceived(Map map) {
-    return baseMapper.getNotReceived( map );
+  public Map getAlarmType(Map map) {
+    return null;
   }
-  //已接收预警
+//全部报警
   @Override
-  public List getReceivedWarnings(Map map) {
-    return baseMapper.getReceivedWarnings( map );
+  public IPage<List<Map>> getAlarms(Page page,Map map) {
+    IPage<List<Map>> warnings = baseMapper.getAlarms( page,map );
+    List<List<Map>> records = warnings.getRecords();
+    for(int i=0;i<records.size();i++){
+      Map map1 = (Map)records.get( i );
+      Object value = map1.get( "VALUE" );
+      Object schoolId = map1.get( "SchoolId" );
+      map.put( "schoolId", schoolId);
+      map.put( "WarningInfor", value);
+      Integer sameWarning = baseMapper.getSameAlarm( map );
+      Map associationWarning = baseMapper.getAssociationAlarm( map );
+      Object school = associationWarning.get( "school" );
+      Object warning = associationWarning.get( "warning" );
+      map1.put( "sameWarning",sameWarning );
+      map1.put( "school",school );
+      map1.put( "warning", warning);
+     /* List a=new ArrayList(  );
+      a.add(map1);
+      records.set( i,a );*/
+    }
+    return warnings;
   }
+
 }

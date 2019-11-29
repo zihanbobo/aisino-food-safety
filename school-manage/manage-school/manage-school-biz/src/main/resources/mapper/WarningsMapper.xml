@@ -26,6 +26,27 @@
       a.type = 'early_warning'
   </select>
 
+  <!--报警类别-->
+  <select id="getAlarmType" resultType="Map">
+    SELECT
+    VALUE
+      ,
+    CASE
+
+      WHEN `value` IN ( '1', '2' ) THEN
+      '证照报警'
+      WHEN `value` IN ( '3','4' ) THEN
+      '人员报警'
+      WHEN `value` IN ( '5','6','7' ) THEN
+      '食材报警' ELSE ''
+      END AS type,
+      a.description
+    FROM
+      sys_dict a
+    WHERE
+      a.type = 'alarm'
+  </select>
+
 <!--报警类别统计-->
   <select id="getAlarmTotalByYear" resultType="Map">
     select ifnull(sum(a.personTotal),0) as 'personTotal',ifnull(sum(a.cardTotal),0) as 'cardTotal',ifnull(sum(a.foodTotal),0) as 'foodTotal' from (
@@ -44,9 +65,9 @@
     ) b
     <where>
       a.school_id=b.id and a.del_flag = '0' and b.del_flag='0'
-      <if test="map.year != null">
+      <!--<if test="map.year != null">
         and DATE_FORMAT(a.alarm_time,'%Y') = #{map.year}
-      </if>
+      </if>-->
     </where>
     )a
   </select>
@@ -69,9 +90,9 @@
     ) b
     <where>
       a.school_id=b.id and a.del_flag = '0' and b.del_flag='0'
-      <if test="map.year != null">
+      <!--<if test="map.year != null">
         and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-      </if>
+      </if>-->
     </where>
     )a
   </select>
@@ -82,7 +103,14 @@
     c.sch_name as schoolName,
     c.supplier_name as supplierName,
     c.early_time as time,
-    '未接收' as Status,
+    CASE
+
+    WHEN c.deal_with IN ( '1' ) THEN
+    '未查看'
+    WHEN c.deal_with IN ('2') THEN
+    '已查看'
+    ELSE ''
+    END as Status,
     c.school_id as SchoolId
     from (SELECT *
     from ck_early_warning a,
@@ -99,11 +127,14 @@
     <if test="map.startingTime != null&amp;map.endTime != null ">
     AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
     </if>
-    <if test="map.year != null">
+    <!--<if test="map.year != null">
       and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-    </if>
+    </if>-->
     <if test="map.WarningInfor != null">
     and a.early_warning =#{map.WarningInfor}
+    </if>
+    <if test="map.dealWith != null">
+      and a.deal_with =#{map.dealWith}
     </if>
     </where>
     )c,
@@ -149,9 +180,6 @@
       <if test="map.startingTime != null&amp;map.endTime != null ">
         AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
       </if>
-      <if test="map.year!= null">
-        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-      </if>
       <if test="map.WarningInfor != null">
         and a.early_warning =#{map.WarningInfor}
       </if>
@@ -178,27 +206,12 @@
       <if test="map.startingTime != null&amp;map.endTime != null ">
         AND a.early_time BETWEEN #{map.startingTime} AND #{map.endTime}
       </if>
-      <if test="map.year != null">
-        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-      </if>
       <if test="map.WarningInfor != null">
         and a.early_warning =#{map.WarningInfor}
       </if>
     </where>
 
   </select>
-
-
-  <!--没接收预警-->
-  <select id="getNotReceived" resultType="Map">
-
-  </select>
-
-  <!--已接收预警-->
-  <select id="getReceivedWarnings" resultType="Map">
-
-  </select>
-
 
 
 </mapper>

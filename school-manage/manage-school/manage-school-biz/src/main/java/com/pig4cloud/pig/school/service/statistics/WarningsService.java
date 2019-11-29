@@ -1,5 +1,7 @@
 package com.pig4cloud.pig.school.service.statistics;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pig4cloud.pig.school.api.entity.check.EarlyAlarm;
 import org.apache.ibatis.annotations.Param;
@@ -12,9 +14,10 @@ public interface WarningsService extends IService<EarlyAlarm> {
   //预警类别
   Map getWarningType(@Param("map") Map map);
   //所有预警
-  List getWarnings(@Param("map") Map map);
-  //没接收预警
-  List getNotReceived(@Param("map") Map map);
-  //已接收预警
-  List getReceivedWarnings(@Param("map") Map map);
+  IPage<List<Map>> getWarnings(Page page, @Param("map") Map map);
+  //报警类别
+  Map getAlarmType(@Param("map") Map map);
+  //所有报警
+  IPage<List<Map>> getAlarms(Page page,@Param("map") Map map);
+
 }

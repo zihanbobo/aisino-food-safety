@@ -7,7 +7,7 @@
   <!--学校信息上-->
   <select id="getSchoolInformation" resultType="Map">
     select a.id as id,a.sch_name as schoolName,a.sch_address as schAddress,
-    getRegionStr(a.sch_area) as schArea,b.label as 'schoolType',c.label as 'officeNature ' from se_school a
+    getRegionStr(a.sch_area) as schArea,b.label as 'schoolType',c.label as 'officeNature',a.sch_pic as pic from se_school a
     left join (
     select * from sys_dict where del_flag='0' and type='school_type'
     ) b on b.value = a.sch_city
@@ -96,24 +96,7 @@
     </where>
   </select>
 
-  <select id="getSchoolName" resultType="Map">
-    SELECT a.id,a.sch_name as schName
-      from se_school a,
-      (select
-         b.school_id
-          from sup_main_filing b
-         <where>
-         <if test="map.supId != null">
-              b.id=#{map.supId}
-         </if>
-            and b.del_flag='0'
-         </where>
-            )
-            c
-            <where>a.del_flag='0'
-            and c.school_id=a.id
-            </where>
-</select>
+
 
   <!--许可数-->
   <select id="getLicense" resultType="Map">
@@ -352,12 +335,44 @@
     ) b ON b.filing_id = vsi.food_id
 
   </select>
+  <!--食材信息总条数-->
+  <select id="getIngredientsInformationsum" resultType="Integer">
+    SELECT
+    count(vsi.food_id)  as foodIds
+    FROM
+    view_sup_ingredients_filing vsi
+    RIGHT join
+    (
+    SELECT
+    a.pur_time,
+    CASE
+    WHEN ppf.is_qualified='1' THEN
+    '合格'
+    ELSE
+    '不合格'
+    END as qualified,
+    ppf.filing_id
+    FROM
+    pur_purchase_filing ppf
+    LEFT JOIN ( SELECT * FROM pur_purchase_main ppm WHERE ppm.del_flag = 0
+    <if test="map.schoolId != null">
+      and ppm.school_id = #{map.schoolId}
+    </if>
+    ) a ON a.id = ppf.pur_id
+    <where>
+      ppf.is_del = 0
+      <if test="map.startingTime != null&amp;map.endTime != null ">
+        AND a.pur_time BETWEEN #{map.startingTime} AND #{map.endTime}
+      </if>
+    </where>
+    ) b ON b.filing_id = vsi.food_id
+  </select>
 
 
   <!--台账统计--><!--返回是map-->
   <select id="getAccount" resultType="Map">
     select
-    (select ifnull(sum(a.isSample),0)as 'sampleRecord' from (
+    (select round(ifnull(ifnull(sum(a.isSample),0)/count(*),0),2) as 'sampleRecord' from (
     select a.school_id as schoolId,c.sch_name as schoolName,a.rd_date as rdDate,
     CASE WHEN max(b.sr_type) ='0' THEN 0
     WHEN (min(b.sr_type) ='0' AND max(b.sr_type) = '1') THEN 1
@@ -371,6 +386,7 @@
     left join se_school c on c.id = a.school_id
     <where>
       1=1 and a.del_flag = '0'
+      and b.sr_startdate=DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND a.school_id = #{map.schoolId}
       </if>
@@ -380,27 +396,42 @@
     ) a )as'sampleRecord',
 
 
+    (select count(*) from sl_accompany_dinner
+    <where>
+      1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
+      <if test="map.schoolId != null">
+        AND school_id = #{map.schoolId}
+      </if>
+    </where>
+    ) as 'accompanyDinner',
+
+    (SELECT
+    ifnull( meal_time, 0 )
+    FROM
+    se_school
+    <where>
+    del_flag = '0'
+    <if test="map.schoolId != null">
+      AND id  = #{map.schoolId}
+    </if>
+    </where>
+    ) as 'meal',
+
     (select count(*) from sl_dishwash_note
     <where>
       1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND school_id = #{map.schoolId}
       </if>
     </where>
     ) as 'dishwashNote',
 
-
-    (select count(*) from sl_accompany_dinner
-    <where>
-      1=1 and del_flag = '0'
-      <if test="map.schoolId != null">
-        AND school_id = #{map.schoolId}
-      </if>
-    </where>
-    ) as 'accompanyDinner',
     (select count(*) from sl_food_additive
     <where>
       1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND school_id = #{map.schoolId}
       </if>
@@ -411,6 +442,7 @@
     (select count(*) from sl_food_additive
     <where>
       1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND school_id = #{map.schoolId}
       </if>
@@ -419,6 +451,7 @@
     (select count(*) from sl_diningarea_wash
     <where>
       1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND school_id = #{map.schoolId}
       </if>
@@ -428,13 +461,12 @@
     (select count(*) from sl_kitwaste_treatment
     <where>
       1=1 and del_flag = '0'
+      and create_time =DATE_FORMAT(NOW(),'%Y-%m-%d')
       <if test="map.schoolId != null">
         AND school_id = #{map.schoolId}
       </if>
     </where>
     ) as 'kitwasteTreatment'
-
-
   </select>
 
 
@@ -465,11 +497,18 @@
     c.label AS label,
     a.alarm_time AS time,
     a.supplier_name AS supplier,
-    b.sch_name AS schoolName,
-    b.id AS schoolId
-
+    a.sch_name AS schoolName,
+    c.description,
+    d.bulicense_pic,
+    d.permit_pic,
+    e.health_pic,
+    e.identity_pic,
+    f.food_pic,
+    c.value,
+    a.alarm,
+    a.school_id AS schoolId,
+    a.id
     from ck_early_alarm a
-    LEFT JOIN ( SELECT a.* FROM se_school a WHERE 1 = 1 AND a.del_flag = '0' ) b ON b.id = a.school_id
     LEFT JOIN (
     SELECT
     *
@@ -484,20 +523,17 @@
     ) c ON c.
     VALUE
     = a.alarm
+    left  JOIN sup_main_filing d on d.id=a.sup_id
+    left  JOIN sys_user e on e.user_id=a.human_id
+    left  JOIN view_sup_ingredients_filing f on f.food_id=a.pur_foodid
     <where>
       1=1 and a.del_flag = '0'
-      <if test="map.year != null">
-        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-      </if>
+      and YEAR(a.alarm_time)=YEAR(NOW())
       <if test="map.schoolId != null">
-        AND b.id = #{map.schoolId}
+        AND a.school_id = #{map.schoolId}
       </if>
     </where>
-
-  </select>
-
-  <!--历史预警信息-->
-  <select id="getHistoricalWarning" resultType="Map">
+    union all
     select
     CASE
 
@@ -523,10 +559,18 @@
     d.description AS title,
     a.early_time AS time,
     a.supplier_name,
-    b.sch_name AS schoolName,
-    b.id AS schoolId
+    a.sch_name AS schoolName,
+    d.description,
+    g.bulicense_pic,
+    g.permit_pic,
+    e.health_pic,
+    e.identity_pic,
+    f.food_pic,
+    d.value,
+    a.early_warning as alarm,
+    a.school_id AS schoolId,
+    a.id
     from ck_early_warning a
-    LEFT JOIN ( SELECT a.* FROM se_school a WHERE 1 = 1 AND a.del_flag = '0' ) b ON b.id = a.school_id
     LEFT JOIN (
     SELECT
     *
@@ -541,16 +585,525 @@
     ) d ON d.
     VALUE
     = a.early_warning
+    left  JOIN sup_main_filing g on g.id=a.sup_id
+    left  JOIN sys_user e on e.user_id=a.human_id
+    left  JOIN view_sup_ingredients_filing f on f.food_id=a.pur_foodid
     <where>
       1=1 and a.del_flag = '0'
-      <if test="map.year != null">
-        and DATE_FORMAT(a.early_time,'%Y') = #{map.year}
-      </if>
+      and YEAR(a.early_time)=YEAR(NOW())
       <if test="map.schoolId != null">
-        AND b.id = #{map.schoolId}
+        AND a.school_id = #{map.schoolId}
       </if>
     </where>
-
+  </select>
+<!--根据供应商id获得关联学校-->
+  <select id="getSchoolName" resultType="Map">
+    SELECT a.id,a.sch_name as schName
+    from se_school a,
+    (select
+    b.school_id
+    from sup_main_filing b
+    <where>
+      <if test="map.supId != null">
+        b.id=#{map.supId}
+      </if>
+      and b.del_flag='0'
+    </where>
+    )
+    c
+    <where>a.del_flag='0'
+      and c.school_id=a.id
+    </where>
+  </select>
+<!--历史报警详情供应商关联风险-->
+  <select id="getHistoryDetailsW" resultType="Map">
+    select a.value,a.label,a.description,ifnull(b.total,0) as total from (
+    select * from  sys_dict a where a.del_flag= '0' and a.type = 'early_warning' and a.value in ('1','2')
+    )a left join (
+    select a.early_warning,count(*) as 'total' from ck_early_warning a
+    <where>
+     1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+    group by a.early_warning
+    ) b on b.early_warning =a.value
   </select>
 
+  <!--历史预警详情供应商关联风险-->
+  <select id="getHistoryDetailsA" resultType="Map">
+    select a.value,a.label,a.description,ifnull(b.total,0) as total from (
+      select * from  sys_dict a where a.del_flag= '0' and a.type = 'alarm' and a.value in ('1','2')
+    )a left join (
+      select a.alarm,count(*) as 'total' from ck_early_alarm a
+    <where>
+      1=1 and a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+    </where>
+      group by a.alarm
+    ) b on b.alarm =a.value
+  </select>
+
+
+<!--历史预警基础信息(根据学校id和预警id号)供应商-->
+  <select id="getBasicInformationW" resultType="Map">
+    SELECT
+      d.*,
+      c.sch_name AS schoolName,
+      c.supplier_name AS supplierName,
+      c.early_time AS time,
+      c.early_warning,
+      c.sup_id,
+      c.school_id AS SchoolId
+    FROM
+      (
+    SELECT
+      *
+    FROM
+      ck_early_warning a,
+      (
+    SELECT
+      a.id AS sch_id,
+      a.sch_name AS schoolName
+    FROM
+      se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+      AND a.id = #{map.schoolId}
+      </if>
+    </where>
+      ) b
+    WHERE
+      a.del_flag = '0'
+      AND a.school_id = b.sch_id
+      <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+      </if>
+      ) c,
+      (
+    SELECT
+    VALUE
+      ,
+    CASE
+
+      WHEN `value` IN ( '1', '2' ) THEN
+      '证照预警'
+      WHEN `value` IN ( 3 ) THEN
+      '人员预警'
+      WHEN `value` IN ( '4' ) THEN
+      '食材预警' ELSE ''
+      END AS type,
+      a.description
+    FROM
+      sys_dict a
+    WHERE
+      a.type = 'early_warning'
+      ) d
+    WHERE
+      1 = 1
+    AND c.early_warning = d.`VALUE`
+  </select>
+
+  <!--历史报警基础信息(根据学校id和预警id号)供应商-->
+  <select id="getBasicInformationA" resultType="Map">
+    SELECT
+    d.*,
+    c.sch_name AS schoolName,
+    c.supplier_name AS supplierName,
+    c.alarm_time AS time,
+    c.alarm,
+    c.sup_id,
+    c.school_id AS SchoolId
+    FROM
+    (
+    SELECT
+    *
+    FROM
+    ck_early_alarm a,
+    (
+    SELECT
+    a.id AS sch_id,
+    a.sch_name AS schoolName
+    FROM
+    se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.id = #{map.schoolId}
+      </if>
+    </where>
+    ) b
+    WHERE
+    a.del_flag = '0'
+    AND a.school_id = b.sch_id
+    <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+    </if>
+    ) c,
+    (
+    SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照报警'
+    WHEN `value` IN ('3','4' ) THEN
+    '人员报警'
+    WHEN `value` IN ( '5','6','7' ) THEN
+    '食材报警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'alarm'
+    ) d
+    WHERE
+    1 = 1
+    AND c.alarm = d.`VALUE`
+  </select>
+
+
+
+  <!--同一预警数量-->
+  <select id="getSameWarning" resultType="Integer">
+    select
+    a.school_id AS schoolId,
+    count(a.id) as number
+    from ck_early_warning a
+    LEFT JOIN (
+    SELECT
+    *
+    FROM
+    sys_dict a
+    WHERE
+    1 = 1
+    AND a.del_flag = '0'
+    AND a.type = 'early_warning'
+    ORDER BY
+    a.sort
+    ) d ON d.
+    VALUE
+    = a.early_warning
+    left  JOIN sup_main_filing g on g.id=a.sup_id
+    left  JOIN sys_user e on e.user_id=a.human_id
+    left  JOIN view_sup_ingredients_filing f on f.food_id=a.pur_foodid
+    <where>
+      1=1 and a.del_flag = '0'
+      and YEAR(a.early_time)=YEAR(NOW())
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+      <if test="map.early_warning != null">
+        AND a.early_warning = #{map.early_warning}
+      </if>
+    </where>
+  </select>
+
+  <!--同一报警数量-->
+  <select id="getSameAlarm" resultType="Integer">
+    select
+    a.school_id AS schoolId,
+    count(a.id) as number
+    from ck_early_alarm a
+    LEFT JOIN (
+    SELECT
+    *
+    FROM
+    sys_dict a
+    WHERE
+    1 = 1
+    AND a.del_flag = '0'
+    AND a.type = 'alarm'
+    ORDER BY
+    a.sort
+    ) d ON d.
+    VALUE
+    = a.alarm
+    left  JOIN sup_main_filing g on g.id=a.sup_id
+    left  JOIN sys_user e on e.user_id=a.human_id
+    left  JOIN view_sup_ingredients_filing f on f.food_id=a.pur_foodid
+    <where>
+      1=1 and a.del_flag = '0'
+      and YEAR(a.alarm_time)=YEAR(NOW())
+      <if test="map.schoolId != null">
+        AND a.school_id = #{map.schoolId}
+      </if>
+      <if test="map.alarm != null">
+        AND a.alarm = #{map.alarm}
+      </if>
+    </where>
+  </select>
+  <!--人员基础信息预警-->
+  <select id="getManInformationW" resultType="Map">
+    SELECT
+    d.*,
+    c.sch_name AS schoolName,
+    c.supplier_name AS supplierName,
+    c.early_time AS time,
+    c.early_warning,
+    c.human,
+    c.sup_id,
+    c.school_id AS SchoolId
+    FROM
+    (
+    SELECT
+    *
+    FROM
+    ck_early_warning a,
+    (
+    SELECT
+    a.id AS sch_id,
+    a.sch_name AS schoolName
+    FROM
+    se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.id = #{map.schoolId}
+      </if>
+    </where>
+    ) b
+    WHERE
+    a.del_flag = '0'
+    AND a.school_id = b.sch_id
+    <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+    </if>
+    ) c,
+    (
+    SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照预警'
+    WHEN `value` IN ( 3 ) THEN
+    '人员预警'
+    WHEN `value` IN ( '4' ) THEN
+    '食材预警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'early_warning'
+    ) d
+    WHERE
+    1 = 1
+    AND c.early_warning = d.`VALUE`
+  </select>
+
+  <!--人员基础信息报警-->
+  <select id="getManInformationA" resultType="Map">
+    SELECT
+    d.*,
+    c.sch_name AS schoolName,
+    c.supplier_name AS supplierName,
+    c.alarm_time AS time,
+    c.alarm,
+    c.human,
+    c.sup_id,
+    c.school_id AS SchoolId
+    FROM
+    (
+    SELECT
+    *
+    FROM
+    ck_early_alarm a,
+    (
+    SELECT
+    a.id AS sch_id,
+    a.sch_name AS schoolName
+    FROM
+    se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.id = #{map.schoolId}
+      </if>
+    </where>
+    ) b
+    WHERE
+    a.del_flag = '0'
+    AND a.school_id = b.sch_id
+    <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+    </if>
+    ) c,
+    (
+    SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照报警'
+    WHEN `value` IN ('3','4' ) THEN
+    '人员报警'
+    WHEN `value` IN ( '5','6','7' ) THEN
+    '食材报警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'alarm'
+    ) d
+    WHERE
+    1 = 1
+    AND c.alarm = d.`VALUE`
+  </select>
+
+  <!--食材基础信息预警-->
+  <select id="getFoodInformationW" resultType="Map">
+    SELECT
+    d.*,
+    c.sch_name AS schoolName,
+    c.supplier_name AS supplierName,
+    c.early_time AS time,
+    c.early_warning,
+    e.foodName,
+    c.pur_foodid as foodId,
+    c.school_id AS SchoolId
+    FROM
+    (
+    SELECT
+    *
+    FROM
+    ck_early_warning a,
+    (
+    SELECT
+    a.id AS sch_id,
+    a.sch_name AS schoolName
+    FROM
+    se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.id = #{map.schoolId}
+      </if>
+    </where>
+    ) b
+    WHERE
+    a.del_flag = '0'
+    AND a.school_id = b.sch_id
+    <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+    </if>
+    ) c,
+    (
+    SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照预警'
+    WHEN `value` IN ( 3 ) THEN
+    '人员预警'
+    WHEN `value` IN ( '4' ) THEN
+    '食材预警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'early_warning'
+    ) d,
+    view_sup_ingredients_filing e
+    WHERE
+    1 = 1
+    AND c.early_warning = d.`VALUE`
+    and c.pur_foodid=e.food_id
+  </select>
+
+  <!--食材基础信息报警-->
+  <select id="getFoodInformationA" resultType="Map">
+    SELECT
+    d.*,
+    c.sch_name AS schoolName,
+    c.supplier_name AS supplierName,
+    c.alarm_time AS time,
+    c.alarm,
+    e.foodName,
+    c.pur_foodid as foodId,
+    c.school_id AS SchoolId
+    FROM
+    (
+    SELECT
+    *
+    FROM
+    ck_early_alarm a,
+    (
+    SELECT
+    a.id AS sch_id,
+    a.sch_name AS schoolName
+    FROM
+    se_school a
+    <where>
+      1 = 1
+      AND a.del_flag = '0'
+      <if test="map.schoolId != null">
+        AND a.id = #{map.schoolId}
+      </if>
+    </where>
+    ) b
+    <where>
+    a.del_flag = '0'
+    AND a.school_id = b.sch_id
+    <if test="map.warningId != null">
+      and a.id=#{map.warningId}
+    </if>
+    </where>
+    ) c,
+    (
+    SELECT
+    VALUE
+    ,
+    CASE
+
+    WHEN `value` IN ( '1', '2' ) THEN
+    '证照报警'
+    WHEN `value` IN ('3','4' ) THEN
+    '人员报警'
+    WHEN `value` IN ( '5','6','7' ) THEN
+    '食材报警' ELSE ''
+    END AS type,
+    a.description
+    FROM
+    sys_dict a
+    WHERE
+    a.type = 'alarm'
+    ) d,
+    view_sup_ingredients_filing e
+    WHERE
+    1 = 1
+    AND c.alarm = d.`VALUE`
+    and c.pur_foodid=e.food_id
+  </select>
+
+  <!--食材所关联学校-->
+  <select id="getSchNameFood" resultType="Map">
+  SELECT schoolName
+    from
+    view_sup_ingredients_filing
+    <where>
+    1=1
+    <if test="map.foodId != null">
+        and food_id=#{map.foodId}
+    </if>
+    </where>
+  </select>
 </mapper>

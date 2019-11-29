@@ -207,14 +207,23 @@ public class StatisticsController {
   @GetMapping("/getIngredientsInformation")
   public R getIngredientsInformation(@RequestParam(value="schoolId")String schoolId,
                                      @RequestParam(value="startingTime",required = false)String startingTime,
-                                     @RequestParam(value="endTime",required = false)String endTime){
+                                     @RequestParam(value="endTime",required = false)String endTime,
+                                     @RequestParam(value="page",required = false)Integer page,//页码
+                                     @RequestParam(value="size",required = false)Integer size//条数
+                                     ){
     if(startingTime==null){
       startingTime = "1900-01-01";
     }
     if(endTime==null){
       endTime = "3333-01-01";
     }
-    return new R<>(remoteStatisticsService.getIngredientsInformation( schoolId, startingTime,endTime,SecurityConstants.FROM_IN ));
+    if(page==null){
+    page = 1;
+  }
+    if(size==null){
+      size = 10;
+  }
+    return new R<>(remoteStatisticsService.getIngredientsInformation( page,size,schoolId, startingTime,endTime,SecurityConstants.FROM_IN ));
   }
 
   //台账信息
@@ -224,14 +233,43 @@ public class StatisticsController {
   }
   //历史报警
   @GetMapping("/getHistoricalAlarm")
-  public R getHistoricalAlarm(@RequestParam(value="year")String year,@RequestParam(value="schoolId")String schoolId){
-    return new R<>(remoteStatisticsService.getHistoricalAlarm( schoolId, year,SecurityConstants.FROM_IN ));
+  public R getHistoricalAlarm(@RequestParam(value="page",required = false)Integer page,//页码<备用>
+                              @RequestParam(value="size",required = false)Integer size,//条数<备用>
+                              @RequestParam(value="schoolId")String schoolId){
+    if(page==null){
+      page = 1;
+    }
+    if(size==null){
+      size = 10;
+    }
+    return new R<>(remoteStatisticsService.getHistoricalAlarm( page,size,schoolId, SecurityConstants.FROM_IN ));
+  }
+  //历史详情(供应商)
+  @GetMapping("/getHistoryDetails")
+  public R getHistoryDetails(@RequestParam(value="schoolId")String schoolId,
+                             @RequestParam(value="iswarning")Integer iswarning,
+                             @RequestParam(value="warningId")Integer warningId){
+    return new R<>(remoteStatisticsService.getHistoryDetails( schoolId, iswarning,warningId,SecurityConstants.FROM_IN ));
+  }
+
+  //历史详情(食材)
+  @GetMapping("/getHistoryFood")
+  public R getHistoryFood(@RequestParam(value="schoolId")String schoolId,
+                             @RequestParam(value="iswarning")Integer iswarning,
+                             @RequestParam(value="warningId")Integer warningId){
+    return new R<>(remoteStatisticsService.getHistoryFood( schoolId, iswarning,warningId,SecurityConstants.FROM_IN ));
+  }
+  //历史详情(人员)
+  @GetMapping("/getHistoryMan")
+  public R getHistoryMan(@RequestParam(value="schoolId")String schoolId,
+                          @RequestParam(value="iswarning")Integer iswarning,
+                          @RequestParam(value="warningId")Integer warningId){
+    return new R<>(remoteStatisticsService.getHistoryMan( schoolId, iswarning,warningId,SecurityConstants.FROM_IN ));
   }
 
 
 
-
-  //预警信息
+  //预警和报警信息
 
   //预警类型
   @GetMapping("/getWarningType")
@@ -247,7 +285,9 @@ public class StatisticsController {
                        @RequestParam(value="schoolName",required = false)String schoolName,
                        @RequestParam(value="startingTime",required = false)String startingTime,
                        @RequestParam(value="endTime",required = false)String endTime,
-                       @RequestParam(value="year")String year,
+                       @RequestParam(value="page",required = false)Integer page,//页码<备用>
+                       @RequestParam(value="size",required = false)Integer size,//条数<备用>
+                       @RequestParam(value="dealWith",required = false)String dealWith,//是否已查看
                        @RequestParam(value="regionalLevel")String regionalLevel,
                        @RequestParam(value="areaCode")String areaCode,
                        @RequestParam(value="Type")Integer Type){
@@ -257,45 +297,48 @@ public class StatisticsController {
     if(endTime==null){
       endTime = "3333-01-01";
     }
-    R warningType = remoteStatisticsService.getWarnings( WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+    if(page==null){
+      page = 1;
+    }
+    if(size==null){
+      size = 10;
+    }
+    R warningType = remoteStatisticsService.getWarnings( dealWith,WarningInfor,schoolName,startingTime,endTime,page,size,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
     return new R<>(warningType.getData());
   }
-  //未接收预警
-  @GetMapping("/getNotReceived")
-  public R getNotReceived(@RequestParam(value="WarningInfor",required = false)Integer WarningInfor,
-                          @RequestParam(value="schoolName",required = false)String schoolName,
-                          @RequestParam(value="startingTime",required = false)String startingTime,
-                          @RequestParam(value="endTime",required = false)String endTime,
-                          @RequestParam(value="year")String year,
+
+  //报警类型
+  @GetMapping("/getAlarmType")
+  public R getAlarmType(@RequestParam(value="year")String year,
                           @RequestParam(value="regionalLevel")String regionalLevel,
-                          @RequestParam(value="areaCode")String areaCode,
-                          @RequestParam(value="Type")Integer Type){
-    if(startingTime==null){
-      startingTime = "1900-01-01";
-    }
-    if(endTime==null){
-      endTime = "3333-01-01";
-    }
-    R warningType = remoteStatisticsService.getNotReceived(WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+                          @RequestParam(value="areaCode")String areaCode){
+    R warningType = remoteStatisticsService.getAlarmType(year,regionalLevel,areaCode, SecurityConstants.FROM_IN );
     return new R<>(warningType.getData());
   }
-  //已接收预警
-  @GetMapping("/getReceivedWarnings")
-  public R getReceivedWarnings(@RequestParam(value="WarningInfor",required = false)Integer WarningInfor,
-                               @RequestParam(value="schoolName",required = false)String schoolName,
-                               @RequestParam(value="startingTime",required = false)String startingTime,
-                               @RequestParam(value="endTime",required = false)String endTime,
-                               @RequestParam(value="year")String year,
-                               @RequestParam(value="regionalLevel")String regionalLevel,
-                               @RequestParam(value="areaCode")String areaCode,
-                               @RequestParam(value="Type")Integer Type){
+  //全部报警
+  @GetMapping("/getAlarms")
+  public R getAlarms(@RequestParam(value="AlarmInfor",required = false)Integer AlarmInfor,
+                       @RequestParam(value="schoolName",required = false)String schoolName,
+                       @RequestParam(value="startingTime",required = false)String startingTime,
+                       @RequestParam(value="endTime",required = false)String endTime,
+                       @RequestParam(value="page",required = false)Integer page,//页码<备用>
+                       @RequestParam(value="size",required = false)Integer size,//条数<备用>
+                       @RequestParam(value="regionalLevel")String regionalLevel,
+                       @RequestParam(value="areaCode")String areaCode,
+                       @RequestParam(value="Type")Integer Type){
     if(startingTime==null){
       startingTime = "1900-01-01";
     }
     if(endTime==null){
       endTime = "3333-01-01";
     }
-    R warningType = remoteStatisticsService.getReceivedWarnings(WarningInfor,schoolName,startingTime,endTime,year,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
+    if(page==null){
+      page = 1;
+    }
+    if(size==null){
+      size = 10;
+    }
+    R warningType = remoteStatisticsService.getAlarms( AlarmInfor,schoolName,startingTime,endTime,page,size,regionalLevel,areaCode,Type, SecurityConstants.FROM_IN );
     return new R<>(warningType.getData());
   }
 

@@ -17,6 +17,8 @@
 package com.pig4cloud.pig.school.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.school.api.entity.check.EarlyAlarm;
 import org.apache.ibatis.annotations.Param;
 
@@ -66,9 +68,29 @@ public interface SchoolDetailsMapper extends BaseMapper<EarlyAlarm> {
   //台账统计
   Map getAccount(@Param("map") Map map);
   //食材信息
-  List getIngredientsInformation(@Param("map") Map map);
+  IPage<List<Map>> getIngredientsInformation(Page page, @Param("map") Map map);
   //报警信息
-  List getHistoricalAlarm(@Param("map") Map map);
-  //预警信息
-  List getHistoricalWarning(@Param("map") Map map);
+  IPage<List<Map>> getHistoricalAlarm(Page page,@Param("map") Map map);
+  //历史报警详情
+  List getHistoryDetailsA(@Param("map") Map map);
+  //历史预警详情
+  List getHistoryDetailsW(@Param("map") Map map);
+  //历史预警基础信息(供应商)
+  Map getBasicInformationW(@Param("map") Map map);
+  //历史报警基础信息(供应商)
+  Map getBasicInformationA(@Param("map") Map map);
+  //历史报警基础信息(人员)
+  Map getManInformationA(@Param("map") Map map);
+  //历史预警基础信息(人员)
+  Map getManInformationW(@Param("map") Map map);
+  //历史报警基础信息(食材)
+  Map getFoodInformationA(@Param("map") Map map);
+  //历史预警基础信息(食材)
+  Map getFoodInformationW(@Param("map") Map map);
+  //食材所关联学校
+  List<Map>getSchNameFood(@Param("map") Map map);
+  //同一预警数量
+  Integer getSameWarning(@Param("map") Map map);
+  //同一报警数量
+  Integer getSameAlarm(@Param("map") Map map);
 }

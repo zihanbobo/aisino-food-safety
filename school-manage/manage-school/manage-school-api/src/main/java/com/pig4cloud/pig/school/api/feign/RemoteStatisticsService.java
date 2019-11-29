@@ -142,7 +142,9 @@ public interface RemoteStatisticsService {
                       @RequestHeader(SecurityConstants.FROM) String from);
   //食材信息
   @GetMapping("/analysisData/getIngredientsInformation")
-  R getIngredientsInformation(@RequestParam(value = "schoolId") String schoolId,
+  R getIngredientsInformation(@RequestParam(value="page")Integer page,
+                              @RequestParam(value="size")Integer size,
+                              @RequestParam(value = "schoolId") String schoolId,
                               @RequestParam(value = "startingTime") String startingTime,
                               @RequestParam(value = "endTime") String endTime,
                @RequestHeader(SecurityConstants.FROM) String from);
@@ -152,9 +154,37 @@ public interface RemoteStatisticsService {
                        @RequestHeader(SecurityConstants.FROM) String from);
   //历史报警
   @GetMapping("/analysisData/getHistoricalAlarm")
-  R getHistoricalAlarm(@RequestParam(value = "schoolId") String schoolId,
-                       @RequestParam(value = "year") String year,
-                          @RequestHeader(SecurityConstants.FROM) String from);
+  R getHistoricalAlarm(@RequestParam(value="page")Integer page,
+                       @RequestParam(value="size")Integer size,
+                       @RequestParam(value = "schoolId") String schoolId,
+                       @RequestHeader(SecurityConstants.FROM) String from);
+
+
+//历史详情(食材)
+  @GetMapping("/analysisData/getHistoryFood")
+  R getHistoryFood(@RequestParam(value = "schoolId") String schoolId,
+                      @RequestParam(value = "iswarning") Integer iswarning,
+                      @RequestParam(value = "warningId") Integer warningId,
+               @RequestHeader(SecurityConstants.FROM) String from);
+
+  //历史详情(供应商)
+  @GetMapping("/analysisData/getHistoryDetails")
+  R getHistoryDetails(@RequestParam(value = "schoolId") String schoolId,
+                      @RequestParam(value = "iswarning") Integer iswarning,
+                      @RequestParam(value = "warningId") Integer warningId,
+                      @RequestHeader(SecurityConstants.FROM) String from);
+
+  //历史详情(人员)
+  @GetMapping("/analysisData/getHistoryMan")
+  R getHistoryMan(@RequestParam(value = "schoolId") String schoolId,
+                      @RequestParam(value = "iswarning") Integer iswarning,
+                      @RequestParam(value = "warningId") Integer warningId,
+                      @RequestHeader(SecurityConstants.FROM) String from);
+
+
+
+
+
 
 
 
@@ -167,35 +197,36 @@ public interface RemoteStatisticsService {
 
   //全部预警
   @GetMapping("/analysisData/getWarnings")
-  R getWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
+  R getWarnings(@RequestParam(value = "dealWith") String dealWith,
+                @RequestParam(value="WarningInfor")Integer WarningInfor,
                 @RequestParam(value="schoolName")String schoolName,
                 @RequestParam(value="startingTime")String startingTime,
                 @RequestParam(value="endTime")String endTime,
-                @RequestParam(value="year")String year,
+                @RequestParam(value="page")Integer page,
+                @RequestParam(value="size")Integer size,
                 @RequestParam(value="regionalLevel")String regionalLevel,
                 @RequestParam(value="areaCode")String areaCode,
                 @RequestParam(value = "Type") Integer Type,
                 @RequestHeader(SecurityConstants.FROM) String from);
-  //未接收预警
-  @GetMapping("/analysisData/getNotReceived")
-   R getNotReceived(@RequestParam(value="WarningInfor")Integer WarningInfor,
-                    @RequestParam(value="schoolName")String schoolName,
-                    @RequestParam(value="startingTime")String startingTime,
-                    @RequestParam(value="endTime")String endTime,
-                    @RequestParam(value="year")String year,
-                    @RequestParam(value="regionalLevel")String regionalLevel,
-                    @RequestParam(value="areaCode")String areaCode,
-                    @RequestParam(value = "Type") Integer Type,
-                    @RequestHeader(SecurityConstants.FROM) String from);
-  //已接收预警
-  @GetMapping("/analysisData/getReceivedWarnings")
-   R getReceivedWarnings(@RequestParam(value="WarningInfor")Integer WarningInfor,
-                         @RequestParam(value="schoolName")String schoolName,
-                         @RequestParam(value="startingTime")String startingTime,
-                         @RequestParam(value="endTime")String endTime,
-                         @RequestParam(value="year")String year,
-                         @RequestParam(value="regionalLevel")String regionalLevel,
-                         @RequestParam(value="areaCode")String areaCode,
-                         @RequestParam(value = "Type") Integer Type,
-                         @RequestHeader(SecurityConstants.FROM) String from);
+
+
+  //报警类型
+  @GetMapping("/analysisData/getAlarmType")
+  R getAlarmType(@RequestParam(value="year")String year,
+                   @RequestParam(value="regionalLevel")String regionalLevel,
+                   @RequestParam(value="areaCode")String areaCode,
+                   @RequestHeader(SecurityConstants.FROM) String from);
+
+  //全部报警
+  @GetMapping("/analysisData/getAlarms")
+  R getAlarms(@RequestParam(value="AlarmInfor")Integer AlarmInfor,
+                @RequestParam(value="schoolName")String schoolName,
+                @RequestParam(value="startingTime")String startingTime,
+                @RequestParam(value="endTime")String endTime,
+                @RequestParam(value="page")Integer page,
+                @RequestParam(value="size")Integer size,
+                @RequestParam(value="regionalLevel")String regionalLevel,
+                @RequestParam(value="areaCode")String areaCode,
+                @RequestParam(value = "Type") Integer Type,
+                @RequestHeader(SecurityConstants.FROM) String from);
 }
